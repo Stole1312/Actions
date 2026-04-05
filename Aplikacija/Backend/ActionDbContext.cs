@@ -21,5 +21,9 @@ namespace Backend.Data
         public DbSet<DeoAkcije> DeoAkcije{get;set;}
         public DbSet<SlikaSaAkcije> SlikeSaAkcije{get;set;}
         public DbSet<Comment> Comments{get;set;}
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<ChatParticipant> ChatParticipants { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
     }
 }

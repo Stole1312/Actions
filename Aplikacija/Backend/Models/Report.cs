@@ -9,10 +9,9 @@ namespace Backend.Models
         public int InitiatorID { get; set; }
         public int ReciverID { get; set; }
         public ReportReason Reason { get; set; }
-        public required string Description{get;set;}
+        public required string Description { get; set; }
         public DateTime Created { get; set; }
-        public UserRequestStatus Status{get;set;}
-        // Navigation properties
+        public UserRequestStatus Status { get; set; }
         public User Sender { get; set; }
         public User Reciver { get; set; }
     }
