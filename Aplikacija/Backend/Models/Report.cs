@@ -1,10 +1,12 @@
 using System;
 
-namespace App.Models
+namespace Backend.Models
 {
     public class Report
     {
-        public int SenderID { get; set; }
+        [Key]
+        public int ID{get;set;}
+        public int InitiatorID { get; set; }
         public int ReciverID { get; set; }
         public ReportReason Reason { get; set; }
         public required string Description{get;set;}

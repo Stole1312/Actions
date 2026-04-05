@@ -5,6 +5,7 @@ namespace Backend.Models
 {
     public class Friends
     {
+        [Key]
         public int InitiatorID {get;set;}
         public int ReceiverID {get;set;}
         public User Initiator{get;set;}

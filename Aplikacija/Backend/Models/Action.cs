@@ -11,7 +11,9 @@ namespace Backend.Models
         public required string Location{get;set;}
         public ActionTypes Type {get;set;}
         public DateTime DateAndTime{get;set;}
-        public User ProducerID {get;set;}
+        public int ProducerID{get;set;}
+        //Navigation property
+        public User Producer {get;set;}
         public int maxParticipants {get;set;}
         public decimal Price {get;set;}
         public ActionStatus Status{get;set;}
