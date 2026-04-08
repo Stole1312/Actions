@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Actions/Actions.csproj": {}
+    "C:\\Users\\milan\\Desktop\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Actions\\Actions.csproj": {}
   },
   "projects": {
-    "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Actions/Actions.csproj": {
+    "C:\\Users\\milan\\Desktop\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Actions\\Actions.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Actions/Actions.csproj",
+        "projectUniqueName": "C:\\Users\\milan\\Desktop\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Actions\\Actions.csproj",
         "projectName": "Actions",
-        "projectPath": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Actions/Actions.csproj",
-        "packagesPath": "/Users/vasilije/.nuget/packages/",
-        "outputPath": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Actions/obj/",
+        "projectPath": "C:\\Users\\milan\\Desktop\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Actions\\Actions.csproj",
+        "packagesPath": "C:\\Users\\milan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\milan\\Desktop\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Actions\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/vasilije/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\milan\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -60,6 +60,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -68,7 +86,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
