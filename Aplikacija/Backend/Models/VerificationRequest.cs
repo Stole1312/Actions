@@ -12,7 +12,7 @@ namespace Backend.Models
         public DateTime Created { get; set; }
         public UserRequestStatus Status{get;set;}
         // Navigation properties
-        public User Sender { get; set; }
-        public User Reviewer { get; set; }
+        public User Sender { get; set; } = null!;
+        public User Reviewer { get; set; } = null!;
     }
 }

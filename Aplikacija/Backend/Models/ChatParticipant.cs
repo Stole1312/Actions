@@ -11,7 +11,7 @@ namespace Backend.Models
         public bool IsAdmin { get; set; }
 
         //Navigation property
-        public User User { get; set; }
-        public Chat Chat { get; set; }
+        public User User { get; set; } = null!;
+        public Chat Chat { get; set; } = null!;
     }
 }

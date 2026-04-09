@@ -1,6 +1,6 @@
 public enum ActionStatus{
-    Upcoming=1,
-    Ongoing=2,
-    Over=3,
-    Cancled=4
+    Upcoming=0,
+    Ongoing=1,
+    Over=2,
+    Cancled=3
 }

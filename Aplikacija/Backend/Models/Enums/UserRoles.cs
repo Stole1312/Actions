@@ -1,7 +1,10 @@
-public enum UserRoles
+namespace Backend.Models.Enums
 {
-    User = 1,
-    Producer = 2,
-    Moderator = 3,
-    Admin = 4
+    public enum UserRoles
+    {
+        User = 0,
+        Producer = 1,
+        Moderator = 2,
+        Admin = 3
+    }
 }

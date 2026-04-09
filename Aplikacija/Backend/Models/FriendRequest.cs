@@ -11,7 +11,7 @@ namespace Backend.Models
         public UserRequestStatus Status { get; set; }
         public DateTime Created { get; set; }
         // Navigation properties
-        public User Initiator { get; set; }
-        public User Reciver { get; set; }
+        public User Initiator { get; set; } = null!;
+        public User Reciver { get; set; } = null!;
     }
 }

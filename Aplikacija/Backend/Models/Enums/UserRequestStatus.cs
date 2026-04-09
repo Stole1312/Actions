@@ -1,6 +1,9 @@
-public enum UserRequestStatus
+namespace Backend.Models.Enums
 {
-    Pending = 1,
-    Rejected =2,
-    Approved =3
+    public enum UserRequestStatus
+    {
+        Pending = 0,
+        Rejected =1,
+        Approved =2
+    }
 }

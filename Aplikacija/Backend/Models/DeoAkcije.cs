@@ -11,7 +11,7 @@ namespace Backend.Models
         public bool isOrganizator{get;set;}
         public bool deniedByOrganizator { get; set; }
         // Navigation properties
-        public User User { get; set; }
-        public Akcija Akcija { get; set; }
+        public User User { get; set; } = null!;
+        public Akcija Akcija { get; set; } = null!;
     }
 }

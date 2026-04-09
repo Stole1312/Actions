@@ -12,7 +12,7 @@ namespace Backend.Models
         public required string Description { get; set; }
         public DateTime Created { get; set; }
         public UserRequestStatus Status { get; set; }
-        public User Sender { get; set; }
-        public User Reciver { get; set; }
+        public User Sender { get; set; } = null!;
+        public User Reciver { get; set; } = null!;
     }
 }

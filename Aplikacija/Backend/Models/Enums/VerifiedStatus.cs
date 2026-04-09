@@ -1,7 +1,10 @@
-public enum VerifiedStatus
+namespace Backend.Models.Enums
 {
-    None = 1,
-    Pending = 2,
-    Verified = 3,
-    Rejected = 4
+    public enum VerifiedStatus
+    {
+        None = 0,
+        Pending = 1,
+        Verified = 2,
+        Rejected = 3
+    }
 }
