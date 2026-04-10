@@ -6,11 +6,11 @@ namespace Backend.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        public Backend.Models.ActionContext Context{get;set;}
-        
+        public Backend.Models.AppDBContext Context { get; set; }
+
         private readonly IConfiguration _configuration;
-        public UserController(Backend.Models.ActionContext context, IConfiguration configuration)
-        {   
+        public UserController(Backend.Models.AppDBContext context, IConfiguration configuration)
+        {
             Context = context;
             _configuration = configuration;
         }
@@ -30,23 +30,23 @@ namespace Backend.Controllers
                 if (string.IsNullOrWhiteSpace(usr.Password))
                     return BadRequest("User must have a password");
 
-                usr.Password=BCrypt.Net.BCrypt.HashPassword(usr.Password);
+                usr.Password = BCrypt.Net.BCrypt.HashPassword(usr.Password);
 
                 //Setujem default vrednosti ukoliko se posalje prazno polje medjutim za Role ne mora jer je enum
                 //a ako se nista ne posalje za enum on racuna pod 0 za default vrednost ondnosno User
                 usr.Bio = usr.Bio ?? "I <3 Actions";
                 usr.ProfilePicture = usr.ProfilePicture ?? "default-avatar.png";
-                usr.isBanned = false; 
+                usr.isBanned = false;
                 usr.VerificationStatus = VerifiedStatus.None;
 
                 var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == usr.Username);
 
-                if(user!=null)
+                if (user != null)
                     return BadRequest("Username is already taken");
 
                 await Context.Users.AddAsync(usr);
                 await Context.SaveChangesAsync();
-                
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, usr.ID.ToString()),
@@ -57,8 +57,9 @@ namespace Backend.Controllers
                 var token = GenerateJwtToken(claims);
 
                 //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
-                return Ok(new{
-                    message= $"User {usr.Username} with ID: {usr.ID} has been added.",
+                return Ok(new
+                {
+                    message = $"User {usr.Username} with ID: {usr.ID} has been added.",
                     userViewModel = MapUserToViewModel(usr),
                     Token = token
                 });
@@ -69,13 +70,13 @@ namespace Backend.Controllers
             }
         }
         [HttpDelete("DeleteUser")]
-        public async Task<ActionResult> DeleteUser([FromBody]int id)
+        public async Task<ActionResult> DeleteUser([FromBody] int id)
         {
             try
             {
                 var usr = await Context.Users.FindAsync(id);
 
-                if(usr==null)
+                if (usr == null)
                     return BadRequest($"There is no user with ID: {id}");
 
                 Context.Users.Remove(usr);
@@ -83,7 +84,7 @@ namespace Backend.Controllers
 
                 return Ok($"User with ID: {id} has been deleted");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
@@ -107,7 +108,8 @@ namespace Backend.Controllers
 
                 await Context.SaveChangesAsync();
 
-                return Ok(new {
+                return Ok(new
+                {
                     message = $"User with ID: {userInDB.ID} have been edited",
                     userViewModel = MapUserToViewModel(userInDB)
                 });
@@ -126,22 +128,22 @@ namespace Backend.Controllers
         */
 
         //Omogucava korisniku User i Producer da postave request
-        [Authorize(Roles="User, Producer")]
+        [Authorize(Roles = "User, Producer")]
         [HttpPost("SubmitvVerificationRequest/{id}")]
-        public async Task<ActionResult> SubmitVerificationRequest(int id,[FromBody] VerificationRequest request)
+        public async Task<ActionResult> SubmitVerificationRequest(int id, [FromBody] VerificationRequest request)
         {
             try
             {
                 request.Created = DateTime.Now;
                 request.Status = UserRequestStatus.Pending;
                 request.InitiatorID = id;
-        
+
                 Context.VerificationRequests.Add(request);
                 await Context.SaveChangesAsync();
-        
+
                 return Ok("Request has been forwarded to administration");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
@@ -166,16 +168,16 @@ namespace Backend.Controllers
         public async Task<ActionResult> ReviewVerification(int id, [FromQuery] UserRequestStatus newStatus, [FromQuery] int moderatorId)
         {
             var request = await Context.VerificationRequests.FindAsync(id);
-            if (request == null) 
+            if (request == null)
                 return NotFound();
 
             request.Status = newStatus;
-            request.ReviewerID = moderatorId; 
+            request.ReviewerID = moderatorId;
 
             if (newStatus == UserRequestStatus.Approved)
-            {                
+            {
                 var user = await Context.Users.FindAsync(request.InitiatorID);
-                if (user != null) 
+                if (user != null)
                     user.VerificationStatus = VerifiedStatus.Verified;
             }
 
@@ -188,12 +190,12 @@ namespace Backend.Controllers
         {
             var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == userData.Username);
 
-            if (user == null) 
+            if (user == null)
                 return Unauthorized("Wrong username");
 
-            bool correctPassword = BCrypt.Net.BCrypt.Verify(userData.Password,user.Password);
+            bool correctPassword = BCrypt.Net.BCrypt.Verify(userData.Password, user.Password);
 
-            if(!correctPassword)
+            if (!correctPassword)
                 return Unauthorized("Wrong password");
 
             var claims = new List<Claim>
@@ -206,18 +208,18 @@ namespace Backend.Controllers
             var token = GenerateJwtToken(claims);
 
             //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
-            return Ok(new { Token = token, userViewModel = MapUserToViewModel(user)});
+            return Ok(new { Token = token, userViewModel = MapUserToViewModel(user) });
         }
 
         //Moderatori ce da imaju negde input i dugme vezano za njega i tu ce moci
         //da unesu Username i da kliknu dugme i dobice alert You have added a moderator
-        [Authorize(Roles ="Moderator,Admin")]
+        [Authorize(Roles = "Moderator,Admin")]
         [HttpPut("AddModerator")]
-        public async Task<ActionResult> AddModerator([FromBody]string username)
+        public async Task<ActionResult> AddModerator([FromBody] string username)
         {
             var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
-            if(user==null)
+            if (user == null)
                 return BadRequest($"There is no user with username: {username}");
 
             user.Role = UserRoles.Moderator;
@@ -227,13 +229,13 @@ namespace Backend.Controllers
             return Ok($"You have given ${username} Moderator access");
         }
 
-        [Authorize(Roles ="Moderator,Admin")]
+        [Authorize(Roles = "Moderator,Admin")]
         [HttpPut("BanUser")]
-        public async Task<ActionResult> BanUser([FromBody]string username)
+        public async Task<ActionResult> BanUser([FromBody] string username)
         {
             var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
-            if(user==null)
+            if (user == null)
                 return BadRequest($"There is no user with username: {username}");
 
             user.isBanned = true;
@@ -245,7 +247,8 @@ namespace Backend.Controllers
 
         private UserViewModel MapUserToViewModel(User u)
         {
-            return new UserViewModel {
+            return new UserViewModel
+            {
                 ID = u.ID,
                 Username = u.Username,
                 Email = u.Email,
@@ -254,7 +257,7 @@ namespace Backend.Controllers
                 VerificationStatus = u.VerificationStatus,
                 ProfilePicture = u.ProfilePicture
             };
-        } 
+        }
 
         private string GenerateJwtToken(List<Claim> claims)
         {

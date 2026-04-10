@@ -4,8 +4,8 @@ namespace Backend.Controllers
     [Route("[controller]")]
     public class ActionController : ControllerBase
     {
-        public Backend.Models.ActionContext Context{get;set;}
-        public ActionController(Backend.Models.ActionContext context)
+        public Backend.Models.AppDBContext Context { get; set; }
+        public ActionController(Backend.Models.AppDBContext context)
         {
             Context = context;
         }
@@ -33,13 +33,13 @@ namespace Backend.Controllers
             }
         }
         [HttpDelete("DeleteAkcija")]
-        public async Task<ActionResult> DeleteAction([FromBody]int id)
+        public async Task<ActionResult> DeleteAction([FromBody] int id)
         {
             try
             {
                 var akcija = await Context.Akcije.FindAsync(id);
 
-                if(akcija==null)
+                if (akcija == null)
                     return BadRequest($"There is no Akcija with ID: {id}");
 
                 Context.Akcije.Remove(akcija);
@@ -47,7 +47,7 @@ namespace Backend.Controllers
 
                 return Ok($"Akcija with ID: {id} has been deleted");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
