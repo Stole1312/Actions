@@ -1,25 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Backend.csproj": {}
+    "C:\\Pavle\\FAKS\\6. Semestar\\Softversko Inzinjerstvo\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Backend.csproj": {}
   },
   "projects": {
-    "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Backend.csproj": {
+    "C:\\Pavle\\FAKS\\6. Semestar\\Softversko Inzinjerstvo\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Backend.csproj",
+        "projectUniqueName": "C:\\Pavle\\FAKS\\6. Semestar\\Softversko Inzinjerstvo\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Backend.csproj",
         "projectName": "Backend",
-        "projectPath": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/Backend.csproj",
-        "packagesPath": "/Users/vasilije/.nuget/packages/",
-        "outputPath": "/Users/vasilije/Desktop/Elfak/6.Semestar/Actions/si.26.78.act/Aplikacija/Backend/obj/",
+        "projectPath": "C:\\Pavle\\FAKS\\6. Semestar\\Softversko Inzinjerstvo\\Actions\\si.26.78.act\\Aplikacija\\Backend\\Backend.csproj",
+        "packagesPath": "C:\\Users\\pavle\\.nuget\\packages\\",
+        "outputPath": "C:\\Pavle\\FAKS\\6. Semestar\\Softversko Inzinjerstvo\\Actions\\si.26.78.act\\Aplikacija\\Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/vasilije/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\pavle\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -38,7 +40,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -89,15 +91,19 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.20, 8.0.20]"
+              "version": "[8.0.25, 8.0.25]"
             },
             {
-              "name": "Microsoft.NETCore.App.Host.osx-arm64",
-              "version": "[8.0.20, 8.0.20]"
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.25, 8.0.25]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.20, 8.0.20]"
+              "version": "[8.0.25, 8.0.25]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.25, 8.0.25]"
             }
           ],
           "frameworkReferences": {
@@ -108,7 +114,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

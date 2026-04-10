@@ -49,9 +49,9 @@ namespace Backend.Controllers
                 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, usr.ID.ToString()),
+                    new Claim(ClaimTypes.Name, usr.Username),
+                    new Claim(ClaimTypes.Role, usr.Role.ToString())
                 };
 
                 var token = GenerateJwtToken(claims);

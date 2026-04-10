@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aplikacija", "Aplikacija", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{A18983BF-A0D6-5E4A-1D61-30987B8D3169}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actions", "Aplikacija\Backend\Actions\Actions.csproj", "{E01CB4F9-4BAE-8D24-D180-6A4EC84E89AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Actions", "Aplikacija\Backend\Backend.csproj", "{E01CB4F9-4BAE-8D24-D180-6A4EC84E89AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
