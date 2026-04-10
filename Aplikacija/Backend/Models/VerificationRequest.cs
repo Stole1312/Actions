@@ -8,7 +8,7 @@ namespace Backend.Models
         public int ID{get;set;}
         public int InitiatorID { get; set; }
         public int ReviewerID { get; set; }
-        public string Document{get;set;}
+        public required string Document{get;set;}
         public DateTime Created { get; set; }
         public UserRequestStatus Status{get;set;}
         // Navigation properties

@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+
 namespace Backend.Controllers
 {
     [ApiController]
@@ -9,8 +11,8 @@ namespace Backend.Controllers
         private readonly IConfiguration _configuration;
         public UserController(Backend.Models.ActionContext context, IConfiguration configuration)
         {   
-        Context = context;
-        _configuration = configuration;
+            Context = context;
+            _configuration = configuration;
         }
 
         //ce da se koristi i za regiset
@@ -44,10 +46,21 @@ namespace Backend.Controllers
 
                 await Context.Users.AddAsync(usr);
                 await Context.SaveChangesAsync();
+                
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                };
 
+                var token = GenerateJwtToken(claims);
+
+                //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
                 return Ok(new{
                     message= $"User {usr.Username} with ID: {usr.ID} has been added.",
-                    userViewModel = MapUserToViewModel(usr)
+                    userViewModel = MapUserToViewModel(usr),
+                    Token = token
                 });
             }
             catch (Exception e)
@@ -109,19 +122,19 @@ namespace Backend.Controllers
             Ideja za proces verifikacije:
                 Korisnik klikne dugme da se verifikuje i posalje dokument da potvrdi verifikaciju
                 Moderatori i Admini imaju sekciju na sajtu Requests u kojoj mogu da vide sve trenutno
-                otvorene Requestove. Na klik im se otvara request i renderuju dva dugmeta (Accept/Decile)
-
+                otvorene Requestove. Na klik im se otvara request i renderuju dva dugmeta (Accept/Decile) i Dokumnet
         */
 
         //Omogucava korisniku User i Producer da postave request
         [Authorize(Roles="User, Producer")]
-        [HttpPost("SubmitvVerificationRequest")]
-        public async Task<ActionResult> SubmitVerificationRequest([FromBody] VerificationRequest request)
+        [HttpPost("SubmitvVerificationRequest/{id}")]
+        public async Task<ActionResult> SubmitVerificationRequest(int id,[FromBody] VerificationRequest request)
         {
             try
             {
                 request.Created = DateTime.Now;
                 request.Status = UserRequestStatus.Pending;
+                request.InitiatorID = id;
         
                 Context.VerificationRequests.Add(request);
                 await Context.SaveChangesAsync();
