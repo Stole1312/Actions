@@ -1,11 +1,21 @@
+<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
+=======
+using Backend.Models;
+>>>>>>> dev
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+<<<<<<< HEAD
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+=======
+builder.Services.AddDbContext<Backend.Models.AppDBContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+>>>>>>> dev
 
 builder.Services.AddCors(options =>
 {
