@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Claims;
 
@@ -15,6 +16,16 @@ public class CommunicationController : ControllerBase
         Context = context;
     }
 
+    //Funkcija za proveravanje validnosti tokena - Izvlacenje ID trenutno ulogovanog korisnika
+    private int GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if(string.IsNullOrEmpty(userIdClaim))
+            throw new Exception("User ID not found in token!");
+        
+        return int.Parse(userIdClaim);
+    }
+
     [Authorize]
     [HttpPost("OpenPrivateChat")]
     public async Task<ActionResult> OpenPrivateChat([FromBody] OpenPrivateChatDTO opcDTO)
@@ -22,10 +33,7 @@ public class CommunicationController : ControllerBase
         try
         {
             //Izvlaci iz tokena ID trenutno ulogovanog korisnika
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(string.IsNullOrEmpty(userIdClaim))
-                return BadRequest("User ID not found in token!");
-            int currentUserId = int.Parse(userIdClaim);
+            int currentUserId = GetCurrentUserId();
 
             //Proverava da li je i drugi korisnik validan
             if(opcDTO.otherUserId <= 0)
@@ -35,9 +43,14 @@ public class CommunicationController : ControllerBase
             if(currentUserId == opcDTO.otherUserId)
                 return BadRequest("You can not open private chat with yourself!");
 
+            //Provera da li trenutni korisnik postoji - Koristim ga samo za ime chata NIJE IDEALNO TREBA SE UNAPREDI!
+            var currentUser = await Context.Users.FindAsync(currentUserId);
+            if (currentUser == null)
+                return BadRequest("Current user not found!");
+
             //Provera da li drugi korisnik postoji
-            var otherUserId = await Context.Users.FindAsync(opcDTO.otherUserId);
-            if(otherUserId == null)
+            var otherUser = await Context.Users.FindAsync(opcDTO.otherUserId);
+            if(otherUser == null)
                 return BadRequest("User does not exist!");
 
             //Trazi postojeci chat
@@ -64,7 +77,7 @@ public class CommunicationController : ControllerBase
             //Pravljenje novog chata
             var newChat = new Chat
             {
-                Name = $"{otherUserId.Username}",
+                Name = $"{currentUser.Username}-{otherUser.Username}",
                 Type = ChatType.Private
             };
 
@@ -107,10 +120,7 @@ public class CommunicationController : ControllerBase
         try
         {
             //Izvlaci iz tokena ID trenutno ulogovanog korisnika
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(string.IsNullOrEmpty(userIdClaim))
-                return BadRequest("User ID not found in token!");
-            int currentUserId = int.Parse(userIdClaim);
+            int currentUserId = GetCurrentUserId();
 
             //Proverava validnost akcije
             if(akcijaId <= 0)
@@ -126,7 +136,7 @@ public class CommunicationController : ControllerBase
 
             //Zabrana da se napravi chat sam sa sobom
             if(currentUserId == producerId)
-                return BadRequest("You can not open private chat with yourself!");
+                return BadRequest("You can not open action chat with yourself!");
 
             //Provera da li producer postoji
             var producer = await Context.Users.FindAsync(producerId);
@@ -188,6 +198,212 @@ public class CommunicationController : ControllerBase
             });
         }
         catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("GetChatById/{chatId}")]
+    public async Task<ActionResult> GetChatById(int chatId)
+    {
+        try
+        {
+            //Izvlaci iz tokena ID trenutno ulogovanog korisnika
+            int currentUserId = GetCurrentUserId();
+
+            //Provera validnosti chat-a
+            if(chatId <= 0 )
+                return BadRequest("Chat ID is not valid");
+
+            //Pronadji chat sa ucesnicima i porukama
+            var chat = await Context.Chats
+                .Include(c => c.Participants)
+                .Include(c => c.Messages)
+                .FirstOrDefaultAsync(c => c.ID == chatId);
+
+            if(chat == null)
+                return BadRequest("Chat does not exist!");
+
+            //Provera da li je korisnik ucesnik tog chata
+            bool isParticipant = chat.Participants.Any(p => p.UserID == currentUserId);
+            if (!isParticipant)
+                return BadRequest("You are not participant of this chat!");
+
+            return Ok(new
+            {
+                chat.ID,
+                chat.Name,
+                chat.Type,
+                chat.AkcijaID,
+                isParticipants = chat.Participants.Select(p => new
+                {
+                    p.ID,
+                    p.UserID,
+                    p.IsAdmin
+                }),
+                Messages = chat.Messages.Select(m => new
+                {
+                    m.ID,
+                    m.Content,
+                    m.SenderID,
+                    m.ChatID
+                })
+            });
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("GetMyChats")]
+    public async Task<ActionResult> GetMyChats()
+    {
+        try
+        {
+            //Izvlaci iz tokena ID trenutno ulogovanog korisnika
+            int currentUserId = GetCurrentUserId();
+
+            //Pronalazi sve chatove
+            var chats = await Context.ChatParticipants
+                .Where(cp => cp.UserID == currentUserId)
+                .Select(cp => cp.Chat)
+                .ToListAsync();
+
+            return Ok(chats);
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpPost("SendMessage")]
+    public async Task<ActionResult> SendMessage([FromBody] SendMessageDTO smDTO)
+    {
+        try
+        {
+            //Izvlaci iz tokena ID trenutno ulogovanog korisnika
+            int currentUserId = GetCurrentUserId();
+
+            //Provera validnosti chata
+            if(smDTO.ChatID <= 0)
+                return BadRequest("Chat ID is not valid!");
+
+            //Provera postojanja sadrzaja poruke
+            if(string.IsNullOrWhiteSpace(smDTO.Content))
+                return BadRequest("Message can not be empty!");
+
+            var chat = await Context.Chats.FindAsync(smDTO.ChatID);
+            if(chat == null)
+                return BadRequest("Chat does not exist");
+
+            //Provera da li se korisnik nalazi u chatu
+            bool isParticipant = await Context.ChatParticipants
+                .AnyAsync(cp => cp.ChatID == smDTO.ChatID && cp.UserID == currentUserId);
+
+            if (!isParticipant)
+                return BadRequest("You are not participant of this chat!");
+
+            var newMessage = new Message
+            {
+                ChatID = smDTO.ChatID,
+                SenderID = currentUserId,
+                Content = smDTO.Content,
+                Sent = DateTime.UtcNow 
+            };
+
+            await Context.Messages.AddAsync(newMessage);
+            await Context.SaveChangesAsync();
+
+            return Ok(new
+            {
+               Message = "Message sent successfully!",
+               MessageId = newMessage.ID
+            });
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("DeleteChat/{chatId}")]
+    public async Task<ActionResult> DeleteChat(int chatId)
+    {
+        try
+        {
+            //Izvlaci iz tokena ID trenutno ulogovanog korisnika
+            int currentUserId = GetCurrentUserId();
+
+            //Proverava validnost chata
+            if (chatId <= 0)
+                return BadRequest("Chat ID not valid!");
+
+            //Provera da li se korisnik nalazi u chatu
+            bool isParticipant = await Context.ChatParticipants
+                .AnyAsync(cp => cp.ChatID == chatId && cp.UserID == currentUserId);
+
+            if (!isParticipant)
+                return BadRequest("You are not participant of this chat!");
+
+            //Pronalazi zadati chat, ucesnike i poruke u tom chatu
+            var chat = await Context.Chats.FindAsync(chatId);
+            if(chat == null)
+                return BadRequest("Chat does not exist");
+
+            var participants = await Context.ChatParticipants
+                .Where(cp => cp.ChatID == chatId)
+                .ToListAsync();
+
+            var messages = await Context.Messages
+                .Where(m => m.ChatID == chatId)
+                .ToListAsync();
+
+            Context.ChatParticipants.RemoveRange(participants);
+            Context.Messages.RemoveRange(messages);
+            Context.Chats.Remove(chat);
+            await Context.SaveChangesAsync();
+
+            return Ok("Chat deleted successfully!");
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("DeleteMessage/{messageId}")]
+    public async Task<ActionResult> DeleteMessage(int messageId)
+    {
+        try
+        {
+            //Izvlaci iz tokena ID trenutno ulogovanog korisnika
+            int currentUserId = GetCurrentUserId();
+
+            //Proverava validnost poruke
+            if (messageId <= 0)
+                return BadRequest("Message ID not valid!");
+
+            var message = await Context.Messages.FindAsync(messageId);
+            if(message == null)
+                return BadRequest("Message does not exist!");
+
+            //Dozvola za brisanje samo sopstvene poruke
+            if (message.SenderID != currentUserId)
+                return BadRequest("You can delete only your own message!");
+
+            Context.Messages.Remove(message);
+            await Context.SaveChangesAsync();
+
+            return Ok("Message deleted successfully!");
+        }
+        catch(Exception e)
         {
             return BadRequest(e.Message);
         }
