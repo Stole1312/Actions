@@ -293,7 +293,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("AkcijaID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID", "ActionID")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });
