@@ -81,15 +81,12 @@ namespace Backend.Migrations
                     b.Property<bool>("AdminTextOnly")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("AkcijaID")
-                        .HasColumnType("integer");
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
@@ -227,21 +224,14 @@ namespace Backend.Migrations
                     b.Property<int>("ReceiverID")
                         .HasColumnType("integer");
 
-<<<<<<< HEAD
-=======
                     b.Property<int>("ReciverID")
                         .HasColumnType("integer");
 
->>>>>>> dev
                     b.HasKey("ID");
 
                     b.HasIndex("InitiatorID");
 
-<<<<<<< HEAD
-                    b.HasIndex("ReceiverID");
-=======
                     b.HasIndex("ReciverID");
->>>>>>> dev
 
                     b.ToTable("Friends");
                 });
@@ -554,25 +544,15 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-<<<<<<< HEAD
-                    b.HasOne("Backend.Models.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverID")
-=======
                     b.HasOne("Backend.Models.User", "Reciver")
                         .WithMany()
                         .HasForeignKey("ReciverID")
->>>>>>> dev
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Initiator");
 
-<<<<<<< HEAD
-                    b.Navigation("Receiver");
-=======
                     b.Navigation("Reciver");
->>>>>>> dev
                 });
 
             modelBuilder.Entity("Backend.Models.Message", b =>
