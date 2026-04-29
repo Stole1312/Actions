@@ -17,11 +17,13 @@ builder.Services.AddCors(options =>
               .WithOrigins("http://localhost:5500",
                            "https://localhost:5500",
                            "http://127.0.0.1:5500",
-                           "https://127.0.0.1:5500");
+                           "https://127.0.0.1:5500")
+              .AllowCredentials(); //Ne znam koj kurac
     });
 });
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -64,6 +66,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false
         };
+        //Parsuje token za signalR da odgovara headeru
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/chatHub"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var app = builder.Build();
@@ -84,5 +103,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

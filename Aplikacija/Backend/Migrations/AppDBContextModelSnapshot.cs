@@ -30,6 +30,9 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("double precision");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -48,6 +51,9 @@ namespace Backend.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<int>("ProducerID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RatingCount")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -283,8 +289,8 @@ namespace Backend.Migrations
                     b.Property<int>("AkcijaID")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Rate")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Rate")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserID")
                         .HasColumnType("integer");
@@ -293,7 +299,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("AkcijaID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID", "ActionID")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });

@@ -11,9 +11,11 @@ namespace Backend.Controllers;
 public class CommunicationController : ControllerBase
 {
     public Backend.Models.AppDBContext Context { get; set; }
-    public CommunicationController(Backend.Models.AppDBContext context)
+    private readonly IHubContext<ChatHub> _hubContext;
+    public CommunicationController(Backend.Models.AppDBContext context, IHubContext<ChatHub> hubContext)
     {
         Context = context;
+        _hubContext = hubContext;
     }
 
     //Funkcija za proveravanje validnosti tokena - Izvlacenje ID trenutno ulogovanog korisnika
@@ -98,6 +100,8 @@ public class CommunicationController : ControllerBase
             };
 
             await Context.ChatParticipants.AddAsync(participant1);
+            //TEST ZA POOLER (VISAK ZA NORMALNE USLOVE)
+            await Context.SaveChangesAsync();
             await Context.ChatParticipants.AddAsync(participant2);
             await Context.SaveChangesAsync();
 
@@ -188,6 +192,8 @@ public class CommunicationController : ControllerBase
             };
 
             await Context.ChatParticipants.AddAsync(participant1);
+            //TEST ZA POOLER (VISAK ZA NORMALNE USLOVE)
+            await Context.SaveChangesAsync();
             await Context.ChatParticipants.AddAsync(participant2);
             await Context.SaveChangesAsync();
 
@@ -228,7 +234,7 @@ public class CommunicationController : ControllerBase
             //Provera da li je korisnik ucesnik tog chata
             bool isParticipant = chat.Participants.Any(p => p.UserID == currentUserId);
             if (!isParticipant)
-                return BadRequest("You are not participant of this chat!");
+                return StatusCode(403, "You are not participant of this chat!");
 
             return Ok(new
             {
@@ -236,18 +242,21 @@ public class CommunicationController : ControllerBase
                 chat.Name,
                 chat.Type,
                 chat.AkcijaID,
-                isParticipants = chat.Participants.Select(p => new
+                Participants = chat.Participants.Select(p => new
                 {
                     p.ID,
                     p.UserID,
                     p.IsAdmin
                 }),
-                Messages = chat.Messages.Select(m => new
+                Messages = chat.Messages
+                .OrderBy(m => m.Sent)
+                .Select(m => new
                 {
                     m.ID,
                     m.Content,
                     m.SenderID,
-                    m.ChatID
+                    m.ChatID,
+                    m.Sent
                 })
             });
         }
@@ -306,7 +315,7 @@ public class CommunicationController : ControllerBase
                 .AnyAsync(cp => cp.ChatID == smDTO.ChatID && cp.UserID == currentUserId);
 
             if (!isParticipant)
-                return BadRequest("You are not participant of this chat!");
+                return StatusCode(403, "You are not participant of this chat!");
 
             var newMessage = new Message
             {
@@ -318,6 +327,18 @@ public class CommunicationController : ControllerBase
 
             await Context.Messages.AddAsync(newMessage);
             await Context.SaveChangesAsync();
+
+            //Salje poruku u realtime-u svim korisnicima koj su u tom chat-u
+            await _hubContext.Clients
+                .Group($"chat-{smDTO.ChatID}")
+                .SendAsync("ReceiveMessage", new //Event koji se salje frontendu
+                {
+                    newMessage.ID,
+                    newMessage.ChatID,
+                    newMessage.SenderID,
+                    newMessage.Content,
+                    newMessage.Sent
+                });
 
             return Ok(new
             {
@@ -344,28 +365,26 @@ public class CommunicationController : ControllerBase
             if (chatId <= 0)
                 return BadRequest("Chat ID not valid!");
 
-            //Provera da li se korisnik nalazi u chatu
-            bool isParticipant = await Context.ChatParticipants
-                .AnyAsync(cp => cp.ChatID == chatId && cp.UserID == currentUserId);
-
-            if (!isParticipant)
-                return BadRequest("You are not participant of this chat!");
-
             //Pronalazi zadati chat, ucesnike i poruke u tom chatu
-            var chat = await Context.Chats.FindAsync(chatId);
-            if(chat == null)
-                return BadRequest("Chat does not exist");
+            var chat = await Context.Chats
+                .Include(c => c.Participants)
+                .Include(c => c.Messages)
+                .FirstOrDefaultAsync(c => c.ID == chatId);
 
-            var participants = await Context.ChatParticipants
-                .Where(cp => cp.ChatID == chatId)
-                .ToListAsync();
+            if (chat == null)
+                return NotFound("Chat does not exist!");
 
-            var messages = await Context.Messages
-                .Where(m => m.ChatID == chatId)
-                .ToListAsync();
+            var currentParticipant = chat.Participants
+                .FirstOrDefault(p => p.UserID == currentUserId);
 
-            Context.ChatParticipants.RemoveRange(participants);
-            Context.Messages.RemoveRange(messages);
+            if (currentParticipant == null)
+                return StatusCode(403, "You are not a participant of this chat!");
+
+            if (!currentParticipant.IsAdmin)
+                return StatusCode(403, "Only admin can delete this chat!");
+
+            Context.ChatParticipants.RemoveRange(chat.Participants);
+            Context.Messages.RemoveRange(chat.Messages);
             Context.Chats.Remove(chat);
             await Context.SaveChangesAsync();
 
