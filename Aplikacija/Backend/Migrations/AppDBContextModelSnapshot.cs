@@ -47,7 +47,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int>("ProducerID")
@@ -66,7 +66,10 @@ namespace Backend.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.Property<int>("maxParticipants")
+                    b.Property<int?>("currentNumParticipants")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("maxParticipants")
                         .HasColumnType("integer");
 
                     b.HasKey("ID");
@@ -441,7 +444,7 @@ namespace Backend.Migrations
                     b.Property<int>("InitiatorID")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ReviewerID")
+                    b.Property<int?>("ReviewerID")
                         .HasColumnType("integer");
 
                     b.Property<int>("SenderID")
@@ -645,9 +648,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.User", "Reviewer")
                         .WithMany()
-                        .HasForeignKey("ReviewerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReviewerID");
 
                     b.HasOne("Backend.Models.User", "Sender")
                         .WithMany()
