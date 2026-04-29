@@ -12,6 +12,7 @@ namespace Backend.Models
         public UserRoles Role {get;set;}
         public string? Bio{get;set;}
         public VerifiedStatus VerificationStatus {get;set;}
+        [DefaultValue(false)]
         public bool isBanned {get;set;}=false;
         public DateTime Created {get;set;}=DateTime.UtcNow;
         public string? ProfilePicture {get;set;}
