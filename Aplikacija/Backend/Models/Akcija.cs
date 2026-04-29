@@ -18,6 +18,8 @@ namespace Backend.Models
         public decimal Price {get;set;}
         public ActionStatus Status{get;set;}
         public DateTime Created {get;set;}
+        public double AverageRating { get; set; }
+        public int RatingCount { get; set; }
     }
 }
 
