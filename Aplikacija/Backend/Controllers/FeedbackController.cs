@@ -171,7 +171,7 @@ public class FeedbackController : ControllerBase
             //Ako je korisnik vec ocenio akciju, moze samo da promeni postojecu
             var existingRating = await Context.Ratings
                 .FirstOrDefaultAsync(r =>
-                    r.ActionID == akcijaId &&
+                    r.AkcijaID == akcijaId &&
                     r.UserID == currentUserId
                 );
             //Promena postojeceg rejtinga
@@ -189,7 +189,7 @@ public class FeedbackController : ControllerBase
                 var rating = new Rating
                 {
                     UserID = currentUserId,
-                    ActionID = akcijaId,
+                    AkcijaID = akcijaId,
                     Rate = arDTO.Rate
                 };
                 await Context.Ratings.AddAsync(rating);
@@ -252,7 +252,7 @@ public class FeedbackController : ControllerBase
             if (!isAdmin && !isRatingOwner)
                 return BadRequest("You can delete only your own rating!");
 
-            var akcija = await Context.Akcije.FindAsync(rating.ActionID);
+            var akcija = await Context.Akcije.FindAsync(rating.AkcijaID);
             if (akcija == null)
                 return BadRequest("Action does not exist!");
             
