@@ -171,7 +171,7 @@ public class FeedbackController : ControllerBase
             //Ako je korisnik vec ocenio akciju, moze samo da promeni postojecu
             var existingRating = await Context.Ratings
                 .FirstOrDefaultAsync(r =>
-                    r.ActionID == akcijaId &&
+                    r.AkcijaID == akcijaId &&
                     r.UserID == currentUserId
                 );
             //Promena postojeceg rejtinga
@@ -189,7 +189,7 @@ public class FeedbackController : ControllerBase
                 var rating = new Rating
                 {
                     UserID = currentUserId,
-                    ActionID = akcijaId,
+                    AkcijaID = akcijaId,
                     Rate = arDTO.Rate
                 };
                 await Context.Ratings.AddAsync(rating);
@@ -252,7 +252,7 @@ public class FeedbackController : ControllerBase
             if (!isAdmin && !isRatingOwner)
                 return BadRequest("You can delete only your own rating!");
 
-            var akcija = await Context.Akcije.FindAsync(rating.ActionID);
+            var akcija = await Context.Akcije.FindAsync(rating.AkcijaID);
             if (akcija == null)
                 return BadRequest("Action does not exist!");
             
@@ -350,6 +350,61 @@ public class FeedbackController : ControllerBase
                 .ToListAsync();
 
                 return Ok(reports);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("ChangeReportStatus/{reportId}")]
+    public async Task<ActionResult> ChangeReportStatus(int reportId, [FromBody] UserRequestStatus status)
+    {
+        try
+        {
+            var report = await Context.Reports.FindAsync(reportId);
+            if(report == null)
+                return BadRequest("Report does not exist!");
+
+            report.Status = status;
+
+            await Context.SaveChangesAsync();
+
+            return Ok("Report status updated successfully!");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("DeleteReport/{reportId}")]
+    public async Task<ActionResult> DeleteReport(int reportId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var report = await Context.Reports.FindAsync(reportId);
+            if(report == null)
+                return BadRequest("Report does not exist!");
+
+            var currentUser = await Context.Users.FindAsync(currentUserId);
+            if(currentUser == null)
+                return BadRequest("Current user does not exist!");
+
+            //Samo admin i vlasnik svog reporta mogu obrisati report
+            bool isAdmin = currentUser.Role == UserRoles.Admin;
+            bool isReportOwner = report.InitiatorID == currentUserId;
+            if(!isAdmin && !isReportOwner)
+                return BadRequest("You can delete only your report!");
+
+            Context.Reports.Remove(report);
+            await Context.SaveChangesAsync();
+
+            return Ok("Report deleted successfully!");
         }
         catch (Exception e)
         {

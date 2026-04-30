@@ -286,9 +286,6 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("ActionID")
-                        .HasColumnType("integer");
-
                     b.Property<int>("AkcijaID")
                         .HasColumnType("integer");
 
@@ -302,7 +299,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("AkcijaID");
 
-                    b.HasIndex("UserID", "ActionID")
+                    b.HasIndex("UserID", "AkcijaID")
                         .IsUnique();
 
                     b.ToTable("Ratings");
