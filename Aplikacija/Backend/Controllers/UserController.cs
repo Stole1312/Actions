@@ -1,4 +1,6 @@
 using System.Net.Sockets;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Backend.Controllers
 {
@@ -105,6 +107,7 @@ namespace Backend.Controllers
                 userInDB.Role = editedUser.Role;
                 userInDB.VerificationStatus = editedUser.VerificationStatus;
                 userInDB.ProfilePicture = editedUser.ProfilePicture;
+                userInDB.Bio=editedUser.Bio;
 
                 await Context.SaveChangesAsync();
 
@@ -130,13 +133,18 @@ namespace Backend.Controllers
         //Omogucava korisniku User i Producer da postave request
         [Authorize(Roles = "User, Producer")]
         [HttpPost("SubmitvVerificationRequest/{id}")]
-        public async Task<ActionResult> SubmitVerificationRequest(int id, [FromBody] VerificationRequest request)
+        public async Task<ActionResult> SubmitVerificationRequest(int id, [FromBody] string document)
         {
             try
             {
-                request.Created = DateTime.Now;
-                request.Status = UserRequestStatus.Pending;
-                request.InitiatorID = id;
+                var request = new VerificationRequest
+                {
+                    Created = DateTime.UtcNow,
+                    Status = UserRequestStatus.Pending,
+                    InitiatorID = id,
+                    Document=document,
+                    Sender = await Context.Users.FindAsync(id)
+                };
 
                 Context.VerificationRequests.Add(request);
                 await Context.SaveChangesAsync();
@@ -173,6 +181,7 @@ namespace Backend.Controllers
 
             request.Status = newStatus;
             request.ReviewerID = moderatorId;
+            request.Reviewer = await Context.Users.FindAsync(moderatorId);
 
             if (newStatus == UserRequestStatus.Approved)
             {
@@ -226,7 +235,7 @@ namespace Backend.Controllers
 
             await Context.SaveChangesAsync();
 
-            return Ok($"You have given ${username} Moderator access");
+            return Ok($"You have given {username} Moderator access");
         }
 
         [Authorize(Roles = "Moderator,Admin")]
@@ -242,7 +251,7 @@ namespace Backend.Controllers
 
             await Context.SaveChangesAsync();
 
-            return Ok($"You banned ${username}");
+            return Ok($"You banned {username}");
         }
 
         private UserViewModel MapUserToViewModel(User u)

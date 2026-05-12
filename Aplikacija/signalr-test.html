@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SignalR Test</title>
+</head>
+<body>
+    <h2>SignalR Chat Test</h2>
+
+    <input id="backendUrl" placeholder="Backend URL" value="http://localhost:5227" />
+    <br><br>
+
+    <input id="token" placeholder="JWT token" style="width: 600px;" />
+    <br><br>
+
+    <input id="chatId" placeholder="Chat ID" />
+    <br><br>
+
+    <button onclick="connect()">Connect</button>
+    <button onclick="joinChat()">Join Chat</button>
+
+    <pre id="log"></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
+
+    <script>
+        let connection;
+
+        function log(message) {
+            document.getElementById("log").textContent += message + "\n";
+        }
+
+        async function connect() {
+            const backendUrl = document.getElementById("backendUrl").value;
+            const token = document.getElementById("token").value;
+
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl(`${backendUrl}/chatHub`, {
+                    accessTokenFactory: () => token
+                })
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on("ReceiveMessage", (message) => {
+                log("RECEIVED: " + JSON.stringify(message, null, 2));
+            });
+
+            await connection.start();
+            log("Connected!");
+        }
+
+        async function joinChat() {
+            const chatId = parseInt(document.getElementById("chatId").value);
+
+            await connection.invoke("JoinChat", chatId);
+            log("Joined chat-" + chatId);
+        }
+    </script>
+</body>
+</html>

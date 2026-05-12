@@ -30,6 +30,9 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("double precision");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -44,10 +47,13 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
                     b.Property<int>("ProducerID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RatingCount")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -60,7 +66,10 @@ namespace Backend.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
-                    b.Property<int>("maxParticipants")
+                    b.Property<int?>("currentNumParticipants")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("maxParticipants")
                         .HasColumnType("integer");
 
                     b.HasKey("ID");
@@ -274,14 +283,11 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
-                    b.Property<int>("ActionID")
-                        .HasColumnType("integer");
-
                     b.Property<int>("AkcijaID")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Rate")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Rate")
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserID")
                         .HasColumnType("integer");
@@ -290,7 +296,8 @@ namespace Backend.Migrations
 
                     b.HasIndex("AkcijaID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserID", "AkcijaID")
+                        .IsUnique();
 
                     b.ToTable("Ratings");
                 });
@@ -431,7 +438,7 @@ namespace Backend.Migrations
                     b.Property<int>("InitiatorID")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ReviewerID")
+                    b.Property<int?>("ReviewerID")
                         .HasColumnType("integer");
 
                     b.Property<int>("SenderID")
@@ -635,9 +642,7 @@ namespace Backend.Migrations
                 {
                     b.HasOne("Backend.Models.User", "Reviewer")
                         .WithMany()
-                        .HasForeignKey("ReviewerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReviewerID");
 
                     b.HasOne("Backend.Models.User", "Sender")
                         .WithMany()

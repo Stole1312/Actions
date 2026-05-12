@@ -14,10 +14,13 @@ namespace Backend.Models
         public int ProducerID{get;set;}
         //Navigation property
         public User Producer {get;set;} = null!;
-        public int maxParticipants {get;set;}
-        public decimal Price {get;set;}
+        public int? maxParticipants {get;set;}
+        public int? currentNumParticipants{get;set;}=1;
+        public decimal? Price {get;set;}
         public ActionStatus Status{get;set;}
         public DateTime Created {get;set;}
+        public double AverageRating { get; set; }
+        public int RatingCount { get; set; }
     }
 }
 
