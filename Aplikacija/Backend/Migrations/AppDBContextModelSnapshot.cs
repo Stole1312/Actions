@@ -90,15 +90,12 @@ namespace Backend.Migrations
                     b.Property<bool>("AdminTextOnly")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("AkcijaID")
-                        .HasColumnType("integer");
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
