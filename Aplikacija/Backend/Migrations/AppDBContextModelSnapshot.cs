@@ -233,14 +233,11 @@ namespace Backend.Migrations
                     b.Property<int>("ReceiverID")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ReciverID")
-                        .HasColumnType("integer");
-
                     b.HasKey("ID");
 
                     b.HasIndex("InitiatorID");
 
-                    b.HasIndex("ReciverID");
+                    b.HasIndex("ReceiverID");
 
                     b.ToTable("Friends");
                 });
@@ -551,15 +548,15 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Models.User", "Reciver")
+                    b.HasOne("Backend.Models.User", "Receiver")
                         .WithMany()
-                        .HasForeignKey("ReciverID")
+                        .HasForeignKey("ReceiverID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Initiator");
 
-                    b.Navigation("Reciver");
+                    b.Navigation("Receiver");
                 });
 
             modelBuilder.Entity("Backend.Models.Message", b =>
