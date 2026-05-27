@@ -149,4 +149,171 @@ public class SocialController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [Authorize]
+    [HttpGet("GetFriends")]
+    public async Task<ActionResult> GetFriends()
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var friends = await Context.Friends
+                .Where(f => f.InitiatorID == currentUserId || f.ReceiverID == currentUserId)
+                .Include(f => f.Initiator)
+                .Include(f => f.Receiver)
+                .Select(f => new 
+                {
+                    //Ako sam ja initiator vratice mi recivera i obrnuto
+                    FriendID = f.InitiatorID == currentUserId ? f.ReceiverID : f.InitiatorID,
+                    Username = f.InitiatorID == currentUserId ? f.Receiver.Username : f.Initiator.Username,
+                    ProfilePicture = f.InitiatorID == currentUserId ? f.Receiver.ProfilePicture : f.Initiator.ProfilePicture,
+                    f.FriendsSince
+                })
+                .ToListAsync();
+
+            return Ok(friends);
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    //Remove request
+    [Authorize]
+    [HttpDelete("RemoveFriend/{friendId}")]
+    public async Task<ActionResult> RemoveFriend(int friendId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var friendship = await Context.Friends.FirstOrDefaultAsync(f =>
+                (f.InitiatorID == currentUserId && f.ReceiverID == friendId) ||
+                (f.InitiatorID == friendId && f.ReceiverID == currentUserId)
+            );
+            if(friendship == null)
+                return BadRequest("Friendship does not exist!");
+
+            Context.Friends.Remove(friendship);
+            await Context.SaveChangesAsync();
+
+            return Ok("Friend removed successfully!");      
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("GetSentFriendRequests")]
+    public async Task<ActionResult> GetSentFriendRequests()
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var requests = await Context.FriendRequests
+                .Where(fr => fr.InitiatorID == currentUserId && fr.Status == UserRequestStatus.Pending)
+                .Include(fr => fr.Reciver)
+                .Select(fr => new
+                {
+                    fr.ID,
+                    fr.ReciverID,
+                    ReceiverUsername = fr.Reciver.Username,
+                    ReceiverProfilePicture = fr.Reciver.ProfilePicture,
+                    fr.Created,
+                    fr.Status
+                })
+                .ToListAsync();
+
+            return Ok(requests);
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("CancelFriendRequest/{requestId}")]
+    public async Task<ActionResult> CancelFriendRequest(int requestId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var request = await Context.FriendRequests.FindAsync(requestId);
+            if (request == null)
+                return BadRequest("Friend request does not exist!");
+
+            //User mora biti inicijator requesta da bi ga mogao obrisati
+            if (request.InitiatorID != currentUserId)
+                return Unauthorized("You can not cancel this request!");
+
+            //Samo requestovi koji su pending se mogu obrisati
+            if (request.Status != UserRequestStatus.Pending)
+                return BadRequest("Only pending requests can be cancelled!");
+
+            Context.FriendRequests.Remove(request);
+            await Context.SaveChangesAsync();
+
+            return Ok("Friend request cancelled successfully!");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("GetFriendshipStatus/{userId}")]
+    public async Task<ActionResult> GetFriendshipStatus(int userId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            if (currentUserId == userId)
+                return Ok(new { Status = "Self" });
+
+            //Provera da li su useri prijatelji
+            bool areFriends = await Context.Friends.AnyAsync(f =>
+                (f.InitiatorID == currentUserId && f.ReceiverID == userId) ||
+                (f.InitiatorID == userId && f.ReceiverID == currentUserId)
+            );
+            if (areFriends)
+                return Ok(new { Status = "Friends" });
+
+            //U slucaju da postoji request za dva usera, vrati zahtev koji je pristizajuci ili poslat
+            var request = await Context.FriendRequests.FirstOrDefaultAsync(fr =>
+                fr.Status == UserRequestStatus.Pending &&
+                (
+                    (fr.InitiatorID == currentUserId && fr.ReciverID == userId) ||
+                    (fr.InitiatorID == userId && fr.ReciverID == currentUserId)
+                )
+            );
+            if (request == null)
+                return Ok(new { Status = "None" });
+
+            if (request.InitiatorID == currentUserId)
+                return Ok(new
+                {
+                    Status = "Outgoing",
+                    RequestID = request.ID
+                });
+
+            return Ok(new
+            {
+                Status = "Incoming",
+                RequestID = request.ID
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
