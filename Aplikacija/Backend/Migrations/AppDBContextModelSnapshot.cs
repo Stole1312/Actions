@@ -90,12 +90,15 @@ namespace Backend.Migrations
                     b.Property<bool>("AdminTextOnly")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsPrivate")
-                        .HasColumnType("boolean");
+                    b.Property<int?>("AkcijaID")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.HasKey("ID");
 
@@ -185,6 +188,32 @@ namespace Backend.Migrations
                     b.HasIndex("UserID");
 
                     b.ToTable("DeoAkcije");
+                });
+
+            modelBuilder.Entity("Backend.Models.Follow", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("ConsumerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ProducerId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ConsumerId");
+
+                    b.HasIndex("ProducerId");
+
+                    b.ToTable("Follows");
                 });
 
             modelBuilder.Entity("Backend.Models.FriendRequest", b =>
@@ -519,6 +548,25 @@ namespace Backend.Migrations
                     b.Navigation("Akcija");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Backend.Models.Follow", b =>
+                {
+                    b.HasOne("Backend.Models.User", "Consumer")
+                        .WithMany()
+                        .HasForeignKey("ConsumerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Models.User", "Producer")
+                        .WithMany()
+                        .HasForeignKey("ProducerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Consumer");
+
+                    b.Navigation("Producer");
                 });
 
             modelBuilder.Entity("Backend.Models.FriendRequest", b =>
