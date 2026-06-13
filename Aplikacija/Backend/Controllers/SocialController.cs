@@ -316,4 +316,91 @@ public class SocialController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [Authorize]
+    [HttpPost("FollowProducer/{producerId}")]
+    public async Task<ActionResult> FollowProducer(int producerId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            if (currentUserId == producerId)
+                return BadRequest("You can not follow yourself!");
+
+            var producer = await Context.Users.FindAsync(producerId);
+            if (producer == null)
+                return BadRequest("Producer does not exist!");
+
+            if (producer.Role != UserRoles.Producer)
+                return BadRequest("You can only follow producers!");
+
+            var alreadyFollowing = await Context.Follows.AnyAsync(f =>
+                f.ConsumerId == currentUserId && f.ProducerId == producerId
+            );
+            if (alreadyFollowing)
+                return BadRequest("You are already following this producer!");
+
+            var follow = new Follow
+            {
+                ConsumerId = currentUserId,
+                ProducerId = producerId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await Context.Follows.AddAsync(follow);
+            await Context.SaveChangesAsync();
+
+            return Ok("Producer followed successfully!");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("UnfollowProducer/{producerId}")]
+    public async Task<ActionResult> UnfollowProducer(int producerId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var follow = await Context.Follows.FirstOrDefaultAsync(f =>
+                f.ConsumerId == currentUserId &&
+                f.ProducerId == producerId);
+            if (follow == null)
+                return BadRequest("You are not following this producer!");
+
+            Context.Follows.Remove(follow);
+            await Context.SaveChangesAsync();
+
+            return Ok("Producer unfollowed successfully!");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("IsFollowing/{producerId}")]
+    public async Task<ActionResult<bool>> IsFollowing(int producerId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            bool isFollowing = await Context.Follows.AnyAsync(f =>
+                f.ConsumerId == currentUserId &&
+                f.ProducerId == producerId);
+
+            return Ok(isFollowing);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
