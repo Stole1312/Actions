@@ -19,34 +19,58 @@ namespace Backend.Controllers
 
         //ce da se koristi i za regiset
         [HttpPost("AddUser")]
-        public async Task<ActionResult> AddUser([FromBody] User usr)
+        public async Task<ActionResult> AddUser([FromForm] UserRegisterVM usr)
         {
             try
             {
                 //Korisnik na stranici moze da bira da li ce da bude korisnik ili producer
                 //Takodje prilikom editovanja profila moze da promeni u producer
-                if (string.IsNullOrWhiteSpace(usr.Username))
-                    return BadRequest("User must have a username");
-                if (string.IsNullOrWhiteSpace(usr.Email))
-                    return BadRequest("User must have an email adresse");
-                if (string.IsNullOrWhiteSpace(usr.Password))
-                    return BadRequest("User must have a password");
+                if (string.IsNullOrWhiteSpace(usr.Username)) return BadRequest("User must have a username");
+                if (string.IsNullOrWhiteSpace(usr.Email)) return BadRequest("User must have an email adresse");
+                if (string.IsNullOrWhiteSpace(usr.Password)) return BadRequest("User must have a password");
 
-                usr.Password = BCrypt.Net.BCrypt.HashPassword(usr.Password);
+                var checkUser = await Context.Users.FirstOrDefaultAsync(u => u.Username == usr.Username);
 
-                //Setujem default vrednosti ukoliko se posalje prazno polje medjutim za Role ne mora jer je enum
-                //a ako se nista ne posalje za enum on racuna pod 0 za default vrednost ondnosno User
-                usr.Bio = usr.Bio ?? "I <3 Actions";
-                usr.ProfilePicture = usr.ProfilePicture ?? "default-avatar.png";
-                usr.isBanned = false;
-                usr.VerificationStatus = VerifiedStatus.None;
-
-                var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == usr.Username);
-
-                if (user != null)
+                if (checkUser != null)
                     return BadRequest("Username is already taken");
 
-                await Context.Users.AddAsync(usr);
+                string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/ProfilePictures/defaultAvatar.jpg";
+                string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
+                string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey is missing in appsettings.");
+                string bucketName = _configuration["Supabase:BucketName"] ?? "avatars";
+                
+                if(usr.ProfilePictureFile !=null && usr.ProfilePictureFile.Length > 0)
+                {
+                    var storageClient = new Supabase.Storage.Client(supabaseUrl + "/storage/v1", new Dictionary<string, string>
+                    {
+                        { "Authorization", $"Bearer {supabaseKey}" },
+                        { "apikey", supabaseKey }
+                    });
+
+                    var extension = Path.GetExtension(usr.ProfilePictureFile.FileName);
+
+                    var fileName = $"{usr.Username}_{DateTime.UtcNow.Ticks}{extension}";
+
+                    using var ms = new MemoryStream();
+                    await usr.ProfilePictureFile.CopyToAsync(ms); // Kopiramo sliku u memorijski strim
+                    var fileBytes = ms.ToArray();
+
+                    await storageClient.From(bucketName).Upload(fileBytes, fileName);
+                    imageUrl = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                }
+
+                var user = new User
+                {
+                    Username = usr.Username,
+                    Email = usr.Email,
+                    Password = BCrypt.Net.BCrypt.HashPassword(usr.Password),
+                    Bio = usr.Bio ?? "I <3 Actions",
+                    isBanned = false,
+                    VerificationStatus = VerifiedStatus.None,
+                    ProfilePicture = imageUrl
+                };
+
+                await Context.Users.AddAsync(user);
                 await Context.SaveChangesAsync();
 
                 var claims = new List<Claim>
@@ -61,8 +85,8 @@ namespace Backend.Controllers
                 //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
                 return Ok(new
                 {
-                    message = $"User {usr.Username} with ID: {usr.ID} has been added.",
-                    userViewModel = MapUserToViewModel(usr),
+                    message = $"User {user.Username} with ID: {user.ID} has been added.",
+                    userViewModel = MapUserToViewModel(user),
                     Token = token
                 });
             }
@@ -93,7 +117,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("EditUser")]
-        public async Task<ActionResult> EditUser([FromBody] UserViewModel editedUser)
+        public async Task<ActionResult> EditUser([FromForm] UserRegisterVM editedUser)
         {
             try
             {
@@ -106,8 +130,36 @@ namespace Backend.Controllers
                 userInDB.Email = editedUser.Email;
                 userInDB.Role = editedUser.Role;
                 userInDB.VerificationStatus = editedUser.VerificationStatus;
-                userInDB.ProfilePicture = editedUser.ProfilePicture;
-                userInDB.Bio=editedUser.Bio;
+                userInDB.Bio=editedUser.Bio ?? userInDB.Bio;
+
+                if (editedUser.ProfilePictureFile != null && editedUser.ProfilePictureFile.Length > 0)
+                {
+                    string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL missing.");
+                    string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey missing.");
+                    string bucketName = _configuration["Supabase:BucketName"] ?? "avatars";
+
+                    // Inicijalizacija Supabase Storage klijenta
+                    var storageClient = new Supabase.Storage.Client(supabaseUrl + "/storage/v1", new Dictionary<string, string>
+                    {
+                        { "Authorization", $"Bearer {supabaseKey}" },
+                        { "apikey", supabaseKey }
+                    });
+
+                    // Generisanje jedinstvenog imena fajla
+                    var extension = Path.GetExtension(editedUser.ProfilePictureFile.FileName);
+                    var fileName = $"{editedUser.Username}_edit_{DateTime.UtcNow.Ticks}{extension}";
+
+                    // Pretvaranje IFormFile u niz bajtova
+                    using var ms = new MemoryStream();
+                    await editedUser.ProfilePictureFile.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+
+                    // Upload na Supabase Storage
+                    await storageClient.From(bucketName).Upload(fileBytes, fileName);
+
+                    // Postavljanje NOVOG URL-a u objekat baze
+                    userInDB.ProfilePicture = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                }
 
                 await Context.SaveChangesAsync();
 
@@ -197,27 +249,31 @@ namespace Backend.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult> Login([FromBody] LoginViewModel userData)
         {
-            var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == userData.Username);
-
-            if (user == null)
-                return Unauthorized("Wrong username");
-
-            bool correctPassword = BCrypt.Net.BCrypt.Verify(userData.Password, user.Password);
-
-            if (!correctPassword)
-                return Unauthorized("Wrong password");
-
-            var claims = new List<Claim>
+            if (userData == null || string.IsNullOrEmpty(userData.Username))
             {
-                new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
-            };
+                return BadRequest("Nisu prosleđeni podaci za login.");
+            }
+                var user = await Context.Users.FirstOrDefaultAsync(u => u.Username == userData.Username);
 
-            var token = GenerateJwtToken(claims);
+                if (user == null)
+                    return Unauthorized("Wrong username");
 
-            //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
-            return Ok(new { Token = token, userViewModel = MapUserToViewModel(user) });
+                bool correctPassword = BCrypt.Net.BCrypt.Verify(userData.Password, user.Password);
+
+                if (!correctPassword)
+                    return Unauthorized("Wrong password");
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                };
+
+                var token = GenerateJwtToken(claims);
+
+                //Na fontu cemo da ga cuvamo u local storage pomocu LocalStorage.setItem
+                return Ok(new { Token = token, userViewModel = MapUserToViewModel(user) });
         }
 
         //Moderatori ce da imaju negde input i dugme vezano za njega i tu ce moci
