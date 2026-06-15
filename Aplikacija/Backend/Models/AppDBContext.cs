@@ -21,5 +21,6 @@ namespace Backend.Models
         public DbSet<ChatParticipant> ChatParticipants { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<Follow> Follows { get; set; }
     }
 }
