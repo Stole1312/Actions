@@ -202,6 +202,9 @@ namespace Backend.Controllers
                 deoAkcije.deniedByOrganizator = true;
 
                 var akcija = await Context.Akcije.FindAsync(akcijaID);
+                if(akcija ==null)
+                    return BadRequest("Akcija is null");
+                    
                 akcija.currentNumParticipants--;
 
                 await Context.SaveChangesAsync();

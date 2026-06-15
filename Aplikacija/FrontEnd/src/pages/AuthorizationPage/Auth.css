@@ -1,0 +1,234 @@
+/* ==========================================================================
+   1. OSNOVNI STILOVI (BODY & GENERAL)
+   ========================================================================== */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    min-height: 100vh;
+    background-color: #FAFAF8;    
+    font-family: sans-serif; /* Dodato radi lepšeg fonta inputa i tekstarea */
+}
+
+/* ==========================================================================
+   2. GLAVNA ZAJEDNIČKA BELA KARTICA (Kontejner za Slajder)
+   ========================================================================== */
+.auth-slider-wrapper.login-container {
+    display: block !important;       /* Prekida flex da bi overflow radio */
+    overflow: hidden !important;     /* STROGO SAKRIVA drugi korak dok ne zatreba */
+    position: relative;
+    
+    width: 100%;
+    max-width: 400px;                /* Fiksna širina tvoje bele kartice */
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   3. LOGIKA SLAJDOVANJA (Unutrašnja traka)
+   ========================================================================== */
+.slider-content {
+    display: flex !important;        /* Ređa korak 1 i korak 2 vodoravno */
+    width: 200% !important;          /* Duplo šira od bele kartice */
+    margin: 0 !important;
+    padding: 0 !important;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Pokretač slajda - pomera traku ulevo za tačno širinu jedne forme */
+.slide-active {
+    transform: translateX(-50%) !important;
+}
+
+/* Pojedinačni paneli (Korak 1 i Korak 2) */
+.slide-pane {
+    width: 50% !important;           /* Svaki panel zauzima tačno 100% bele kartice */
+    flex: 0 0 50% !important;        /* SPREČAVA pretraživač da zgnječi i prikaže obe forme */
+    flex-shrink: 0 !important;       /* Dodatna sigurnost od skupljanja */
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   4. FORME I UNUTRAŠNJI ELEMENTI (Zadržan tvoj stil i izjednačene visine)
+   ========================================================================== */
+.loginForm {
+    display: flex;
+    flex-direction: column;  
+    align-items: flex-start; 
+    justify-content: space-between; /* Ravnomerno raspoređuje elemente od vrha do dna */
+    
+    width: 100%;
+    height: 540px;                   /* FIKSNA VISINA: Osigurava da su obe "kartice" u piksel identične visine */
+    padding: 30px;
+    box-sizing: border-box;
+    background: transparent !important; /* Skidamo pozadinu jer je sada drži .auth-slider-wrapper */
+    box-shadow: none !important;        /* Skidamo duplu senku */
+}
+
+/* Grupisanje gornjeg dela forme da dugme uvek ostane zakucano za dno */
+.form-top-group {
+    width: 100%;
+}
+
+.loginForm input, .bio-textarea {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.loginForm label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.loginForm button, .final-submit-btn {
+    width: 100%;
+    padding: 12px;
+    cursor: pointer;
+    background-color: #F59E0B;
+    border-radius: 10px;
+    border-style: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: auto; /* Gura dugme na samo dno .loginForme */
+}
+
+.loginHeader {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.loginHeader h1 {
+    margin: 0 0 5px 0;
+}
+
+.loginHeader p {
+    margin: 0;
+    color: #D97706;
+}
+
+/* ==========================================================================
+   5. SPECIFIČNI STILOVI ZA DRUGI KORAK (Slika i Biografija)
+   ========================================================================== */
+.image-upload-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.profile-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    margin-top: 5px;
+    transition: border-color 0.2s;
+}
+
+.profile-circle:hover {
+    border-color: #555;
+}
+
+.profile-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.plus-icon {
+    font-size: 28px;
+    color: #aaa;
+}
+
+.bio-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.bio-textarea {
+    resize: none;
+    height: 100px; /* Fiksna visina textarea polja */
+    font-family: inherit;
+}
+
+.char-counter {
+    align-self: flex-end;
+    font-size: 12px;
+    color: #777;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+/* Kontejner koji drži Back i Skip/Confirm jedno pored drugog */
+.buttons-group {
+    display: flex;
+    gap: 15px;       /* Razmak između dugmića */
+    width: 100%;
+    margin-top: auto; /* Gura celu grupu na dno forme, prateći tvoj raspored */
+}
+
+/* Stil za Back dugme */
+.back-btn {
+    flex: 1;         /* Uzima jednaku polovinu prostora */
+    padding: 12px;
+    cursor: pointer;
+    background-color: #E5E7EB; /* Blago siva pozadina */
+    color: #374151;            /* Tamno sivi tekst */
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+    background-color: #D1D5DB; /* Malo tamnija siva na hover */
+}
+
+/* Prilagođavamo i glavno dugme da deli prostor 50/50 */
+.final-submit-btn {
+    flex: 1;         /* Uzima drugu polovinu prostora */
+    margin-top: 0 !important; /* Poništavamo margin-top jer je sada .buttons-group drži auto */
+}
+
+button {
+    /* Tvoji postojeći stilovi za dugme... */
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease !important;
+}
+
+button:hover {
+    background-color: #D97706 !important; /* Tamnija narandžasta za sve */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+a {
+    color: #F59E0B;             /* Tvoja osnovna narandžasta boja */
+    font-weight: bold;          /* Čini link malo uočljivijim */
+    transition: color 0.2s ease; /* Glatki prelaz boje na hover */
+}
