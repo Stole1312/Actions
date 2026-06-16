@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using Castle.Core.Smtp;
 
 namespace Backend.Controllers
 {
@@ -37,26 +38,53 @@ namespace Backend.Controllers
                 string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/ProfilePictures/defaultAvatar.jpg";
                 string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
                 string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey is missing in appsettings.");
-                string bucketName = _configuration["Supabase:BucketName"] ?? "avatars";
+                string bucketName = _configuration["Supabase:BucketName"] ?? "ProfilePictures";
                 
-                if(usr.ProfilePictureFile !=null && usr.ProfilePictureFile.Length > 0)
+                if (usr.ProfilePictureFile != null && usr.ProfilePictureFile.Length > 0)
                 {
-                    var storageClient = new Supabase.Storage.Client(supabaseUrl + "/storage/v1", new Dictionary<string, string>
+                    try
                     {
-                        { "Authorization", $"Bearer {supabaseKey}" },
-                        { "apikey", supabaseKey }
-                    });
+                        // Inicijalizacija Storage klijenta
+                        var storageClient = new Supabase.Storage.Client(supabaseUrl, new Dictionary<string, string>
+                        {
+                            { "Authorization", $"Bearer {supabaseKey}" },
+                            { "apikey", supabaseKey }
+                        });
 
-                    var extension = Path.GetExtension(usr.ProfilePictureFile.FileName);
+                        // Generisanje jedinstvenog imena fajla
+                        var extension = Path.GetExtension(usr.ProfilePictureFile.FileName);
+                        if(string.IsNullOrEmpty(extension)) extension = ".jpg";
+                        var fileName = $"{Guid.NewGuid()}{extension}";
 
-                    var fileName = $"{usr.Username}_{DateTime.UtcNow.Ticks}{extension}";
+                        // Pretvaranje u byte array - tako se mora salje
+                        using var ms = new MemoryStream();
+                        await usr.ProfilePictureFile.CopyToAsync(ms);
+                        var fileBytes = ms.ToArray();
 
-                    using var ms = new MemoryStream();
-                    await usr.ProfilePictureFile.CopyToAsync(ms); // Kopiramo sliku u memorijski strim
-                    var fileBytes = ms.ToArray();
+                        // Upload na Supabase pomocu httpa
+                        using var httpClient = new HttpClient();
+                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseKey}");
+                        httpClient.DefaultRequestHeaders.Add("apikey", supabaseKey);
 
-                    await storageClient.From(bucketName).Upload(fileBytes, fileName);
-                    imageUrl = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                        var content = new ByteArrayContent(fileBytes);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                            usr.ProfilePictureFile.ContentType
+                        );
+
+                        var uploadUrl = $"{supabaseUrl}/storage/v1/object/{bucketName}/{fileName}";
+
+                        var uploadResponse = await httpClient.PostAsync(uploadUrl, content);
+                        var responseBody = await uploadResponse.Content.ReadAsStringAsync();
+
+                        if (!uploadResponse.IsSuccessStatusCode)
+                            return BadRequest($"Upload failed: {responseBody}");
+
+                        imageUrl = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                    }
+                    catch(Exception e)
+                    {
+                        return NotFound(e.Message);
+                    }
                 }
 
                 var user = new User
@@ -189,13 +217,17 @@ namespace Backend.Controllers
         {
             try
             {
+                var sender = await Context.Users.FindAsync(id);
+                if(sender == null)
+                    return BadRequest($"There is no user with ID: {id}");
+
                 var request = new VerificationRequest
                 {
                     Created = DateTime.UtcNow,
                     Status = UserRequestStatus.Pending,
                     InitiatorID = id,
                     Document=document,
-                    Sender = await Context.Users.FindAsync(id)
+                    Sender = sender
                 };
 
                 Context.VerificationRequests.Add(request);
