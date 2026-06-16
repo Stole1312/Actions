@@ -7,6 +7,7 @@ namespace Backend.Models
         public required string Title {get;set;}
         public required string Description {get;set;}
         public required string Location{get;set;}
+        public required IFormFile ActionPicture{get;set;}
         public ActionTypes Type {get;set;}
         public DateTime DateAndTime{get;set;}
         public int ProducerID{get;set;}

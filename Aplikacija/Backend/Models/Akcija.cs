@@ -21,6 +21,8 @@ namespace Backend.Models
         public DateTime Created {get;set;}
         public double AverageRating { get; set; }
         public int RatingCount { get; set; }
+
+        public string? ActionPicture {get;set;}
     }
 }
 

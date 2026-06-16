@@ -142,7 +142,7 @@ namespace Backend.Controllers
                     Akcija = akcija
                 };
 
-                Context.DeoAkcije.AddAsync(deoAkcije);
+                await Context.DeoAkcije.AddAsync(deoAkcije);
                 await Context.SaveChangesAsync();
 
                 akcija.currentNumParticipants++;
