@@ -1,0 +1,37 @@
+body {
+    margin: 0;
+}
+
+h1 {
+    font-family: "Space Grotesk", sans-serif;
+}
+
+p {
+    font-family: "DM Suns", sans-serif;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    appearance: textfield;
+}
+
+button {
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.97);
+}
+
+.auth_page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

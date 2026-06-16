@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function MainPage({ onLogout }) {
+export default function MainPage({ onLogout, handleAddActionClick }) {
     // Čitamo username i profilnu sliku iz localStorage-a
     const username = localStorage.getItem("username") || "Guest";
     const profilePicture = localStorage.getItem("profilePicture");
@@ -55,6 +55,8 @@ export default function MainPage({ onLogout }) {
             <button onClick={handleLogoutClick} style={{ maxWidth: '200px' }}>
                 Log Out
             </button>
+
+            <button onClick={handleAddActionClick}>AddAction</button>
         </div>
     );
 }

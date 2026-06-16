@@ -3,25 +3,19 @@
    ========================================================================== */
 body {
     margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center; 
-    align-items: center;    
-    min-height: 100vh;
-    background-color: #FAFAF8;    
-    font-family: sans-serif; /* Dodato radi lepšeg fonta inputa i tekstarea */
+    padding: 0; /* Dodato radi lepšeg fonta inputa i tekstarea */
 }
 
 /* ==========================================================================
    2. GLAVNA ZAJEDNIČKA BELA KARTICA (Kontejner za Slajder)
    ========================================================================== */
 .auth-slider-wrapper.login-container {
-    display: block !important;       /* Prekida flex da bi overflow radio */
-    overflow: hidden !important;     /* STROGO SAKRIVA drugi korak dok ne zatreba */
+    display: block !important; /* Prekida flex da bi overflow radio */
+    overflow: hidden !important; /* STROGO SAKRIVA drugi korak dok ne zatreba */
     position: relative;
-    
+
     width: 100%;
-    max-width: 400px;                /* Fiksna širina tvoje bele kartice */
+    max-width: 400px; /* Fiksna širina tvoje bele kartice */
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -32,8 +26,8 @@ body {
    3. LOGIKA SLAJDOVANJA (Unutrašnja traka)
    ========================================================================== */
 .slider-content {
-    display: flex !important;        /* Ređa korak 1 i korak 2 vodoravno */
-    width: 200% !important;          /* Duplo šira od bele kartice */
+    display: flex !important; /* Ređa korak 1 i korak 2 vodoravno */
+    width: 200% !important; /* Duplo šira od bele kartice */
     margin: 0 !important;
     padding: 0 !important;
     transition: transform 0.5s ease-in-out;
@@ -46,9 +40,9 @@ body {
 
 /* Pojedinačni paneli (Korak 1 i Korak 2) */
 .slide-pane {
-    width: 50% !important;           /* Svaki panel zauzima tačno 100% bele kartice */
-    flex: 0 0 50% !important;        /* SPREČAVA pretraživač da zgnječi i prikaže obe forme */
-    flex-shrink: 0 !important;       /* Dodatna sigurnost od skupljanja */
+    width: 50% !important; /* Svaki panel zauzima tačno 100% bele kartice */
+    flex: 0 0 50% !important; /* SPREČAVA pretraživač da zgnječi i prikaže obe forme */
+    flex-shrink: 0 !important; /* Dodatna sigurnost od skupljanja */
     box-sizing: border-box;
 }
 
@@ -57,16 +51,16 @@ body {
    ========================================================================== */
 .loginForm {
     display: flex;
-    flex-direction: column;  
-    align-items: flex-start; 
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between; /* Ravnomerno raspoređuje elemente od vrha do dna */
-    
+
     width: 100%;
-    height: 540px;                   /* FIKSNA VISINA: Osigurava da su obe "kartice" u piksel identične visine */
+    height: 540px; /* FIKSNA VISINA: Osigurava da su obe "kartice" u piksel identične visine */
     padding: 30px;
     box-sizing: border-box;
     background: transparent !important; /* Skidamo pozadinu jer je sada drži .auth-slider-wrapper */
-    box-shadow: none !important;        /* Skidamo duplu senku */
+    box-shadow: none !important; /* Skidamo duplu senku */
 }
 
 /* Grupisanje gornjeg dela forme da dugme uvek ostane zakucano za dno */
@@ -74,7 +68,8 @@ body {
     width: 100%;
 }
 
-.loginForm input, .bio-textarea {
+.loginForm input,
+.bio-textarea {
     width: 100%;
     margin-bottom: 15px;
     padding: 10px;
@@ -89,11 +84,12 @@ body {
     font-size: 14px;
 }
 
-.loginForm button, .final-submit-btn {
+.loginForm button,
+.final-submit-btn {
     width: 100%;
     padding: 12px;
     cursor: pointer;
-    background-color: #F59E0B;
+    background-color: #f59e0b;
     border-radius: 10px;
     border-style: none;
     color: white;
@@ -113,7 +109,7 @@ body {
 
 .loginHeader p {
     margin: 0;
-    color: #D97706;
+    color: #d97706;
 }
 
 /* ==========================================================================
@@ -182,18 +178,18 @@ body {
 /* Kontejner koji drži Back i Skip/Confirm jedno pored drugog */
 .buttons-group {
     display: flex;
-    gap: 15px;       /* Razmak između dugmića */
+    gap: 15px; /* Razmak između dugmića */
     width: 100%;
     margin-top: auto; /* Gura celu grupu na dno forme, prateći tvoj raspored */
 }
 
 /* Stil za Back dugme */
 .back-btn {
-    flex: 1;         /* Uzima jednaku polovinu prostora */
+    flex: 1; /* Uzima jednaku polovinu prostora */
     padding: 12px;
     cursor: pointer;
-    background-color: #E5E7EB; /* Blago siva pozadina */
-    color: #374151;            /* Tamno sivi tekst */
+    background-color: #e5e7eb; /* Blago siva pozadina */
+    color: #374151; /* Tamno sivi tekst */
     border-radius: 10px;
     border: none;
     font-weight: bold;
@@ -202,22 +198,25 @@ body {
 }
 
 .back-btn:hover {
-    background-color: #D1D5DB; /* Malo tamnija siva na hover */
+    background-color: #d1d5db; /* Malo tamnija siva na hover */
 }
 
 /* Prilagođavamo i glavno dugme da deli prostor 50/50 */
 .final-submit-btn {
-    flex: 1;         /* Uzima drugu polovinu prostora */
+    flex: 1; /* Uzima drugu polovinu prostora */
     margin-top: 0 !important; /* Poništavamo margin-top jer je sada .buttons-group drži auto */
 }
 
 button {
     /* Tvoji postojeći stilovi za dugme... */
-    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease !important;
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease !important;
 }
 
 button:hover {
-    background-color: #D97706 !important; /* Tamnija narandžasta za sve */
+    background-color: #d97706 !important; /* Tamnija narandžasta za sve */
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -228,7 +227,7 @@ button:active {
 }
 
 a {
-    color: #F59E0B;             /* Tvoja osnovna narandžasta boja */
-    font-weight: bold;          /* Čini link malo uočljivijim */
+    color: #f59e0b; /* Tvoja osnovna narandžasta boja */
+    font-weight: bold; /* Čini link malo uočljivijim */
     transition: color 0.2s ease; /* Glatki prelaz boje na hover */
 }

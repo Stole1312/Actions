@@ -1,0 +1,137 @@
+.card-review-container {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-review {
+    width: 100%;
+    height: 310px;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e7e5e0;
+}
+
+.review-title {
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.preview-image-container {
+    position: relative;
+    height: 155px;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.preview-type-badge {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e7e5e0;
+    border-radius: 10px;
+}
+
+.preview-type-badge > p {
+    margin: 0;
+    padding: 5px 10px;
+    font-size: 0.688rem;
+    color: #111110;
+    font-weight: 500;
+}
+
+.preview-price-badge {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background-color: #10b981;
+    border-radius: 10px;
+}
+
+.preview-price-badge > p {
+    margin: 0;
+    padding: 5px 10px;
+    font-size: 0.688rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 15px;
+}
+
+.info-container > h1 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.info-child-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.info-child-container > p {
+    margin: 0px;
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.info-icon {
+    color: #78716c;
+    width: 13px;
+    height: 13px;
+}
+
+.card-review > hr {
+    margin: 0px 15px;
+    height: 1px;
+    background-color: #e7e5e0;
+    border: none;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: row;
+    padding: 10px 15px;
+    gap: 10px;
+    align-items: center;
+}
+
+.footer-container > p {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.footer-container > button {
+    pointer-events: none;
+    margin-left: auto;
+    background-color: #f59e0b;
+    border-radius: 10px;
+    border: none;
+    padding: 7px 15px;
+
+    color: #ffffff;
+    font-size: 0.688rem;
+    font-weight: 600;
+    font-family: "DM Suns", sans-serif;
+}
