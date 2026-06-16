@@ -81,7 +81,7 @@ export default function SignUpForm({ onSwitchToLogin }) {
         
         // 3. Ako je slika izabrana, dodajemo sirovi fajl pod imenom koje backend očekuje
         if (imageFile) {
-            formData.append("ProfileImageFile", imageFile); 
+            formData.append("ProfilePictureFile", imageFile); 
         }
 
         try {
