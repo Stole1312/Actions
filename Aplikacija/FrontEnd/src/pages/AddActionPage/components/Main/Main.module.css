@@ -1,3 +1,9 @@
+.add-action-page {
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+}
+
 .main-add-action-page {
     display: flex;
     flex-direction: row;

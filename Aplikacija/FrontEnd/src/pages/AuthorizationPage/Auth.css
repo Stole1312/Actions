@@ -1,10 +1,6 @@
 /* ==========================================================================
    1. OSNOVNI STILOVI (BODY & GENERAL)
    ========================================================================== */
-body {
-    margin: 0;
-    padding: 0; /* Dodato radi lepšeg fonta inputa i tekstarea */
-}
 
 /* ==========================================================================
    2. GLAVNA ZAJEDNIČKA BELA KARTICA (Kontejner za Slajder)
