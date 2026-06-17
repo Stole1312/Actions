@@ -31,6 +31,7 @@ export default function Main({ handleGoBackClick }) {
     const [maxParticipants, setMaxParticipants] = useState("")
     const [paid, setPaid] = useState(false)
     const [price, setPrice] = useState("")
+    const [description, setDescription] = useState("")
     //Lokacija
     const [locationText, setLocationText] = useState("")
     const [suggestions, setSuggestions] = useState([])
@@ -163,7 +164,7 @@ export default function Main({ handleGoBackClick }) {
         alert("MAJMUNEEE")
     }
     return (
-        <>
+        <div className={styles["add-action-page"]}>
             <Header
                 onSubmit={submitAction}
                 handleGoBackClick={handleGoBackClick}
@@ -263,6 +264,10 @@ export default function Main({ handleGoBackClick }) {
                             </label>
                             <textarea
                                 id="description"
+                                value={description}
+                                onChange={(event) =>
+                                    setDescription(event.target.value)
+                                }
                                 name="description"
                                 placeholder="Opišite vašu akciju — lokacija, šta poneti, ko je dobrodošao..."
                             ></textarea>
@@ -606,6 +611,6 @@ export default function Main({ handleGoBackClick }) {
                     />
                 </section>
             </main>
-        </>
+        </div>
     )
 }

@@ -1,0 +1,49 @@
+.app-nav-bar {
+    flex: 1;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;
+    border-right: 1px solid #e7e5e0;
+}
+
+.title-container {
+    padding: 20px;
+}
+
+.title-container > h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.title-container > p {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.nav-buttons-container {
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-buttons-container > button {
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    border-radius: 16px;
+    background: transparent;
+    border: none;
+}
+
+.nav-icons {
+    width: 17px;
+    height: 17px;
+}
