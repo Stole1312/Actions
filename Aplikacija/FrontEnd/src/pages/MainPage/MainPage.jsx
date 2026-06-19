@@ -11,7 +11,7 @@ export default function MainPage({ onLogout, handleAddActionClick }) {
     }
 
     return (
-        <div style={{ flex: 5 }}>
+        <div>
             <div
                 style={{
                     textAlign: "center",
@@ -74,8 +74,6 @@ export default function MainPage({ onLogout, handleAddActionClick }) {
                 >
                     Log Out
                 </button>
-
-                <button onClick={handleAddActionClick}>AddAction</button>
             </div>
         </div>
     )
