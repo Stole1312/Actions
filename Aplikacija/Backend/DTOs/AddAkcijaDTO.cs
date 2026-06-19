@@ -9,7 +9,8 @@ namespace Backend.Models
         public required string Location{get;set;}
         public required IFormFile ActionPicture{get;set;}
         public ActionTypes Type {get;set;}
-        public DateTime DateAndTime{get;set;}
+        public DateTime DTStart{get;set;}
+        public DateTime DTEnd{get;set;}
         public int ProducerID{get;set;}
         public int maxParticipants {get;set;}
         public decimal? Price {get;set;} 
