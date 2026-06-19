@@ -1,5 +1,6 @@
 .app-nav-bar {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
     position: sticky;
     top: 0;
@@ -26,6 +27,7 @@
 }
 
 .nav-buttons-container {
+    flex: 1;
     padding: 10px 20px;
     display: flex;
     flex-direction: column;
@@ -46,4 +48,12 @@
 .nav-icons {
     width: 17px;
     height: 17px;
+}
+
+.nav-buttons-container > .add-action-button {
+    background-color: #f59e0b;
+    justify-content: center;
+    margin-top: auto;
+    color: white;
+    margin-bottom: 10px;
 }

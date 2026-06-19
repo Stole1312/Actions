@@ -6,6 +6,7 @@ import {
     UsersIcon,
     ChatBubbleOvalLeftIcon,
 } from "@heroicons/react/24/outline"
+import { PlusIcon } from "@heroicons/react/24/solid"
 
 export default function NavBar(props) {
     return (
@@ -45,6 +46,15 @@ export default function NavBar(props) {
                     <UserIcon className={styles["nav-icons"]} />
                     Profil
                 </button>
+                {!props.addActionButton && (
+                    <button
+                        className={styles["add-action-button"]}
+                        onClick={props.handleAddActionClick}
+                    >
+                        <PlusIcon className={styles["nav-icons"]} />
+                        Nova Akcija
+                    </button>
+                )}
             </div>
         </nav>
     )
