@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualBasic;
 using Backend.DTOs;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace Backend.Controllers
 {
@@ -14,28 +15,88 @@ namespace Backend.Controllers
     public class ActionController : ControllerBase
     {
         public Backend.Models.AppDBContext Context { get; set; }
+        private readonly IConfiguration _configuration;
         public ActionController(Backend.Models.AppDBContext context)
         {
             Context = context;
         }
 
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(string.IsNullOrEmpty(userIdClaim))
+                throw new Exception("User ID not found in token!");
+            
+            return int.Parse(userIdClaim);
+        }
+
         [HttpPost("AddAkcija")]
-        public async Task<ActionResult> AddAkcija([FromBody] AddAkcijaDTO akcijaDTO)
+        public async Task<ActionResult> AddAkcija([FromForm] AddAkcijaDTO akcijaDTO)
         {
             try
             {
+                var userID = GetCurrentUserId();
                 if (string.IsNullOrWhiteSpace(akcijaDTO.Title))
                     return BadRequest("Your action must have a title");
                 if (string.IsNullOrWhiteSpace(akcijaDTO.Description))
                     return BadRequest("Your action must have a description");
                 if (string.IsNullOrWhiteSpace(akcijaDTO.Location))
                     return BadRequest("Your action must have a location");
-                else if(akcijaDTO.DateAndTime.ToUniversalTime() < DateTime.UtcNow)
+                else if (akcijaDTO.DTStart.ToUniversalTime() < DateTime.UtcNow)
                     return BadRequest("You cant add an akcija that has already started");
 
-                var producer = await Context.Users.FindAsync(akcijaDTO.ProducerID);
-                if(producer == null)
-                    return BadRequest($"There is no user with ID: {akcijaDTO.ProducerID}");
+                var producer = await Context.Users.FindAsync(userID);
+                if (producer == null)
+                    return BadRequest($"There is no user with ID: {userID}");
+
+                // Default slika ako korisnik ne uploaduje svoju
+                string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/AkcijaPictures/defaultAkcija.jpg";
+                string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
+                string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey is missing in appsettings.");
+                string bucketName = _configuration["Supabase:AkcijaBucketName"] ?? "AkcijaPictures";
+
+                if (akcijaDTO.ActionPicture != null && akcijaDTO.ActionPicture.Length > 0)
+                {
+                    try
+                    {
+                        var storageClient = new Supabase.Storage.Client(supabaseUrl, new Dictionary<string, string>
+                        {
+                            { "Authorization", $"Bearer {supabaseKey}" },
+                            { "apikey", supabaseKey }
+                        });
+
+                        var extension = Path.GetExtension(akcijaDTO.ActionPicture.FileName);
+                        if (string.IsNullOrEmpty(extension)) extension = ".jpg";
+                        var fileName = $"{Guid.NewGuid()}{extension}";
+
+                        using var ms = new MemoryStream();
+                        await akcijaDTO.ActionPicture.CopyToAsync(ms);
+                        var fileBytes = ms.ToArray();
+
+                        using var httpClient = new HttpClient();
+                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseKey}");
+                        httpClient.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
+                        var content = new ByteArrayContent(fileBytes);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                            akcijaDTO.ActionPicture.ContentType
+                        );
+
+                        var uploadUrl = $"{supabaseUrl}/storage/v1/object/{bucketName}/{fileName}";
+
+                        var uploadResponse = await httpClient.PostAsync(uploadUrl, content);
+                        var responseBody = await uploadResponse.Content.ReadAsStringAsync();
+
+                        if (!uploadResponse.IsSuccessStatusCode)
+                            return BadRequest($"Upload failed: {responseBody}");
+
+                        imageUrl = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                    }
+                    catch (Exception e)
+                    {
+                        return NotFound(e.Message);
+                    }
+                }
 
                 var akcija = new Akcija
                 {
@@ -43,17 +104,20 @@ namespace Backend.Controllers
                     Description = akcijaDTO.Description,
                     Location = akcijaDTO.Location,
                     Type = akcijaDTO.Type,
-                    DateAndTime = akcijaDTO.DateAndTime,
-                    ProducerID = akcijaDTO.ProducerID,
+                    DTStart = akcijaDTO.DTStart,
+                    DTEnd = akcijaDTO.DTEnd,
+                    ProducerID = userID,
                     Producer = producer,
                     maxParticipants = (akcijaDTO.maxParticipants == 0 || akcijaDTO.maxParticipants == null) ? 10 : akcijaDTO.maxParticipants,
                     currentNumParticipants = 1,
                     Price = akcijaDTO.Price == null ? 0 : akcijaDTO.Price,
                     Status = 0,
-                    Created=akcijaDTO.Created,
+                    Created = akcijaDTO.Created,
                     AverageRating = 0,
-                    RatingCount = 0
+                    RatingCount = 0,
+                    ActionPicture = imageUrl 
                 };
+
                 await Context.Akcije.AddAsync(akcija);
                 await Context.SaveChangesAsync();
 
@@ -64,6 +128,7 @@ namespace Backend.Controllers
                 return BadRequest(e.Message);
             }
         }
+
         [HttpDelete("DeleteAkcija")]
         public async Task<ActionResult> DeleteAction([FromBody] int id)
         {
@@ -99,7 +164,8 @@ namespace Backend.Controllers
                 akcijaUBazi.Description = izmenjenaAkcija.Description ?? akcijaUBazi.Description;
                 akcijaUBazi.Location = izmenjenaAkcija.Location ?? akcijaUBazi.Location;
                 akcijaUBazi.Type = izmenjenaAkcija.Type ?? akcijaUBazi.Type;
-                akcijaUBazi.DateAndTime = izmenjenaAkcija.DateAndTime ?? akcijaUBazi.DateAndTime;
+                akcijaUBazi.DTStart = izmenjenaAkcija.DTStart ?? akcijaUBazi.DTStart;
+                akcijaUBazi.DTEnd = izmenjenaAkcija.DTEnd ?? akcijaUBazi.DTEnd;
                 akcijaUBazi.maxParticipants = izmenjenaAkcija.maxParticipants ?? akcijaUBazi.maxParticipants;
                 akcijaUBazi.Price = izmenjenaAkcija.Price ?? akcijaUBazi.Price;
 
@@ -113,11 +179,12 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("ApplyAkcija/{akcijaID}/user/{userID}")]
-        public async Task<ActionResult> ApplyAkcija(int akcijaID, int userID)
+        [HttpPost("ApplyAkcija/{akcijaID}")]
+        public async Task<ActionResult> ApplyAkcija(int akcijaID)
         {
             try
             {
+                var userID = GetCurrentUserId();
                 var akcija = await Context.Akcije.FindAsync(akcijaID);
                 var user = await Context.Users.FindAsync(userID);
                 if(akcija == null)

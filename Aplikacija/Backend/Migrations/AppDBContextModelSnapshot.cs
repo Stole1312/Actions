@@ -30,13 +30,19 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
 
+                    b.Property<string>("ActionPicture")
+                        .HasColumnType("text");
+
                     b.Property<double>("AverageRating")
                         .HasColumnType("double precision");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateAndTime")
+                    b.Property<DateTime>("DTEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DTStart")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -378,8 +384,7 @@ namespace Backend.Migrations
                     b.Property<int>("AkcijaID")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Picture")
-                        .IsRequired()
+                    b.Property<string>("PictureUrl")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("TimeUploaded")
