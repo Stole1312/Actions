@@ -19,6 +19,7 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import CardReview from "../CardReview/CardReview.jsx"
 import Header from "../Header/Header.jsx"
+import { authFetch } from "../../../../api.js"
 
 export default function Main({ handleGoBackClick }) {
     //States
@@ -45,6 +46,7 @@ export default function Main({ handleGoBackClick }) {
     const typesElements = types.map((type) => (
         <button
             key={type}
+            type="button"
             onClick={() => setSelectedType(type)}
             className={
                 selectedType === type
@@ -60,6 +62,7 @@ export default function Main({ handleGoBackClick }) {
     const suggestionsElements = suggestions.map((place) => (
         <button
             key={place.place_id}
+            type="button"
             onClick={() => selectLocation(place)}
             className={styles["location-suggestion"]}
         >
@@ -82,7 +85,6 @@ export default function Main({ handleGoBackClick }) {
     }, [debouncedLocation])
 
     //Functions
-    function addAction(formData) {}
 
     function handleImageChange(event) {
         const file = event.target.files[0]
@@ -137,7 +139,7 @@ export default function Main({ handleGoBackClick }) {
         return null
     }
 
-    function submitAction(event) {
+    async function submitAction(event) {
         event.preventDefault()
 
         const missingFiles = []
@@ -161,7 +163,37 @@ export default function Main({ handleGoBackClick }) {
             return
         }
 
-        alert("MAJMUNEEE")
+        const typeMap = {
+            Ostalo: 0,
+            Izlasci: 1,
+            Sport: 2,
+            "Drustvene igre": 3,
+        }
+
+        const actionData = new FormData()
+        actionData.append("Title", title)
+        actionData.append("Description", description)
+        actionData.append("Location", locationText)
+        actionData.append("ActionPicture", selectedImage)
+        actionData.append("Type", typeMap[selectedType])
+        actionData.append("maxParticipants", maxParticipants)
+        actionData.append("Price", paid ? price : 0)
+        actionData.append("Created", new Date().toISOString())
+
+        const dtStart = new Date(date)
+        dtStart.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0)
+        const dtEnd = new Date(date)
+        dtEnd.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0)
+        actionData.append("DTStart", dtStart.toISOString())
+        actionData.append("DTEnd", dtEnd.toISOString())
+
+        const response = await authFetch("/Action/AddAkcija", {
+            method: "POST",
+            body: actionData,
+        })
+
+        console.log(response.status)
+        console.log(await response.text())
     }
     return (
         <div className={styles["add-action-page"]}>
@@ -171,7 +203,7 @@ export default function Main({ handleGoBackClick }) {
             />
             <main className={styles["main-add-action-page"]}>
                 <section className={styles["form-container"]}>
-                    <form action={addAction}>
+                    <form id="add-action-form" onSubmit={submitAction}>
                         <section className={styles["form-title-container"]}>
                             <h1>Onsovne informacije</h1>
                             <hr />
@@ -501,6 +533,7 @@ export default function Main({ handleGoBackClick }) {
                                     }
                                 >
                                     <button
+                                        type="button"
                                         className={
                                             paid
                                                 ? styles["price-button"]
@@ -524,6 +557,7 @@ export default function Main({ handleGoBackClick }) {
                                         Besplatno
                                     </button>
                                     <button
+                                        type="button"
                                         className={
                                             paid
                                                 ? styles[
@@ -578,17 +612,21 @@ export default function Main({ handleGoBackClick }) {
                             className={styles["publish-buttons-container"]}
                         >
                             <button
+                                type="button"
                                 className={styles["save-cancel-button"]}
                                 onClick={handleGoBackClick}
                             >
                                 Otkaži
                             </button>
-                            <button className={styles["save-cancel-button"]}>
+                            <button
+                                type="button"
+                                className={styles["save-cancel-button"]}
+                            >
                                 Sačuvaj nacrt
                             </button>
                             <button
+                                type="submit"
                                 className={styles["publish-button"]}
-                                onClick={submitAction}
                             >
                                 <PaperAirplaneIcon
                                     className={styles["publish-icon"]}

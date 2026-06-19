@@ -65,7 +65,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             // Ovde koristi isti ključ koji si koristio u GenerateJwtToken metodi
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value!)),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+
+            NameClaimType = ClaimTypes.NameIdentifier
         };
         //Parsuje token za signalR da odgovara headeru
         options.Events = new JwtBearerEvents
