@@ -1,17 +1,15 @@
 import { useState } from "react";
-import "./Auth.css" ;
+import styles from "./Auth.module.css";
 
 export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
     const [error, setError] = useState({ field: '', message: '' }); 
-    
-    // Uvodimo stanja samo za čuvanje teksta u poljima nakon greške
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
 
     async function handleSubmit(e) {
-        e.preventDefault(); // Sprečavamo podrazumevani submit da nam browser ne obriše polja
+        e.preventDefault(); 
         
         const formData = new FormData(e.target);
         const url = baseUrl + "/User/Login";
@@ -34,7 +32,6 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                     setError({ field: 'username', message: errorText });
                 } else if (errorText.toLowerCase().includes("password")) {
                     setError({ field: 'password', message: errorText });
-                    // Ako je pogrešna šifra, brišemo samo šifru da može odmah da kuca ponovo
                     setPassword(''); 
                 } else {
                     setError({ field: 'general', message: errorText });
@@ -45,7 +42,7 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
             const data = await response.json();
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", data.userViewModel.username);
-            localStorage.setItem("profilePicture",data.profilePicture);
+            localStorage.setItem("profilePicture", data.userViewModel.profilePicture);
 
             alert('Uspešno ste se ulogovali!');
             onLoginSuccess();
@@ -57,11 +54,10 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
     }
 
     return (
-        <div className="login-container auth-slider-wrapper">
-            {/* Vratili smo onSubmit={handleSubmit} umesto action-a radi bolje kontrole brisanja */}
-            <form className="loginForm" onSubmit={handleSubmit}>   
-                <div className="form-top-group">
-                    <div className="loginHeader">
+        <div className={`${styles['auth-slider-wrapper']} ${styles['login-container']}`}>
+            <form className={styles.loginForm} onSubmit={handleSubmit}>   
+                <div className={styles['form-top-group']}>
+                    <div className={styles.loginHeader}>
                         <h1>Login</h1>
                         <p>Welcome to Akcije</p>
                     </div> 
@@ -72,7 +68,6 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                         </p>
                     )}
                     
-                    {/* === USERNAME INPUT === */}
                     <label style={{ color: error.field === 'username' ? '#DC2626' : 'inherit' }}>
                         Username
                     </label>
@@ -82,10 +77,10 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                         placeholder="Enter your username here" 
                         required 
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)} // Pamti šta je korisnik ukucao
+                        onChange={(e) => setUsername(e.target.value)} 
                         style={{ 
                             border: error.field === 'username' ? '2px solid #DC2626' : '1px solid #ccc',
-                            marginBottom: error.field === 'username' ? '5px' : '15px'
+                            marginBottom: error.field === 'username' ? '5px' : '10px'
                         }}
                     />
                     {error.field === 'username' && (
@@ -94,7 +89,6 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                         </span>
                     )}
                     
-                    {/* === PASSWORD INPUT === */}
                     <label style={{ color: error.field === 'password' ? '#DC2626' : 'inherit' }}>
                         Password
                     </label>
@@ -104,10 +98,10 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                         placeholder="Enter your password here" 
                         required 
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)} // Pamti šifru, ali je mi praznimo ako pukne login
+                        onChange={(e) => setPassword(e.target.value)} 
                         style={{ 
                             border: error.field === 'password' ? '2px solid #DC2626' : '1px solid #ccc',
-                            marginBottom: error.field === 'password' ? '5px' : '15px'
+                            marginBottom: error.field === 'password' ? '5px' : '10px'
                         }}
                     />
                     {error.field === 'password' && (
@@ -118,7 +112,7 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
                 </div>
                 
                 <button type="submit">Log in!</button>
-                <p style={{ marginTop: '15px', width: '100%', textAlign: 'left' }}>
+                <p>
                     Don't have account yet?{' '}
                     <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToSignUp(); }}>
                         Click Here!

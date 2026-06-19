@@ -1,10 +1,18 @@
 .app-nav-bar {
+    /* dodao da mogu da zalepim dugme na dno */
+    display: flex;
+    flex-direction: column;
+
     flex: 1;
     height: 100vh;
     position: sticky;
     top: 0;
     background-color: #ffffff;
     border-right: 1px solid #e7e5e0;
+
+    /*dodao da se ne lepi za ivice*/
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .title-container {
@@ -26,7 +34,7 @@
 }
 
 .nav-buttons-container {
-    padding: 10px 20px;
+    /*odavde sam sklonio padding jer sam ga dodao gore*/
     display: flex;
     flex-direction: column;
 }
@@ -38,12 +46,38 @@
     align-items: center;
     gap: 5px;
 
+    padding: 0 15px; /* unutrasnji razmak za teks */
     border-radius: 16px;
     background: transparent;
     border: none;
+}
+.nav-buttons-container > button:hover{
+    color: #ffffff; /* da se lakse cita kad cove hoveruje*/
 }
 
 .nav-icons {
     width: 17px;
     height: 17px;
+}
+
+.add-akcija-button {
+    margin-top: auto; 
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    
+    height: 48px;
+    width: 100%;
+    background-color: #F59E0B; 
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    
+    border: none;
+    border-radius: 24px; /* na figmi je ovako a i meni se licno svidja da je zaobljenije*/
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }

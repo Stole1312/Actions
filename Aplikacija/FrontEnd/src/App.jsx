@@ -4,6 +4,7 @@ import SignUpForm from "./pages/AuthorizationPage/SignUpForm"
 import MainPage from "./pages/MainPage/MainPage"
 import AddActionPage from "./pages/AddActionPage/AddActionPage.jsx"
 import NavBar from "./components/NavBar.jsx"
+import MyProfilePage from "./pages/MyProfilePage/MyProfilePage.jsx"
 
 export default function App() {
     const [currentView, setCurrentView] = useState(() => {
@@ -42,10 +43,7 @@ export default function App() {
                         selected={"main"}
                     />
                     <MainPage
-                        onLogout={() => {
-                            setCurrentView("login")
-                            localStorage.clear()
-                        }}
+                        onMyProfileClick={() => { setCurrentView("myProfilePage")}}
                         handleAddActionClick={() => setCurrentView("addAction")}
                     />
                 </div>
@@ -59,6 +57,22 @@ export default function App() {
                     />
                     <AddActionPage
                         handleGoBackClick={() => setCurrentView("main")}
+                    />
+                </div>
+            )}
+
+            {currentView === "myProfilePage" && (
+                <div className="app-layout">
+                    <NavBar
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        selected={"myProfilePage"}
+                    />
+                    <MyProfilePage
+                        onLogout={() => {
+                            setCurrentView("login")
+                            localStorage.clear()
+                        }}
                     />
                 </div>
             )}

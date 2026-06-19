@@ -5,6 +5,7 @@ import {
     CalendarIcon,
     UsersIcon,
     ChatBubbleOvalLeftIcon,
+    PlusIcon
 } from "@heroicons/react/24/outline"
 
 export default function NavBar(props) {
@@ -46,6 +47,13 @@ export default function NavBar(props) {
                     Profil
                 </button>
             </div>
+            <button 
+                className={styles["add-akcija-button"]}
+                onClick={() => props.setCurrentView("addAction")}
+            >
+                <PlusIcon className={styles["nav-icons"]}/>
+                Add Akcija
+            </button>
         </nav>
     )
 }

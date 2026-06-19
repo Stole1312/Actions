@@ -1,0 +1,180 @@
+.header-main-page{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.upper-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 30px;
+    gap: 20px;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.profile-picture-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden; /*sve sto je van okvira se ne vidi*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto; /* da ga gurne desno */
+}
+
+.profile-picture-img {
+    width: 100%;
+    height: 100%;
+    object-fit:cover;
+}
+
+.search-container, .datepicker-container {
+    display: flex;
+    align-items: center;
+    background-color: #f5f4f0; 
+    border-radius: 25px; 
+    padding: 8px 20px;
+    border: 1px solid #e2e0da;
+    transition: all 0.2s ease;
+}
+.search-container{
+    width: 320;
+}
+.datepicker-container{
+    width: 200px;
+}
+
+/*stil unutar inputa*/
+.custom-input, .custom-datepicker {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    width: 100%;
+    font-size: 15px;
+    color: #4a4a4a;
+    padding-left: 10px;
+}
+
+.input-icon {
+    width: 20px;
+    height: 20px;
+    color: #7a7874;
+    flex-shrink: 0;
+}
+
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    background-color: #f5f4f0;
+    border-radius: 25px;
+    padding: 2px 15px 2px 20px;
+    border: 1px solid #e2e0da;
+}
+
+.input-icon-dropdown {
+    width: 20px;
+    height: 20px;
+    color: #d97706; 
+    margin-right: 5px;
+}
+
+/* Resetovanje Bootstrap dugmeta da se uklopi u dizajn */
+.custom-dropdown :global(.btn-primary) {
+    background: transparent !important;
+    border: none !important;
+    color: #1a1a1a !important;
+    font-weight: 500;
+    padding: 6px 10px !important;
+    font-size: 15px;
+}
+
+.right-side-container {
+    margin-left: auto; 
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.notification-bell {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    background-color: #f5f4f0;
+    border-radius: 15px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #e2e0da;
+}
+
+.bell-icon {
+    width: 24px;
+    height: 24px;
+    color: #1a1a1a;
+}
+
+.bell-badge {
+    position: absolute;
+    top: 10px;
+    right: 11px;
+    width: 8px;
+    height: 8px;
+    background-color: #d97706; 
+    border-radius: 50%;
+}
+
+.lower-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px 30px;
+    background-color: #FAFAF8;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.tip-label {
+    font-size: 14px;
+    color: #78716c;
+    font-weight: 500;
+    margin-right: 15px;
+}
+
+.buttons-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px; 
+}
+
+.filter-button {
+    background: transparent;
+    border: 1px solid #e7e5e0;
+    padding: 6px 16px;
+    border-radius: 20px; 
+    font-size: 14px;
+    font-weight: 500;
+    color: #57534e;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    background-color: #f5f4f0;
+    border-color: #d6d3d1;
+    color: #ffffff
+}
+
+.filter-button.active {
+    background-color: #F59E0B;
+    color: #ffffff;
+    border-color: #F59E0B;
+}
