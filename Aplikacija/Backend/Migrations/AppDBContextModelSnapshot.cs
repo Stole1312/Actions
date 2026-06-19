@@ -125,6 +125,9 @@ namespace Backend.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastReadAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("UserID")
                         .HasColumnType("integer");
 

@@ -21,8 +21,13 @@ export default function Header(props) {
                     Sačuvaj nacrt
                 </button>
                 <button
+                    type="button"
                     className={styles["publish-button-add-action-page"]}
-                    onClick={props.onSubmit}
+                    onClick={() =>
+                        document
+                            .getElementById("add-action-form")
+                            .requestSubmit()
+                    }
                 >
                     <PaperAirplaneIcon
                         className={styles["publish-button-icon"]}

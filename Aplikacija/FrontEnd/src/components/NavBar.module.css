@@ -8,7 +8,6 @@
     border-right: 1px solid #e7e5e0;
 
     /*dodao da se ne lepi za ivice*/
-    padding: 20px;
     box-sizing: border-box;
 }
 
@@ -49,7 +48,8 @@
     background: transparent;
     border: none;
 }
-.nav-buttons-container > button:hover{
+.nav-buttons-container > button:hover {
+    background-color: #f59e0b;
     color: #ffffff; /* da se lakse cita kad cove hoveruje*/
 }
 

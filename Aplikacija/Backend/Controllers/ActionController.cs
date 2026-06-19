@@ -16,9 +16,10 @@ namespace Backend.Controllers
     {
         public Backend.Models.AppDBContext Context { get; set; }
         private readonly IConfiguration _configuration;
-        public ActionController(Backend.Models.AppDBContext context)
+        public ActionController(Backend.Models.AppDBContext context, IConfiguration configuration)
         {
             Context = context;
+            _configuration = configuration;
         }
 
         private int GetCurrentUserId()

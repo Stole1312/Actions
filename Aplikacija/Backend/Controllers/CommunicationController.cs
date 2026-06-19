@@ -267,6 +267,24 @@ public class CommunicationController : ControllerBase
     }
 
     [Authorize]
+    [HttpPut("MarkChatAsRead/{chatId}")]
+    public async Task<ActionResult> MarkChatAsRead(int chatId)
+    {
+        int currentUserId = GetCurrentUserId();
+
+        var participant = await Context.ChatParticipants
+            .FirstOrDefaultAsync(cp => cp.ChatID == chatId && cp.UserID == currentUserId);
+        if (participant == null)
+            return StatusCode(403, "You are not participant of this chat!");
+
+        participant.LastReadAt = DateTime.UtcNow;
+
+        await Context.SaveChangesAsync();
+
+        return Ok("Chat marked as read.");
+    }
+
+    [Authorize]
     [HttpGet("GetMyChats")]
     public async Task<ActionResult> GetMyChats()
     {
@@ -278,7 +296,38 @@ public class CommunicationController : ControllerBase
             //Pronalazi sve chatove
             var chats = await Context.ChatParticipants
                 .Where(cp => cp.UserID == currentUserId)
-                .Select(cp => cp.Chat)
+                .Select(cp => new
+                {
+                    cp.Chat.ID,
+                    cp.Chat.Name,
+                    cp.Chat.Type,
+
+                    OtherUser = cp.Chat.Participants
+                        .Where(p => p.UserID != currentUserId)
+                        .Select(p => new
+                        {
+                            p.User.ID,
+                            p.User.Username,
+                            p.User.ProfilePicture
+                        })
+                        .FirstOrDefault(),
+
+                    LastMessage = cp.Chat.Messages
+                        .OrderByDescending(m => m.Sent)
+                        .Select(m => new
+                        {
+                            m.ID,
+                            m.Content,
+                            m.SenderID,
+                            m.Sent
+                        })
+                        .FirstOrDefault(),
+
+                    UnreadCount = cp.Chat.Messages.Count(m =>
+                        m.SenderID != currentUserId &&
+                        (cp.LastReadAt == null || m.Sent > cp.LastReadAt)
+                    )
+                })
                 .ToListAsync();
 
             return Ok(chats);
@@ -339,6 +388,23 @@ public class CommunicationController : ControllerBase
                     newMessage.Content,
                     newMessage.Sent
                 });
+
+            //Salje ucesnicima chata signal da je doslo do neke promene (stigla je nova poruka)
+            var receiverIds = await Context.ChatParticipants
+                .Where(cp => cp.ChatID == smDTO.ChatID && cp.UserID != currentUserId)
+                .Select(cp => cp.UserID)
+                .ToListAsync();
+
+            foreach (var receiverId in receiverIds)
+            {
+                await _hubContext.Clients
+                    .User(receiverId.ToString())
+                    .SendAsync("UnreadMessagesChanged", new
+                    {
+                        ChatID = smDTO.ChatID
+                    });
+            }
+
 
             return Ok(new
             {
@@ -427,5 +493,4 @@ public class CommunicationController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
 }
