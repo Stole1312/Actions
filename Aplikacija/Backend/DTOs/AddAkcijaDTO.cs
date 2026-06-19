@@ -11,7 +11,6 @@ namespace Backend.Models
         public ActionTypes Type {get;set;}
         public DateTime DTStart{get;set;}
         public DateTime DTEnd{get;set;}
-        public int ProducerID{get;set;}
         public int maxParticipants {get;set;}
         public decimal? Price {get;set;} 
         public DateTime Created{get;set;}

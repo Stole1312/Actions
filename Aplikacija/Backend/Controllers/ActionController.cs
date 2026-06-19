@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualBasic;
 using Backend.DTOs;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace Backend.Controllers
 {
@@ -20,11 +21,21 @@ namespace Backend.Controllers
             Context = context;
         }
 
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(string.IsNullOrEmpty(userIdClaim))
+                throw new Exception("User ID not found in token!");
+            
+            return int.Parse(userIdClaim);
+        }
+
         [HttpPost("AddAkcija")]
         public async Task<ActionResult> AddAkcija([FromForm] AddAkcijaDTO akcijaDTO)
         {
             try
             {
+                var userID = GetCurrentUserId();
                 if (string.IsNullOrWhiteSpace(akcijaDTO.Title))
                     return BadRequest("Your action must have a title");
                 if (string.IsNullOrWhiteSpace(akcijaDTO.Description))
@@ -34,9 +45,9 @@ namespace Backend.Controllers
                 else if (akcijaDTO.DTStart.ToUniversalTime() < DateTime.UtcNow)
                     return BadRequest("You cant add an akcija that has already started");
 
-                var producer = await Context.Users.FindAsync(akcijaDTO.ProducerID);
+                var producer = await Context.Users.FindAsync(userID);
                 if (producer == null)
-                    return BadRequest($"There is no user with ID: {akcijaDTO.ProducerID}");
+                    return BadRequest($"There is no user with ID: {userID}");
 
                 // Default slika ako korisnik ne uploaduje svoju
                 string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/AkcijaPictures/defaultAkcija.jpg";
@@ -95,7 +106,7 @@ namespace Backend.Controllers
                     Type = akcijaDTO.Type,
                     DTStart = akcijaDTO.DTStart,
                     DTEnd = akcijaDTO.DTEnd,
-                    ProducerID = akcijaDTO.ProducerID,
+                    ProducerID = userID,
                     Producer = producer,
                     maxParticipants = (akcijaDTO.maxParticipants == 0 || akcijaDTO.maxParticipants == null) ? 10 : akcijaDTO.maxParticipants,
                     currentNumParticipants = 1,
@@ -168,11 +179,12 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpPost("ApplyAkcija/{akcijaID}/user/{userID}")]
-        public async Task<ActionResult> ApplyAkcija(int akcijaID, int userID)
+        [HttpPost("ApplyAkcija/{akcijaID}")]
+        public async Task<ActionResult> ApplyAkcija(int akcijaID)
         {
             try
             {
+                var userID = GetCurrentUserId();
                 var akcija = await Context.Akcije.FindAsync(akcijaID);
                 var user = await Context.Users.FindAsync(userID);
                 if(akcija == null)
