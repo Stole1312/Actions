@@ -40,6 +40,7 @@ export default function App() {
                     <NavBar
                         currentView={currentView}
                         setCurrentView={setCurrentView}
+                        handleAddActionClick={() => setCurrentView("addAction")}
                         selected={"main"}
                     />
                     <MainPage
@@ -54,6 +55,7 @@ export default function App() {
                     <NavBar
                         currentView={currentView}
                         setCurrentView={setCurrentView}
+                        addActionButton={true}
                     />
                     <AddActionPage
                         handleGoBackClick={() => setCurrentView("main")}

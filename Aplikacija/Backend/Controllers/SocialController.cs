@@ -1,5 +1,7 @@
 namespace Backend.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class SocialController : ControllerBase
 {
     public Backend.Models.AppDBContext Context { get; set; }
