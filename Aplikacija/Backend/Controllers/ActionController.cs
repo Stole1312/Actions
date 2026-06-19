@@ -216,5 +216,17 @@ namespace Backend.Controllers
                 return BadRequest(e);
             }
         }
+        [HttpGet("GetActionTypes")]
+        public async Task<ActionResult> GetActionTypes()
+        {
+            var types = Enum.GetValues(typeof(ActionTypes))
+                    .Cast<ActionTypes>()
+                    .Select(e => new {
+                        Id = (int)e,
+                        Name = e.ToString() // Vraća "Other", "NightOut", "SportEvent"...
+                    });
+
+            return Ok(types);
+        }
     }
 }

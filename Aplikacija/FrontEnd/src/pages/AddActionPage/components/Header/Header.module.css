@@ -7,7 +7,10 @@
     background-color: #ffffff;
     border-bottom: 1px solid #e7e5e0;
     margin: 0;
-    padding: 10px 0px;
+    /* ovde sam ti promenio paddinge da ne bi dugme objavi akciju virilo napolje*/
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 30px;
 }
 
 .back-button-add-action-page {

@@ -6,6 +6,10 @@
     top: 0;
     background-color: #ffffff;
     border-right: 1px solid #e7e5e0;
+
+    /*dodao da se ne lepi za ivice*/
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .title-container {
@@ -40,9 +44,13 @@
     align-items: center;
     gap: 5px;
 
+    padding: 0 15px; /* unutrasnji razmak za teks */
     border-radius: 16px;
     background: transparent;
     border: none;
+}
+.nav-buttons-container > button:hover{
+    color: #ffffff; /* da se lakse cita kad cove hoveruje*/
 }
 
 .nav-icons {
