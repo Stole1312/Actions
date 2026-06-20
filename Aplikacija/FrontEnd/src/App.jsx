@@ -22,6 +22,18 @@ export default function App() {
     const [totalUnread, setTotalUnread] = useState(0)
     const [connection, setConnection] = useState(null)
 
+    useEffect(() => {
+        localStorage.setItem("currentView", currentView)
+    }, [currentView])
+
+    useEffect(() => {
+        if (previousView) {
+            localStorage.setItem("previousView", previousView)
+        } else {
+            localStorage.removeItem("previousView")
+        }
+    }, [previousView])
+
     //SIDE EFFECTS
     //Ubacio sam ovo da kad uradish refresh da te ne vrati na login vec da ostanes na trenutnu stranicu
     useEffect(() => {
@@ -134,8 +146,9 @@ export default function App() {
                     />
                     <MyProfilePage
                         onLogout={() => {
-                            setCurrentView("login")
-                            localStorage.clear()
+                            localStorage.clear();
+                            setPreviousView(null);
+                            etCurrentView("login");
                         }}
                     />
                 </div>
