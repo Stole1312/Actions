@@ -1,0 +1,413 @@
+.header-main-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.upper-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 30px;
+    gap: 12px;
+    border-bottom: 1px solid #e7e5e0;
+    /* sklonjen margin-bottom da ne pravi belu prazninu pre pozadine */
+}
+
+.search-container {
+    width: 300px;
+}
+
+.datepicker-container {
+    position: relative;
+    width: 200px;
+}
+
+.dropdown-container {
+    position: relative;
+    width: 220px;
+}
+
+.search-container,
+.datepicker-container,
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    background-color: #f5f4f0;
+    border-radius: 25px;
+    padding: 6px 16px;
+    border: 1px solid #e2e0da;
+    transition: all 0.2s ease;
+}
+
+.search-container:hover,
+.datepicker-container:hover,
+.dropdown-container:hover {
+    border-color: #d97706;
+}
+
+.custom-input,
+.custom-datepicker,
+.custom-input-location {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    width: 100%;
+    font-size: 14px;
+    color: #4a4a4a;
+    padding-left: 8px;
+}
+
+.datepicker-container :global(.react-datepicker__input-container input) {
+    max-width: 155px;
+    padding-right: 30px !important; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.input-icon {
+    width: 18px;
+    height: 18px;
+    color: #7a7874;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.search-container:hover .input-icon,
+.datepicker-container:hover .input-icon {
+    color: #d97706;
+}
+
+.input-icon-dropdown {
+    width: 18px;
+    height: 18px;
+    color: #d97706;
+    flex-shrink: 0;
+}
+
+.datepicker-container :global(.react-datepicker__input-container) {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.datepicker-container :global(.react-datepicker__close-icon) {
+    position: absolute;
+    padding: 0;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: auto;
+    display: flex;
+    align-items: center;
+}
+
+.datepicker-container :global(.react-datepicker__close-icon::after) {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    font-size: 12px;
+    font-weight: 700;
+    content: "×";
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    padding-bottom: 2px;
+    box-sizing: border-box;
+}
+
+.datepicker-container :global(.react-datepicker__close-icon:hover::after) {
+    background-color: #b45309 !important;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e2e0da;
+    border-radius: 15px;
+    margin: 0;
+    padding: 6px 0;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.06);
+}
+
+.autocomplete-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4a4a4a;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.autocomplete-item:hover {
+    background-color: #f5f4f0;
+    color: #d97706;
+}
+
+.autocomplete-item strong {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.autocomplete-item:hover strong {
+    color: #d97706;
+}
+
+.country-span {
+    font-size: 13px;
+    color: #7a7874;
+}
+
+.right-side-container {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.notification-bell {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    background-color: #f5f4f0;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #e2e0da;
+    transition: all 0.2s ease;
+}
+
+.notification-bell:hover {
+    border-color: #d97706;
+    background-color: #ffffff;
+}
+
+.bell-icon {
+    width: 22px;
+    height: 22px;
+    color: #1a1a1a;
+    transition: color 0.2s ease;
+}
+
+.notification-bell:hover .bell-icon {
+    color: #d97706;
+}
+
+.bell-badge {
+    position: absolute;
+    top: 10px;
+    right: 11px;
+    width: 8px;
+    height: 8px;
+    background-color: #d97706;
+    border-radius: 50%;
+}
+
+.profile-picture-container {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.profile-picture-container:hover {
+    border-color: #d97706;
+}
+
+.profile-picture-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* fiks za pozadinu: prostor pomeren u padding-top umesto margine */
+.lower-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 22px 30px 10px 30px; 
+    background-color: #fafaf8;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.filters-left-group {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.dropdown-menu-container,
+.distance-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tip-label,
+.distance-label {
+    font-size: 14px;
+    color: #78716c;
+    font-weight: 500;
+}
+
+.custom-select {
+    padding: 6px 35px 6px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #57534e;
+    background-color: #ffffff;
+    border: 1px solid #e7e5e0;
+    border-radius: 20px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 160px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357534e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+.custom-select:hover {
+    background-color: #ffffff;
+    border-color: #d97706;
+    color: #1a1a1a;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.custom-select:focus {
+    border-color: #d97706;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.custom-select option {
+    background-color: #ffffff;
+    color: #4a4a4a;
+    font-weight: 500;
+}
+
+.distance-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e7e5e0;
+    border-radius: 20px;
+    padding: 6px 35px 6px 15px;
+    width: 90px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.distance-input-wrapper:hover,
+.distance-input-wrapper:focus-within {
+    border-color: #d97706;
+}
+
+.distance-input-wrapper:focus-within {
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.custom-input-distance {
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-align: left;
+}
+
+.custom-input-distance::-webkit-outer-spin-button,
+.custom-input-distance::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.distance-suffix {
+    position: absolute;
+    right: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #78716c;
+    pointer-events: none;
+}
+
+/* izmenjeno: prebaceno na zelene nijanse */
+.sort-button {
+    background: transparent;
+    border: 1px solid #e7e5e0;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #57534e;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+    background-color: #ffffff;
+    border-color: #047857; /* tamnija zelena za okvir na hover */
+    color: #1a1a1a;
+}
+
+.sort-button.active {
+    background-color: #10b981; /* tvoja zelena boja */
+    color: #ffffff;
+    border-color: #047857; /* tamnija zelena za okvir aktivnog stanja */
+}
+
+.filters-right-group {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* razmak između "Najjeftinije prvo" i "Primeni" */
+}
+
+/* Ako već nisi stilizovao .apply-button, evo predloga da se uklopi */
+.apply-button {
+    background-color: #d97706;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.apply-button:hover {
+    background-color: #b45309;
+}

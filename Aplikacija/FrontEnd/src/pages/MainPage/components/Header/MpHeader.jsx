@@ -12,68 +12,37 @@ import "react-datepicker/dist/react-datepicker.css"
 export default function MpHeader(props) {
     const profilePicture = localStorage.getItem("profilePicture");
     
-    const [types, setTypes] = useState([]);
-    const [activeType, setActiveType] = useState(null);
-
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-
-    const [cityInput, setCityInput] = useState(""); 
     const [suggestions, setSuggestions] = useState([]); 
-    const [selectedCoordinates, setSelectedCoordinates] = useState(null); 
     const [showSuggestions, setShowSuggestions] = useState(false);
     
     const dropdownRef = useRef(null);
 
     useEffect(() => {
-        async function fetchTypes() {
-            try {
-                const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
-                const response = await fetch(`${baseUrl}/Action/GetActionTypes`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                
-                const data = await response.json();
-                setTypes([{ id: null, name: "Sve" }, ...data]);
-            } catch (error) {
-                console.error("Greška pri povlačenju tipova:", error);
-            }
-        }
+        // Autodetekcija lokacije se okida samo ako roditelj već nema podešene koordinate/grad
+        if (props.selectedCoordinates) return;
 
-        fetchTypes();
-    }, []);
-
-    //za uzimanje lokacije korisnika
-    useEffect(() => {
         async function detectLocationByIP() {
             try {
                 const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
                 const response = await fetch(`${baseUrl}/Action/GetClientLocation`);
-                
                 if (!response.ok) throw new Error("Greška na našem serveru");
 
                 const data = await response.json();
-                
                 if (data && data.cityName) {
-                    setCityInput(`${data.cityName}, ${data.countryName}`);
-                    setSelectedCoordinates({
-                        lat: data.latitude,
-                        lng: data.longitude
-                    });
+                    props.setCityInput(`${data.cityName}, ${data.countryName}`);
+                    props.setSelectedCoordinates({ lat: data.latitude, lng: data.longitude });
                 }
             } catch (error) {
-                console.error("API nije odgovorio salje se na Bg", error);
-                setCityInput("Beograd, Srbija");
-                setSelectedCoordinates({ lat: 44.7871, lng: 20.4489 });
+                console.error("API nije odgovorio, šalje se na Bg", error);
+                props.setCityInput("Beograd, Srbija");
+                props.setSelectedCoordinates({ lat: 44.7871, lng: 20.4489 });
             }
         }
-        
         detectLocationByIP();
     }, []);
 
     useEffect(() => {
-        if (cityInput.trim().length < 2) {
+        if (props.cityInput.trim().length < 2) {
             setSuggestions([]);
             return;
         }
@@ -81,9 +50,8 @@ export default function MpHeader(props) {
         const delayDebounceFn = setTimeout(async () => {
             try {
                 const response = await fetch(
-                    `https://photon.komoot.io/api/?q=${encodeURIComponent(cityInput)}&limit=15`
+                    `https://photon.komoot.io/api/?q=${encodeURIComponent(props.cityInput)}&limit=15`
                 );
-                
                 if (!response.ok) throw new Error("Mrežna greška");
                 const data = await response.json();
                 
@@ -97,12 +65,8 @@ export default function MpHeader(props) {
                         name: f.properties.name,
                         country: f.properties.country || "",
                         state: f.properties.state || "",
-                        coordinates: {
-                            lat: f.geometry.coordinates[1],
-                            lng: f.geometry.coordinates[0]
-                        }
+                        coordinates: { lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] }
                     }));
-                    
                     setSuggestions(places);
                 } else {
                     setSuggestions([]);
@@ -111,10 +75,10 @@ export default function MpHeader(props) {
                 console.error("Greška sa Geocoding API-jem:", error);
                 setSuggestions([]);
             }
-        }, 400); // Debounce pauza od 400ms
+        }, 400);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [cityInput]);
+    }, [props.cityInput]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -128,56 +92,55 @@ export default function MpHeader(props) {
 
     const handleDateChange = (dates) => {
         const [start, end] = dates;
-        setStartDate(start);
-        setEndDate(end);
+        props.setStartDate(start);
+        props.setEndDate(end);
     };
 
     const handleSelectSuggestion = (place) => {
         const displayName = place.state ? `${place.name}, ${place.state}, ${place.country}` : `${place.name}, ${place.country}`;
-        setCityInput(displayName);
-        setSelectedCoordinates(place.coordinates);
+        props.setCityInput(displayName);
+        props.setSelectedCoordinates(place.coordinates);
         setSuggestions([]);
         setShowSuggestions(false);
-        
     };
 
     return (
         <header className={styles["header-main-page"]}>
             
             <div className={styles["upper-header"]}>
-                {/* Search */}
                 <div className={styles["search-container"]}>
                     <MagnifyingGlassIcon className={styles["input-icon"]} />
                     <input
                         type="text"
                         placeholder="Search akcije..."
                         className={styles["custom-input"]}
+                        value={props.title}
+                        onChange={(e) => props.setTitle(e.target.value)}
                     />
                 </div>
 
-                {/* kalendar */}
                 <div className={styles["datepicker-container"]}>
                     <CalendarIcon className={styles["input-icon"]} />
                     <DatePicker
                         selectsRange={true}
-                        startDate={startDate}
-                        endDate={endDate}
+                        startDate={props.startDate}
+                        endDate={props.endDate}
                         onChange={handleDateChange}
                         isClearable={true}
                         placeholderText="Select date range"
                         className={styles["custom-datepicker"]}
-                        selected={startDate} 
+                        selected={props.startDate} 
+                        dateFormat="dd.MM."
                     />
                 </div>
 
-                {/* input sa lokacijom */}
                 <div className={styles["dropdown-container"]} ref={dropdownRef}>
                     <MapPinIcon className={styles["input-icon-dropdown"]} />
                     <input
                         type="text"
-                        value={cityInput}
+                        value={props.cityInput}
                         onChange={(e) => {
-                            setCityInput(e.target.value);
+                            props.setCityInput(e.target.value);
                             setShowSuggestions(true);
                         }}
                         onFocus={() => setShowSuggestions(true)}
@@ -185,7 +148,6 @@ export default function MpHeader(props) {
                         className={styles["custom-input-location"]}
                     />
                     
-                    {/* lista predloga */}
                     {showSuggestions && suggestions.length > 0 && (
                         <ul className={styles["autocomplete-dropdown"]}>
                             {suggestions.map((place, index) => (
@@ -204,7 +166,6 @@ export default function MpHeader(props) {
                     )}
                 </div>
 
-                {/* notifikacije i profil slika */}
                 <div className={styles["right-side-container"]}>
                     <div className={styles["notification-bell"]}>
                         <BellIcon className={styles["bell-icon"]} />
@@ -214,7 +175,7 @@ export default function MpHeader(props) {
                     <div className={styles["profile-picture-container"]}>
                         <img 
                             src={profilePicture} 
-                            alt="Profile Picture" 
+                            alt="Profile" 
                             className={styles["profile-picture-img"]} 
                             onClick={() => props.onImageClick()}
                         />
@@ -222,29 +183,56 @@ export default function MpHeader(props) {
                 </div>
             </div>
 
-            {/* donji deo headera */}
             <div className={styles["lower-header"]}>
-                <div className={styles["dropdown-menu-container"]}>
-                    <label htmlFor="type-filter" className={styles["tip-label"]}>Tip:</label>
-                    <select
-                        id="type-filter"
-                        value={activeType ?? ""} // Ako je activeType null (opcija "Sve"), vrednost je prazan string
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            // Ako je korisnik izabrao "Sve" (prazan string), postavljamo null, inače kastujemo u broj
-                            setActiveType(value === "" ? null : Number(value));
-                        }}
-                        className={styles["custom-select"]}
+                <div className={styles["filters-left-group"]}>
+                    <div className={styles["dropdown-menu-container"]}>
+                        <label htmlFor="type-filter" className={styles["tip-label"]}>Tip:</label>
+                        <select
+                            id="type-filter"
+                            value={props.actionType ?? ""}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                props.setActionType(value === "" ? null : Number(value));
+                            }}
+                            className={styles["custom-select"]}
+                        >
+                            {props.types.map((type) => (
+                                <option key={type.id ?? "all"} value={type.id ?? ""}>
+                                    {type.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className={styles["distance-container"]}>
+                        <span className={styles["distance-label"]}>U krugu od:</span>
+                        <div className={styles["distance-input-wrapper"]}>
+                            <input
+                                type="number"
+                                value={props.distance}
+                                min="1"
+                                onChange={(e) => props.setDistance(e.target.value ? Number(e.target.value) : "")}
+                                className={styles["custom-input-distance"]}
+                            />
+                            <span className={styles["distance-suffix"]}>km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles["filters-right-group"]}>
+                    <button 
+                        className={`${styles["sort-button"]} ${props.cheapestFirst ? styles["active"] : ""}`}
+                        onClick={() => props.setCheapestFirst(!props.cheapestFirst)}
                     >
-                        {types.map((type) => (
-                            <option 
-                                key={type.id ?? "all"} 
-                                value={type.id ?? ""}
-                            >
-                                {type.name}
-                            </option>
-                        ))}
-                    </select>
+                        Najjeftinije prvo
+                    </button>
+
+                    <button 
+                        className={styles["apply-button"]}
+                        onClick={props.onApplyFilters}
+                    >
+                        Primeni
+                    </button>
                 </div>
             </div>
 

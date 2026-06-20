@@ -215,8 +215,8 @@ namespace Backend.Controllers
             }
         }
 
-        [HttpGet("FilterAkcija")]
-        public async Task<ActionResult> FilterAkcija([FromQuery] AkcijaFilterDTO filter)
+        [HttpPost("FilterAkcija")]
+        public async Task<ActionResult> FilterAkcija([FromBody] AkcijaFilterDTO filter)
         {
             try
             {
