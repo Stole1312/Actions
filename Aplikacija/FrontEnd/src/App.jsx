@@ -111,10 +111,6 @@ export default function App() {
                         onMyProfileClick={() => {
                             setCurrentView("myProfilePage")
                         }}
-                        handleAddActionClick={() => {
-                            setCurrentView("addAction")
-                            setPreviousView("main")
-                        }}
                     />
                 </div>
             )}
