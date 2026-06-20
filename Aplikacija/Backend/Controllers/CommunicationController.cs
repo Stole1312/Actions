@@ -328,6 +328,9 @@ public class CommunicationController : ControllerBase
                         (cp.LastReadAt == null || m.Sent > cp.LastReadAt)
                     )
                 })
+                .OrderByDescending(c => c.LastMessage != null
+                    ? c.LastMessage.Sent
+                    : DateTime.MinValue)
                 .ToListAsync();
 
             return Ok(chats);

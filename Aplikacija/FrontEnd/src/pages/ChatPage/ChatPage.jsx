@@ -36,6 +36,11 @@ export default function ChatPage(props) {
         messagesEndRef.current?.scrollIntoView()
     }, [messages])
 
+    const inputRef = useRef(null)
+    useEffect(() => {
+        inputRef.current?.focus()
+    }, [selectedChat])
+
     //SignalR listener
     useEffect(() => {
         if (!props.connection) return
@@ -328,6 +333,7 @@ export default function ChatPage(props) {
                             onSubmit={sendMessage}
                         >
                             <input
+                                ref={inputRef}
                                 type="text"
                                 placeholder="Napiši poruku..."
                                 value={messageText}
