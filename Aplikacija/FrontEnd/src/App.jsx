@@ -144,7 +144,7 @@ export default function App() {
                         onLogout={() => {
                             localStorage.clear();
                             setPreviousView(null);
-                            etCurrentView("login");
+                            setCurrentView("login");
                         }}
                     />
                 </div>

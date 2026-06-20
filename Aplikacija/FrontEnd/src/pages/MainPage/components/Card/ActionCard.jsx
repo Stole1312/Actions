@@ -21,18 +21,6 @@ export default function ActionCard({ action, types}) {
         return `${formattedDate} · ${time}`;
     };
 
-    // Mapiranje tipa akcije u tekstualni tag (prilagodi svojim ID-jevima sa backenda)
-    const getTypeText = (typeId) => {
-        const types = {
-            0: "Zabava",
-            1: "Sport",
-            2: "Društvene igre",
-            3: "Umetnost",
-            4: "Muzika"
-        };
-        return types[typeId] || "Ostalo";
-    };
-
     // Funkcija za odlazak na detalje akcije
     const handleCardClick = () => {
         console.log(`Otvaram detalje za akciju sa ID-jem: ${action.id}`);

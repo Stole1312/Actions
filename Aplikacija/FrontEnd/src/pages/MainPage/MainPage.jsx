@@ -92,6 +92,7 @@ export default function MainPage(props) {
                 title={title} setTitle={setTitle}
                 onApplyFilters={handleApplyFilters}
                 types={types} setTypes={setTypes}
+                onImageClick={props.onMyProfileClick}
             />
             
             {/* MREŽA KARTICA UNUTAR MAIN TAGA */}
