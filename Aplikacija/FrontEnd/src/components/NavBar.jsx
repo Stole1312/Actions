@@ -7,6 +7,8 @@ import {
     ChatBubbleOvalLeftIcon,
 } from "@heroicons/react/24/outline"
 import { PlusIcon } from "@heroicons/react/24/solid"
+import { useEffect, useState } from "react"
+import { authFetch } from "../api"
 
 export default function NavBar(props) {
     return (
@@ -52,6 +54,21 @@ export default function NavBar(props) {
                 >
                     <ChatBubbleOvalLeftIcon className={styles["nav-icons"]} />
                     Poruke
+                    {props.totalUnread !== 0 && (
+                        <div
+                            className={styles["unread-count-container"]}
+                            style={
+                                props.selected === "chatPage"
+                                    ? {
+                                          backgroundColor: "white",
+                                          color: "#F59E0B",
+                                      }
+                                    : {}
+                            }
+                        >
+                            {props.totalUnread > 9 ? "9+" : props.totalUnread}
+                        </div>
+                    )}
                 </button>
                 <button>
                     <UserIcon className={styles["nav-icons"]} />
