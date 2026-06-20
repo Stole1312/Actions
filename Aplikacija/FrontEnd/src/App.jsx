@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import * as signalR from "@microsoft/signalr"
+import { authFetch } from "./api"
 import LoginForm from "./pages/AuthorizationPage/LoginForm"
 import SignUpForm from "./pages/AuthorizationPage/SignUpForm"
 import MainPage from "./pages/MainPage/MainPage"
@@ -13,14 +15,54 @@ export default function App() {
     })
     //Ubacio sam da bi back dugme znalo na koju stranicu da se vrati (sig bolje da se napravi stack ali i ovo radi poso)
     const [previousView, setPreviousView] = useState(() => {
-        return localStorage.getItem("previousView" || null)
+        return localStorage.getItem("previousView")
     })
 
+    //Ovaj state je za unreadMessages za NavBar i za chat
+    const [totalUnread, setTotalUnread] = useState(0)
+    const [connection, setConnection] = useState(null)
+
+    //SIDE EFFECTS
     //Ubacio sam ovo da kad uradish refresh da te ne vrati na login vec da ostanes na trenutnu stranicu
     useEffect(() => {
-        localStorage.setItem("currentView", currentView)
-        localStorage.setItem("previousView", previousView)
+        if (currentView === "login" || currentView === "signup") return
+        if (connection) return
+
+        fetchUnreadCount()
+
+        const token = localStorage.getItem("token")
+
+        const conn = new signalR.HubConnectionBuilder()
+            .withUrl(`${import.meta.env.VITE_BACKEND_API_URL}/chatHub`, {
+                accessTokenFactory: () => token,
+            })
+            .configureLogging(signalR.LogLevel.None)
+            .withAutomaticReconnect()
+            .build()
+
+        conn.on("UnreadMessagesChanged", () => {
+            fetchUnreadCount()
+        })
+
+        conn.start()
+            .then(() => {
+                setConnection(conn)
+            })
+            .catch((error) => {
+                console.log("SignalR greška:", error)
+            })
     }, [currentView])
+
+    //FUNCTIONS
+    async function fetchUnreadCount() {
+        const response = await authFetch("/Communication/GetMyChats")
+        if (!response.ok) return
+
+        const chats = await response.json()
+
+        const unread = chats.reduce((sum, chat) => sum + chat.unreadCount, 0)
+        setTotalUnread(unread)
+    }
 
     return (
         <div className="auth-wrapper">
@@ -51,6 +93,7 @@ export default function App() {
                             setPreviousView("main")
                         }}
                         selected={"main"}
+                        totalUnread={totalUnread}
                     />
                     <MainPage
                         onMyProfileClick={() => {
@@ -70,6 +113,7 @@ export default function App() {
                         currentView={currentView}
                         setCurrentView={setCurrentView}
                         addActionButton={true}
+                        totalUnread={totalUnread}
                     />
                     <AddActionPage
                         handleGoBackClick={() => {
@@ -86,6 +130,7 @@ export default function App() {
                         currentView={currentView}
                         setCurrentView={setCurrentView}
                         selected={"myProfilePage"}
+                        totalUnread={totalUnread}
                     />
                     <MyProfilePage
                         onLogout={() => {
@@ -106,8 +151,12 @@ export default function App() {
                             setPreviousView("chatPage")
                         }}
                         selected={"chatPage"}
+                        totalUnread={totalUnread}
                     />
-                    <ChatPage />
+                    <ChatPage
+                        connection={connection}
+                        refreshUnreadCount={fetchUnreadCount}
+                    />
                 </div>
             )}
         </div>
