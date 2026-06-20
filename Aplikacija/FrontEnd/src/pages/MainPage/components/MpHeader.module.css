@@ -1,4 +1,4 @@
-.header-main-page{
+.header-main-page {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -16,24 +16,8 @@
     border-bottom: 1px solid #e7e5e0;
 }
 
-.profile-picture-container {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    overflow: hidden; /*sve sto je van okvira se ne vidi*/
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto; /* da ga gurne desno */
-}
-
-.profile-picture-img {
-    width: 100%;
-    height: 100%;
-    object-fit:cover;
-}
-
-.search-container, .datepicker-container {
+/* Kontejneri za unose (Search, Datepicker, Lokacija) */
+.search-container {
     display: flex;
     align-items: center;
     background-color: #f5f4f0; 
@@ -41,16 +25,35 @@
     padding: 8px 20px;
     border: 1px solid #e2e0da;
     transition: all 0.2s ease;
-}
-.search-container{
-    width: 320;
-}
-.datepicker-container{
-    width: 200px;
+    width: 320px;
 }
 
-/*stil unutar inputa*/
-.custom-input, .custom-datepicker {
+.datepicker-container {
+    display: flex;
+    align-items: center;
+    background-color: #f5f4f0; 
+    border-radius: 25px; 
+    padding: 8px 20px;
+    border: 1px solid #e2e0da;
+    transition: all 0.2s ease;
+    width: 230px; /* Malo prošireno (sa 200px na 230px) da opseg datuma i ugrađeno X dugme imaju mesta */
+}
+
+.dropdown-container {
+    position: relative; 
+    display: flex;
+    align-items: center;
+    background-color: #f5f4f0;
+    border-radius: 25px;
+    padding: 8px 20px; 
+    border: 1px solid #e2e0da;
+    width: 240px; 
+}
+
+/* Stilovi za čiste inpute unutar kontejnera */
+.custom-input, 
+.custom-datepicker, 
+.custom-input-location {
     border: none !important;
     background: transparent !important;
     outline: none !important;
@@ -60,6 +63,7 @@
     padding-left: 10px;
 }
 
+/* Ikonice unutar input polja */
 .input-icon {
     width: 20px;
     height: 20px;
@@ -67,32 +71,82 @@
     flex-shrink: 0;
 }
 
-.dropdown-container {
-    display: flex;
-    align-items: center;
-    background-color: #f5f4f0;
-    border-radius: 25px;
-    padding: 2px 15px 2px 20px;
-    border: 1px solid #e2e0da;
-}
-
 .input-icon-dropdown {
     width: 20px;
     height: 20px;
     color: #d97706; 
-    margin-right: 5px;
+    flex-shrink: 0;
 }
 
-/* Resetovanje Bootstrap dugmeta da se uklopi u dizajn */
-.custom-dropdown :global(.btn-primary) {
-    background: transparent !important;
-    border: none !important;
-    color: #1a1a1a !important;
-    font-weight: 500;
-    padding: 6px 10px !important;
-    font-size: 15px;
+/* --- FIKS ZA DATEPICKER "X" DUGME --- */
+.datepicker-container :global(.react-datepicker__input-container) {
+    width: 100%;
+    display: flex;
+    align-items: center;
 }
 
+.datepicker-container :global(.react-datepicker__close-icon) {
+    padding: 0;
+    right: 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.datepicker-container :global(.react-datepicker__close-icon::after) {
+    background-color: transparent !important;
+    color: #7a7874 !important;
+    font-size: 18px;
+    content: "×";
+}
+
+.datepicker-container :global(.react-datepicker__close-icon:hover::after) {
+    color: #1a1a1a !important; 
+}
+
+/* --- AUTOCOMPLETE PROZOR ZA GRAD --- */
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 6px); 
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e2e0da;
+    border-radius: 15px; 
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.06); 
+}
+
+.autocomplete-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #4a4a4a;
+    text-align: left;
+    transition: background-color 0.15s ease;
+}
+
+.autocomplete-item:hover {
+    background-color: #f5f4f0; 
+    color: #1a1a1a;
+}
+
+.autocomplete-item strong {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.country-span {
+    font-size: 13px;
+    color: #7a7874; 
+}
+
+/* Desna strana gornjeg reda (Zvono i Profil) */
 .right-side-container {
     margin-left: auto; 
     display: flex;
@@ -129,52 +183,83 @@
     border-radius: 50%;
 }
 
+.profile-picture-container {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-picture-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* --- DONJI RED (Sada sa ugrađenim Select Dropdown-om) --- */
 .lower-header {
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
-    padding: 15px 30px;
-    background-color: #FAFAF8;
+    padding: 12px 30px; /* Blago smanjen padding radi kompaktnosti */
+    background-color: #fafaf8;
     border-bottom: 1px solid #e7e5e0;
+}
+
+.dropdown-menu-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .tip-label {
     font-size: 14px;
     color: #78716c;
     font-weight: 500;
-    margin-right: 15px;
 }
 
-.buttons-list {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px; 
-}
-
-.filter-button {
-    background: transparent;
-    border: 1px solid #e7e5e0;
-    padding: 6px 16px;
-    border-radius: 20px; 
+.custom-select {
+    padding: 6px 35px 6px 15px; /* Više prostora desno za ugrađenu strelicu browsera */
     font-size: 14px;
     font-weight: 500;
     color: #57534e;
-    cursor: pointer;
+    background-color: #ffffff;
+    border: 1px solid #e7e5e0;
+    border-radius: 20px; /* Zaobljeno isto kao što su nekad bila i dugmad */
     outline: none;
+    cursor: pointer;
     transition: all 0.2s ease;
+    min-width: 160px;
+    
+    /* Elegantno prilagođavanje izgleda u modernim browserima */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357534e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
 }
 
-.filter-button:hover {
+.custom-select:hover {
     background-color: #f5f4f0;
     border-color: #d6d3d1;
-    color: #ffffff
+    color: #1a1a1a;
 }
 
-.filter-button.active {
-    background-color: #F59E0B;
-    color: #ffffff;
-    border-color: #F59E0B;
+.custom-select:focus {
+    border-color: #d97706; /* Menja boju u narandžastu kada se aktivira */
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.custom-select option {
+    background-color: #ffffff;
+    color: #4a4a4a;
+    font-weight: 500;
 }

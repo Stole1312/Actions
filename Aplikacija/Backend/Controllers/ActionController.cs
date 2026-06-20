@@ -104,6 +104,8 @@ namespace Backend.Controllers
                     Title = akcijaDTO.Title,
                     Description = akcijaDTO.Description,
                     Location = akcijaDTO.Location,
+                    Latitude = akcijaDTO.Latitude,
+                    Longitude = akcijaDTO.Longitude,
                     Type = akcijaDTO.Type,
                     DTStart = akcijaDTO.DTStart,
                     DTEnd = akcijaDTO.DTEnd,
@@ -164,6 +166,8 @@ namespace Backend.Controllers
                 akcijaUBazi.Title =  izmenjenaAkcija.Title ?? akcijaUBazi.Title;
                 akcijaUBazi.Description = izmenjenaAkcija.Description ?? akcijaUBazi.Description;
                 akcijaUBazi.Location = izmenjenaAkcija.Location ?? akcijaUBazi.Location;
+                akcijaUBazi.Latitude = izmenjenaAkcija.Latitude ?? akcijaUBazi.Latitude;
+                akcijaUBazi.Longitude = izmenjenaAkcija.Longitude ?? akcijaUBazi.Longitude;
                 akcijaUBazi.Type = izmenjenaAkcija.Type ?? akcijaUBazi.Type;
                 akcijaUBazi.DTStart = izmenjenaAkcija.DTStart ?? akcijaUBazi.DTStart;
                 akcijaUBazi.DTEnd = izmenjenaAkcija.DTEnd ?? akcijaUBazi.DTEnd;
@@ -173,6 +177,94 @@ namespace Backend.Controllers
                 await Context.SaveChangesAsync();
 
                 return Ok($"Akcija with ID: {akcijaUBazi.ID} have been edited");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("GetClientLocation")]
+        public async Task<ActionResult> GetClientLocation()
+        {
+            try
+            {
+                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                // Ako radiš u lokalu (localhost), IP će biti "::1" ili "127.0.0.1"
+                // Pošto eksterni API-jevi ne mogu da lociraju localhost, ovde stavljamo neku pravu IP adresu radi testiranja u lokalu
+                if (ipAddress == "::1" || ipAddress == "127.0.0.1" || string.IsNullOrEmpty(ipAddress))
+                {
+                    ipAddress = "24.135.132.10"; // Primer prave IP adrese iz Srbije (Niš/Beograd)
+                }
+
+                using var httpClient = new HttpClient();
+
+                var response = await httpClient.GetAsync($"https://freeipapi.com/api/json/{ipAddress}");
+                
+                if (!response.IsSuccessStatusCode)
+                    return BadRequest("Nije moguće preuzeti lokaciju sa eksternog servisa.");
+
+                var content = await response.Content.ReadAsStringAsync();
+                
+                return Content(content, "application/json");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("FilterAkcija")]
+        public async Task<ActionResult> FilterAkcija([FromQuery] AkcijaFilterDTO filter)
+        {
+            try
+            {
+                var query = Context.Akcije.AsQueryable();
+
+                // po naslovu caseinsensitive
+                if (!string.IsNullOrWhiteSpace(filter.Title))
+                    query = query.Where(a => a.Title.ToLower().Contains(filter.Title.ToLower()));
+
+                // po tipu
+                if (filter.Type.HasValue)
+                    query = query.Where(a => a.Type == filter.Type.Value);
+
+                // po statusu (upcoming ongoing)
+                if (filter.Status.HasValue)
+                    query = query.Where(a => a.Status == filter.Status.Value);
+                
+                // opseg datuma - od kog do kog datuma zelim da akcija POCINJE
+                if (filter.OdKada.HasValue)
+                    query = query.Where(a => a.DTStart >= filter.OdKada.Value);
+                if (filter.DoKada.HasValue)
+                    query = query.Where(a => a.DTStart <= filter.DoKada.Value);
+
+                // ovo je obim zemlje u km i ovo ce valjda da ufuli da uzme akcije samo koje su unutar odredjene distance od setovane lokacije
+                double r = 6371;
+
+                query = query.Where(a => 
+                    (r * Math.Acos(
+                        Math.Sin(filter.Latitude * Math.PI / 180) * Math.Sin(a.Latitude * Math.PI / 180) +
+                        Math.Cos(filter.Latitude * Math.PI / 180) * Math.Cos(a.Latitude * Math.PI / 180) *
+                        Math.Cos((a.Longitude * Math.PI / 180) - (filter.Longitude * Math.PI / 180))
+                    )) <= filter.Distance
+                );
+
+                // cheapest first
+                if (filter.CheapestFirst.HasValue && filter.CheapestFirst.Value)
+                    query = query.OrderBy(a => a.Price ?? 0)
+                                 .ThenByDescending(a => a.currentNumParticipants ?? 0);
+                else
+                    query = query.OrderByDescending(a => a.currentNumParticipants ?? 0);
+
+                // vracam 9 akcija
+                var rezultati = await query.Take(9).ToListAsync();
+
+                if (rezultati.Count == 0)
+                    return Ok(new List<Akcija>()); // ako nista nema prazan niz
+
+                return Ok(rezultati);
             }
             catch (Exception e)
             {

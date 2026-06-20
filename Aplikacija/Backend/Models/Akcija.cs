@@ -9,6 +9,10 @@ namespace Backend.Models
         public required string Title {get;set;}
         public required string Description {get;set;}
         public required string Location{get;set;}
+
+        public required double Latitude{get;set;}
+        public required double Longitude{get;set;}
+
         public ActionTypes Type {get;set;}
         public DateTime DTStart{get;set;}
         public DateTime DTEnd{get;set;}
@@ -22,7 +26,6 @@ namespace Backend.Models
         public DateTime Created {get;set;}
         public double AverageRating { get; set; }
         public int RatingCount { get; set; }
-
         public string? ActionPicture {get;set;}
     }
 }
