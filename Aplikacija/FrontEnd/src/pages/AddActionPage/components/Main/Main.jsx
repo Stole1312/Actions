@@ -179,6 +179,8 @@ export default function Main({ handleGoBackClick }) {
         actionData.append("maxParticipants", maxParticipants)
         actionData.append("Price", paid ? price : 0)
         actionData.append("Created", new Date().toISOString())
+        actionData.append("Latitude", String(coords.lat).replace(".", ","))
+        actionData.append("Longitude", String(coords.lng).replace(".", ","))
 
         const dtStart = new Date(date)
         dtStart.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0)
