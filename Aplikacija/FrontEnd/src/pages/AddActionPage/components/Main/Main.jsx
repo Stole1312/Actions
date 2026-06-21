@@ -12,6 +12,7 @@ import {
     UsersIcon,
     GiftIcon,
     CreditCardIcon,
+    CheckCircleIcon,
 } from "@heroicons/react/24/outline"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -21,7 +22,7 @@ import CardReview from "../CardReview/CardReview.jsx"
 import Header from "../Header/Header.jsx"
 import { authFetch } from "../../../../api.js"
 
-export default function Main({ handleGoBackClick }) {
+export default function Main({ handleGoBackClick, setCurrentView }) {
     //States
     const [selectedImage, setSelectedImage] = useState(null)
     const [title, setTitle] = useState("")
@@ -39,6 +40,9 @@ export default function Main({ handleGoBackClick }) {
     const [coords, setCoords] = useState(null)
     const [debouncedLocation, setDebouncedLocation] = useState("")
     const [hasSelectedLocation, setHasSelectedLocation] = useState(false)
+
+    const [actionCreated, setActionCreated] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     //Const variables
     //PRETVORITI U FETCH
@@ -163,6 +167,8 @@ export default function Main({ handleGoBackClick }) {
             return
         }
 
+        setIsSubmitting(true)
+
         const typeMap = {
             Ostalo: 0,
             Izlasci: 1,
@@ -194,14 +200,38 @@ export default function Main({ handleGoBackClick }) {
             body: actionData,
         })
 
-        console.log(response.status)
-        console.log(await response.text())
+        if (response.ok) {
+            setActionCreated(true)
+
+            setTimeout(() => {
+                setCurrentView("main")
+            }, 2000)
+        }
     }
+
+    if (actionCreated) {
+        return (
+            <div className={styles["action-success-container"]}>
+                <div className={styles["action-success-card"]}>
+                    <CheckCircleIcon
+                        className={styles["action-success-icon"]}
+                    />
+                    <h1>Akcija uspešno objavljena!</h1>
+                    <p>
+                        Vaša akcija je uspešno kreirana i sada je vidljiva
+                        drugim korisnicima.
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={styles["add-action-page"]}>
             <Header
                 onSubmit={submitAction}
                 handleGoBackClick={handleGoBackClick}
+                isSubmitting={isSubmitting}
             />
             <main className={styles["main-add-action-page"]}>
                 <section className={styles["form-container"]}>
@@ -629,11 +659,19 @@ export default function Main({ handleGoBackClick }) {
                             <button
                                 type="submit"
                                 className={styles["publish-button"]}
+                                style={{
+                                    pointerEvents: isSubmitting
+                                        ? "none"
+                                        : "auto",
+                                    opacity: isSubmitting ? 0.7 : 1,
+                                }}
                             >
                                 <PaperAirplaneIcon
                                     className={styles["publish-icon"]}
                                 />
-                                Objavi Akciju
+                                {isSubmitting
+                                    ? "Objavljivanje..."
+                                    : "Objavi Akciju"}
                             </button>
                         </section>
                     </form>

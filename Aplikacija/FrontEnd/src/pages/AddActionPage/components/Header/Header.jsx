@@ -28,11 +28,15 @@ export default function Header(props) {
                             .getElementById("add-action-form")
                             .requestSubmit()
                     }
+                    style={{
+                        pointerEvents: props.isSubmitting ? "none" : "auto",
+                        opacity: props.isSubmitting ? 0.7 : 1,
+                    }}
                 >
                     <PaperAirplaneIcon
                         className={styles["publish-button-icon"]}
                     />
-                    Objavi akciju
+                    {props.isSubmitting ? "Objavljivanje..." : "Objavi Akciju"}
                 </button>
             </div>
         </header>
