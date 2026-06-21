@@ -36,7 +36,18 @@ export default function NavBar(props) {
                 <button>
                     <CalendarIcon className={styles["nav-icons"]} /> Moje Akcije
                 </button>
-                <button>
+                <button
+                    onClick={() => props.setCurrentView("friendsPage")}
+                    style={
+                        props.selected === "friendsPage"
+                            ? {
+                                  backgroundColor: "#F59E0B",
+                                  color: "white",
+                                  pointerEvents: "none",
+                              }
+                            : {}
+                    }
+                >
                     <UsersIcon className={styles["nav-icons"]} />
                     Prijatelji
                 </button>

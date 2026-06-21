@@ -8,6 +8,7 @@ import AddActionPage from "./pages/AddActionPage/AddActionPage.jsx"
 import NavBar from "./components/NavBar.jsx"
 import MyProfilePage from "./pages/MyProfilePage/MyProfilePage.jsx"
 import ChatPage from "./pages/ChatPage/ChatPage.jsx"
+import FriendsPage from "./pages/FriendsPage/FriendsPage.jsx"
 
 export default function App() {
     const [currentView, setCurrentView] = useState(() => {
@@ -167,6 +168,22 @@ export default function App() {
                         connection={connection}
                         refreshUnreadCount={fetchUnreadCount}
                     />
+                </div>
+            )}
+
+            {currentView === "friendsPage" && (
+                <div className="app-layout">
+                    <NavBar
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        handleAddActionClick={() => {
+                            setCurrentView("addAction")
+                            setPreviousView("friendsPage")
+                        }}
+                        selected={"friendsPage"}
+                        totalUnread={totalUnread}
+                    />
+                    <FriendsPage />
                 </div>
             )}
         </div>

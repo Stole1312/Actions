@@ -405,4 +405,19 @@ public class SocialController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [Authorize]
+    [HttpGet("FollowersCount/{producerId}")]
+    public async Task<ActionResult<int>> GetFollowersCount(int producerId)
+    {
+        var producerExists = await Context.Users
+            .AnyAsync(u => u.ID == producerId && u.Role == UserRoles.Producer);
+        if (!producerExists)
+            return NotFound("Producer ne postoji.");
+
+        var count = await Context.Follows
+            .CountAsync(f => f.ProducerId == producerId);
+
+        return Ok(count);
+    }
 }
