@@ -215,6 +215,7 @@ namespace Backend.Controllers
             }
         }
 
+        // koristi se i za inicijalno ucitavanje akcija
         [HttpPost("FilterAkcija")]
         public async Task<ActionResult> FilterAkcija([FromBody] AkcijaFilterDTO filter)
         {
@@ -258,13 +259,16 @@ namespace Backend.Controllers
                 else
                     query = query.OrderByDescending(a => a.currentNumParticipants ?? 0);
 
-                // vracam 9 akcija
-                var rezultati = await query.Take(9).ToListAsync();
+                int ukupnoPronadjeno = await query.CountAsync();
+                // uzimam 9 akcija nakon sto skipijem kolko vec treba
+                var rezultati = await query.Skip(filter.Skip).Take(filter.Take).ToListAsync();
 
-                if (rezultati.Count == 0)
-                    return Ok(new List<Akcija>()); // ako nista nema prazan niz
+                bool imaJos = (filter.Skip + rezultati.Count) < ukupnoPronadjeno;
 
-                return Ok(rezultati);
+                //if nema jos - nema jos else ""
+                string poruka = !imaJos ? "Nema vise akcija koje odgovaraju datim filterima" : "";
+
+                return Ok(new AkcijePagedResponse{Akcije=rezultati, Poruka=poruka, ImaJos=imaJos}); // ako nista nema prazan niz
             }
             catch (Exception e)
             {
