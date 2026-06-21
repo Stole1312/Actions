@@ -128,6 +128,7 @@ export default function App() {
                             setCurrentView(previousView)
                             setPreviousView("addAction")
                         }}
+                        setCurrentView={setCurrentView}
                     />
                 </div>
             )}
@@ -142,9 +143,9 @@ export default function App() {
                     />
                     <MyProfilePage
                         onLogout={() => {
-                            localStorage.clear();
-                            setPreviousView(null);
-                            setCurrentView("login");
+                            localStorage.clear()
+                            setPreviousView(null)
+                            setCurrentView("login")
                         }}
                     />
                 </div>

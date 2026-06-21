@@ -1,10 +1,13 @@
 import styles from "./AddActionPage.module.css"
 import Main from "./components/Main/Main.jsx"
 
-export default function AddActionPage({ handleGoBackClick }) {
+export default function AddActionPage({ handleGoBackClick, setCurrentView }) {
     return (
         <>
-            <Main handleGoBackClick={handleGoBackClick} />
+            <Main
+                handleGoBackClick={handleGoBackClick}
+                setCurrentView={setCurrentView}
+            />
         </>
     )
 }

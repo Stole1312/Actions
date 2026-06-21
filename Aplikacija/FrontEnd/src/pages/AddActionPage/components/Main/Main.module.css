@@ -507,3 +507,40 @@
     width: 14px;
     height: 14px;
 }
+
+.action-success-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-success-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid #e7e5e0;
+}
+
+.action-success-icon {
+    width: 100px;
+    height: 100px;
+    color: #22c55e;
+}
+
+.action-success-card > h1 {
+    margin: 10px;
+    color: #22c55e;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.action-success-card > p {
+    margin: 0;
+    font-size: 0.938rem;
+    font-weight: 400;
+    color: #22c55e;
+}
