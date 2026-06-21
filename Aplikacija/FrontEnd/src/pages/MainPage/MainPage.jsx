@@ -13,6 +13,12 @@ export default function MainPage(props) {
     const [cheapestFirst, setCheapestFirst] = useState(false);
     const [title, setTitle] = useState("");
 
+    const [actions, setActions] = useState([]);
+    const [skip, setSkip] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [backendMessage, setBackendMessage] = useState("");
+    const take = 9;
+
     const [types, setTypes] = useState([]);
     useEffect(() => {
         async function fetchTypes() {
@@ -32,12 +38,9 @@ export default function MainPage(props) {
         fetchTypes();
     }, []);
 
-    // STATE ZA AKCIJE KOJE SE PRIKAZUJU
-    const [actions, setActions] = useState([]);
-
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
 
-    async function handleApplyFilters() {
+    async function handleGetAkcije(skipLocal,isLoadMore) {
         const latitude = selectedCoordinates ? selectedCoordinates.lat : null;
         const longitude = selectedCoordinates ? selectedCoordinates.lng : null;
         
@@ -56,6 +59,8 @@ export default function MainPage(props) {
                     DoKada: endDate,
                     Status: null,
                     CheapestFirst: cheapestFirst,
+                    Skip: skipLocal,
+                    Take: take
                 }),
             });
 
@@ -63,13 +68,32 @@ export default function MainPage(props) {
                 throw new Error(`Server odgovorio sa statusom: ${response.status}`);
 
             const data = await response.json();
-            
-            // Smeštamo dobijeni niz u state
-            setActions(data); 
+            setBackendMessage(data.poruka);
+            setHasMore(data.imaJos);
+
+            if (isLoadMore) {
+                //za ucitaj jos dodajes preko postojece akcije
+                setActions(prevActions => [...prevActions, ...data.akcije]);
+            } else {
+                //za nov filter od pocetka
+                setActions(data.akcije);
+            }
         }
         catch(err) {
             console.error("KRAH:", err.message);
         }
+    }
+
+    async function handleApplyFilters(){
+        setSkip(0);
+        setBackendMessage("");
+        handleGetAkcije(0,false);
+    }
+
+    async function handleLoadMore(){
+        const nextSkip = skip+take;
+        setSkip(nextSkip);
+        handleGetAkcije(nextSkip,true);
     }
 
     useEffect(() => {
@@ -103,8 +127,15 @@ export default function MainPage(props) {
                     ))
                 ) : (
                     <p className={styles["no-results"]}>Nema pronađenih akcija za zadate filtere.</p>
-                )}
+                )} 
             </main>
+                            { hasMore ? (
+                    <button className={styles["load-more-button"]} onClick={handleLoadMore}>
+                        Učitaj još akcija <span className={styles["arrow-down"]}></span>
+                    </button>
+                ):(
+                    <p className={styles["no-results"]}>{backendMessage}</p>
+                )}
         </div>
     )
 }

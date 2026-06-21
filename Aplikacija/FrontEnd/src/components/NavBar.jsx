@@ -70,7 +70,17 @@ export default function NavBar(props) {
                         </div>
                     )}
                 </button>
-                <button>
+                <button                     
+                    onClick={() => props.setCurrentView("myProfilePage")}
+                    style={
+                        props.selected === "myProfilePage"
+                            ? {
+                                  backgroundColor: "#F59E0B",
+                                  color: "white",
+                                  pointerEvents: "none",
+                              }
+                            : {}
+                    }>
                     <UserIcon className={styles["nav-icons"]} />
                     Profil
                 </button>

@@ -1,3 +1,4 @@
+
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -13,4 +14,49 @@
     color: #64748b;
     font-size: 16px;
     margin-top: 40px;
+}
+
+/* Kontejner ili samo dugme ako je direktno u gridu */
+.load-more-button {
+    grid-column: 1 / -1; /* KLJUČNO: Razvlači dugme preko svih kolona grida */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Malo smanjen razmak */
+    
+    width: 100%;
+    max-width: 320px; /* Smanjeno sa 400px da izgleda elegantnije */
+    margin: 40px auto; /* Centriranje pomoću 'auto' i lep razmak odozgo/odozdo */
+    padding: 10px 20px; /* Smanjen padding sa 14px na 10px da dugme ne bude debelo */
+    
+    background-color: #f1f5f9; /* Malo modernija svetlo siva (slate-100) */
+    color: #475569; /* Slate-600 boja teksta, prijatnija za oko */
+    font-size: 15px; /* Blago smanjen font */
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efekat kada se pređe mišem */
+.load-more-button:hover {
+    border-color: #f59e0b;
+}
+
+/* Efekat kada se klikne */
+.load-more-button:active {
+    transform: scale(0.98); /* Suptilan "klik" efekat umesto skakanja gore-dole */
+}
+
+/* CSS Magija za strelicu u obliku slova V */
+.arrow-down {
+    display: inline-block;
+    width: 6px; /* Smanjena strelica da odgovara novoj debljini dugmeta */
+    height: 6px;
+    border-right: 2px solid #475569;
+    border-bottom: 2px solid #475569;
+    transform: rotate(45deg);
+    margin-top: -2px; /* Podešena visina u odnosu na tekst */
+    transition: border-color 0.2s ease-in-out;
 }
