@@ -86,6 +86,7 @@ public class SocialController : ControllerBase
             var requests = await Context.FriendRequests
                 .Where(fr => fr.ReciverID == currentUserId && fr.Status == UserRequestStatus.Pending)
                 .Include(fr => fr.Initiator)
+                .OrderByDescending(fr => fr.Created)
                 .Select(fr => new
                 {
                     fr.ID,
@@ -407,6 +408,34 @@ public class SocialController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("GetFollowing")]
+    public async Task<ActionResult> GetFollowing()
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var following = await Context.Follows
+                .Where(f => f.ConsumerId == currentUserId)
+                .Include(f => f.Producer)
+                .Select(f => new
+                {
+                    ProducerID = f.ProducerId,
+                    Username = f.Producer!.Username,
+                    ProfilePicture = f.Producer.ProfilePicture,
+                    FollowedSince = f.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(following);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
     [HttpGet("FollowersCount/{producerId}")]
     public async Task<ActionResult<int>> GetFollowersCount(int producerId)
     {
@@ -419,5 +448,75 @@ public class SocialController : ControllerBase
             .CountAsync(f => f.ProducerId == producerId);
 
         return Ok(count);
+    }
+
+    [Authorize]
+    [HttpGet("SearchUsers")]
+    public async Task<ActionResult> SearchUsers([FromQuery] string search)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            if (string.IsNullOrWhiteSpace(search))
+                return Ok(Array.Empty<object>());
+
+            search = search.Trim();
+
+            var users = await Context.Users
+                .Where(u =>
+                    u.ID != currentUserId &&
+                    !u.isBanned &&
+                    EF.Functions.ILike(u.Username, $"%{search}%")
+                )
+                .Select(u => new
+                {
+                    u.ID,
+                    u.Username,
+                    u.ProfilePicture,
+
+                    IsProducer = u.Role == UserRoles.Producer,
+
+                    FollowersCount = Context.Follows.Count(f =>
+                        f.ProducerId == u.ID
+                    ),
+
+                    IsFollowing = Context.Follows.Any(f =>
+                        f.ConsumerId == currentUserId &&
+                        f.ProducerId == u.ID
+                    ),
+
+                    FriendshipStatus =
+                        Context.Friends.Any(f =>
+                            (f.InitiatorID == currentUserId && f.ReceiverID == u.ID) ||
+                            (f.InitiatorID == u.ID && f.ReceiverID == currentUserId)
+                        )
+                            ? "Friends"
+
+                            : Context.FriendRequests.Any(fr =>
+                                fr.Status == UserRequestStatus.Pending &&
+                                (
+                                    (fr.InitiatorID == currentUserId &&
+                                    fr.ReciverID == u.ID) ||
+
+                                    (fr.InitiatorID == u.ID &&
+                                    fr.ReciverID == currentUserId)
+                                )
+                            )
+                                ? "Pending"
+
+                                : "None"
+                })
+                .OrderByDescending(u => u.FollowersCount)
+                .ThenBy(u => u.Username)
+                .Take(5)
+                .ToListAsync();
+
+            return Ok(users);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

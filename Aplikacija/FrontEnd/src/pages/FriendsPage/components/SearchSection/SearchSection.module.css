@@ -1,0 +1,170 @@
+.section-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fafaf8;
+}
+
+.main-title {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.main-title > h1 {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.user-search-container {
+    width: 50%;
+    height: 35px;
+    border-radius: 16px;
+    background-color: #f5f4f0;
+    border: 1px solid #e7e5e0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-search-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.user-search-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.search-results-container {
+    width: 70%;
+    align-self: center;
+
+    display: flex;
+    flex-direction: column;
+    padding-top: 15px;
+    gap: 12px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 12px;
+
+    padding: 11px 14px;
+    background-color: white;
+    border: 1px solid #e7e5e0;
+    border-radius: 12px;
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-info-container > p {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #111110;
+}
+
+.user-profile-picture {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.followers-count-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+}
+
+.followers-count-container > p {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.user-info-icon {
+    width: 13px;
+    height: 13px;
+    color: #78716c;
+}
+
+.user-buttons-container {
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+.follow-button,
+.send-friend-request-button {
+    cursor: pointer;
+    border-radius: 16px;
+    padding: 9px 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 0.688rem;
+}
+.follow-button {
+    border: none;
+    background-color: #f59e0b;
+
+    font-weight: 600;
+    color: #ffffff;
+}
+.send-friend-request-button {
+    border: 1px solid #e7e5e0;
+    background-color: #ffffff;
+
+    font-weight: 500;
+    color: #78716c;
+}
+
+.user-button-icon {
+    width: 15px;
+    height: 15px;
+    stroke-width: 3;
+}
+.follow-button > .user-button-icon {
+    color: #ffffff;
+}
+.send-friend-request-button > .user-button-icon {
+    color: #78716c;
+}
+
+.no-result-loading-container {
+    padding-top: 10%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

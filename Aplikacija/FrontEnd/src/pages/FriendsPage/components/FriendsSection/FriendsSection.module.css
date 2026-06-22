@@ -1,4 +1,5 @@
 .section-container {
+    flex: 1;
     display: flex;
     flex-direction: row;
 }
@@ -16,6 +17,8 @@
 }
 
 .main-title {
+    position: relative;
+
     display: flex;
     flex-direction: row;
     gap: 8px;
@@ -31,7 +34,7 @@
     color: #111110;
 }
 
-.main-title > div {
+.friends-number {
     background-color: #f5f4f0;
     min-width: 20px;
     height: 20px;
@@ -137,5 +140,54 @@
     color: #111110;
 }
 .remove-friend-button-icon {
+    color: #78716c;
+}
+
+.friends-loading-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-friends {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.friends-search-container {
+    position: absolute;
+    right: 32px;
+
+    height: 30px;
+    border-radius: 16px;
+    background-color: #f5f4f0;
+    border: 1px solid #e7e5e0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.friends-search-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.friends-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 0.813rem;
+    font-weight: 400;
     color: #78716c;
 }

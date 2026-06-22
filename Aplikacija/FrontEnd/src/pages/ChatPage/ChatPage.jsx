@@ -3,19 +3,65 @@ import styles from "./ChatPage.module.css"
 import { authFetch } from "../../api"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid"
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline"
+import { BeatLoader, ClipLoader } from "react-spinners"
 
 export default function ChatPage(props) {
     //STATES
-    const [chats, setChats] = useState([])
+    const [chats, setChats] = useState(null)
     const [searchChatText, setSearchChatText] = useState("")
     const [selectedChat, setSelectedChat] = useState(null)
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState(null)
     const [messageText, setMessageText] = useState("")
 
     //SIDE EFFECTS
     useEffect(() => {
         fetchMyChats()
     }, [])
+
+    useEffect(() => {
+        if (!props.friendForChat) return
+
+        async function openRequestedFriendChat() {
+            try {
+                const response = await authFetch(
+                    "/Communication/OpenPrivateChat",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            otherUserId: props.friendForChat.friendID,
+                        }),
+                    },
+                )
+
+                if (!response.ok) {
+                    console.log("Greška pri otvaranju privatnog chata")
+                    return
+                }
+
+                const data = await response.json()
+
+                const chat = {
+                    id: data.chatId,
+                    otherUser: {
+                        id: props.friendForChat.friendID,
+                        username: props.friendForChat.username,
+                        profilePicture: props.friendForChat.profilePicture,
+                    },
+                    unreadCount: 0,
+                    lastMessage: null,
+                }
+
+                await openChat(chat)
+            } finally {
+                props.clearFriendForChat()
+            }
+        }
+
+        openRequestedFriendChat()
+    }, [props.friendForChat])
 
     useEffect(() => {
         if (!props.connection) return
@@ -157,19 +203,19 @@ export default function ChatPage(props) {
     }
 
     //VARIABLES
-    const filteredChats = chats.filter((chat) =>
+    const filteredChats = chats?.filter((chat) =>
         chat.otherUser?.username
             ?.toLowerCase()
             .includes(searchChatText.toLowerCase()),
     )
 
-    const chatSideBarElements = filteredChats.map((chat) => (
+    const chatSideBarElements = filteredChats?.map((chat) => (
         <button
             key={chat.id}
             className={styles["chat-card"]}
             style={
                 chat.id === selectedChat?.id
-                    ? { backgroundColor: "#f5f4f0" }
+                    ? { backgroundColor: "#f5f4f0", pointerEvents: "none" }
                     : {}
             }
             onClick={() => openChat(chat)}
@@ -224,7 +270,7 @@ export default function ChatPage(props) {
           )
         : null
 
-    const messagesElements = messages.map((message, index) => {
+    const messagesElements = messages?.map((message, index) => {
         const currentDate = formatMessageDate(message.sent)
         const previousDate =
             index > 0 ? formatMessageDate(messages[index - 1].sent) : null
@@ -287,7 +333,13 @@ export default function ChatPage(props) {
                     </div>
                 </div>
                 <div className={styles["chats-sidebar"]}>
-                    {chats.length === 0 ? (
+                    {chats === null ? (
+                        <div
+                            className={styles["chat-sidebar-loading-container"]}
+                        >
+                            <BeatLoader size={20} color="#F59E0B" />
+                        </div>
+                    ) : filteredChats.length === 0 ? (
                         <p className={styles["no-chats-text"]}>
                             Još uvek nemaš započetih razgovora.
                         </p>
@@ -319,7 +371,15 @@ export default function ChatPage(props) {
                             <p>{selectedChat.otherUser.username}</p>
                         </div>
                         <div className={styles["messages-container"]}>
-                            {messages.length === 0 ? (
+                            {messages === null ? (
+                                <div
+                                    className={
+                                        styles["chat-sidebar-loading-container"]
+                                    }
+                                >
+                                    <ClipLoader size={50} color="#F59E0B" />
+                                </div>
+                            ) : messages.length === 0 ? (
                                 <p className={styles["no-messages-text"]}>
                                     Nema postojećih razmenjenih poruka
                                 </p>
