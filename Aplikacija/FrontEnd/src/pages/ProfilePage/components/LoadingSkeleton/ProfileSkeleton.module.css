@@ -1,0 +1,61 @@
+/* Definicija Shimmer animacije */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton-pulse {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 8px;
+}
+
+/* Raspored na stranici */
+.page-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Gornji veliki karton */
+.header-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    padding: 32px;
+    height: 220px;
+}
+
+/* 4 male stat kartice */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    height: 120px;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    height: 340px; /* Visina tvoje kartice sa slikom i tekstom */
+}

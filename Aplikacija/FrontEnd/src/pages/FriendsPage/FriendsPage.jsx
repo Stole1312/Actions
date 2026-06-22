@@ -180,6 +180,7 @@ export default function FriendsPage(props) {
                     friends={friends}
                     openChatWithFriend={props.openChatWithFriend}
                     removeFriend={removeFriend}
+                    onUserClick={props.onUserClick} //Prosledis dalje ono iz App.jsx
                 />
             )}
 

@@ -18,6 +18,15 @@ namespace Backend.Controllers
             _configuration = configuration;
         }
 
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(string.IsNullOrEmpty(userIdClaim))
+                throw new Exception("User ID not found in token!");
+            
+            return int.Parse(userIdClaim);
+        }
+
         //ce da se koristi i za regiset
         [HttpPost("AddUser")]
         public async Task<ActionResult> AddUser([FromForm] UserRegisterVM usr)
@@ -339,7 +348,61 @@ namespace Backend.Controllers
 
             await Context.SaveChangesAsync();
 
-            return Ok($"You banned {username}");
+            return 
+            Ok($"You banned {username}");
+        }
+
+        [HttpGet("GetUserRoles")]
+        public async Task<ActionResult> GetUserRoles()
+        {
+            var roles = Enum.GetValues(typeof(UserRoles))
+                            .Cast<UserRoles>()
+                            .Select(r => new 
+                            { 
+                                Id = (int)r, 
+                                Name = r.ToString() 
+                            })
+                            .ToList();
+
+            return Ok(roles);
+        }
+
+        [HttpPost("GetUserStats")]
+        public async Task<ActionResult> GetUserStats([FromBody] int ID)
+        {
+            var prijateljiCout = await Context.Friends.CountAsync(f => f.InitiatorID == ID || f.ReceiverID == ID);
+            var ratings = await Context.Akcije
+                .Where(a => a.ProducerID == ID)
+                .Select(a => (double)a.AverageRating)
+                .ToListAsync();
+            var akcijeCount = ratings.Count;
+            double avrage = akcijeCount!=0 ? Math.Round(ratings.Average(),1) : 0.0;
+            var followersCount = await Context.Follows.CountAsync(f => f.ProducerId == ID);
+
+            return Ok(new
+            {
+                prijateljiCount = prijateljiCout,
+                rating = avrage,
+                akcijeCount = akcijeCount,
+                followersCount = followersCount
+            });
+        }
+
+        [HttpPost("GetUserByID")]
+        public async Task<ActionResult> GetUserByID([FromBody] int ID)
+        {
+            try
+            {
+                var user = await Context.Users.FindAsync(ID);
+                if(user!=null)
+                    return Ok(MapUserToViewModel(user));
+                else
+                    return BadRequest("Nemamo ovakvog usera");
+            }
+            catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         private UserViewModel MapUserToViewModel(User u)

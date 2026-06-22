@@ -6,7 +6,7 @@ import SignUpForm from "./pages/AuthorizationPage/SignUpForm"
 import MainPage from "./pages/MainPage/MainPage"
 import AddActionPage from "./pages/AddActionPage/AddActionPage.jsx"
 import NavBar from "./components/NavBar.jsx"
-import MyProfilePage from "./pages/MyProfilePage/MyProfilePage.jsx"
+import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx"
 import ChatPage from "./pages/ChatPage/ChatPage.jsx"
 import FriendsPage from "./pages/FriendsPage/FriendsPage.jsx"
 
@@ -24,6 +24,9 @@ export default function App() {
     const [connection, setConnection] = useState(null)
     //Ovaj state pamti koj chat treba da se otvori u chatPage
     const [friendForChat, setFriendForChat] = useState(null)
+    
+    //Pamti ID korisnika koji treba da se prikaze
+    const [userID, setUserID]=useState(null)
 
     useEffect(() => {
         localStorage.setItem("currentView", currentView)
@@ -144,12 +147,32 @@ export default function App() {
                         selected={"myProfilePage"}
                         totalUnread={totalUnread}
                     />
-                    <MyProfilePage
+                    <ProfilePage
                         onLogout={() => {
                             localStorage.clear()
                             setPreviousView(null)
                             setCurrentView("login")
                         }}
+                        yourProfile={true}
+                    />
+                </div>
+            )}
+
+            {currentView === "profilePage" && (
+                <div className="app-layout">
+                    <NavBar
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        totalUnread={totalUnread}
+                    />
+                    <ProfilePage
+                        onLogout={() => {
+                            localStorage.clear()
+                            setPreviousView(null)
+                            setCurrentView("login")
+                        }}
+                        yourProfile={false}
+                        userID = {userID}
                     />
                 </div>
             )}
@@ -192,6 +215,11 @@ export default function App() {
                             setFriendForChat(friend)
                             setCurrentView("chatPage")
                         }}
+                        onUserClick={(friendID)=>{//Tamo gde ce ti treba da odes na page dodas ovo
+                            setUserID(friendID)// Sledeci korak ti je u FriendsPage.jsx
+                            sessionStorage.setItem("viewingUserID", JSON.stringify(friendID));//ovo se stavlja da ja kad refreshujem stranicu idalje
+                            setCurrentView("profilePage")                                      // mogu da nadjem kog treba da gledam 
+                        }}                                                                      // ako imas pitanja za ovo mog ti pojasnim
                     />
                 </div>
             )}

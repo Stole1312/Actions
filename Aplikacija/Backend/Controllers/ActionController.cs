@@ -223,6 +223,9 @@ namespace Backend.Controllers
             {
                 var query = Context.Akcije.AsQueryable();
 
+                if(filter.ProducerID.HasValue)
+                    query = query.Where(a => a.ProducerID == filter.ProducerID);
+
                 // po naslovu caseinsensitive
                 if (!string.IsNullOrWhiteSpace(filter.Title))
                     query = query.Where(a => a.Title.ToLower().Contains(filter.Title.ToLower()));
@@ -242,22 +245,28 @@ namespace Backend.Controllers
                     query = query.Where(a => a.DTStart <= filter.DoKada.Value);
 
                 // ovo je obim zemlje u km i ovo ce valjda da ufuli da uzme akcije samo koje su unutar odredjene distance od setovane lokacije
-                double r = 6371;
+                
+                if(filter.Latitude>=0 && filter.Latitude>=0 && filter.Distance >=0)
+                {
+                    double r = 6371;
 
-                query = query.Where(a => 
-                    (r * Math.Acos(
-                        Math.Sin(filter.Latitude * Math.PI / 180) * Math.Sin(a.Latitude * Math.PI / 180) +
-                        Math.Cos(filter.Latitude * Math.PI / 180) * Math.Cos(a.Latitude * Math.PI / 180) *
-                        Math.Cos((a.Longitude * Math.PI / 180) - (filter.Longitude * Math.PI / 180))
-                    )) <= filter.Distance
-                );
+                    query = query.Where(a => 
+                        (r * Math.Acos(
+                            Math.Sin(filter.Latitude * Math.PI / 180) * Math.Sin(a.Latitude * Math.PI / 180) +
+                            Math.Cos(filter.Latitude * Math.PI / 180) * Math.Cos(a.Latitude * Math.PI / 180) *
+                            Math.Cos((a.Longitude * Math.PI / 180) - (filter.Longitude * Math.PI / 180))
+                        )) <= filter.Distance
+                    );
+                }
 
                 // cheapest first
                 if (filter.CheapestFirst.HasValue && filter.CheapestFirst.Value)
                     query = query.OrderBy(a => a.Price ?? 0)
+                                 .ThenBy(a => a.DTStart)
                                  .ThenByDescending(a => a.currentNumParticipants ?? 0);
                 else
-                    query = query.OrderByDescending(a => a.currentNumParticipants ?? 0);
+                    query = query.OrderByDescending(a => a.currentNumParticipants ?? 0)
+                                 .ThenBy(a => a.DTStart);
 
                 int ukupnoPronadjeno = await query.CountAsync();
                 // uzimam 9 akcija nakon sto skipijem kolko vec treba
@@ -391,6 +400,24 @@ namespace Backend.Controllers
                     });
 
             return Ok(types);
+        }
+
+        [HttpGet("GetMyAkcije")]
+        public async Task<ActionResult> GetMyAkcije()
+        {
+            try
+            {
+                var userID = GetCurrentUserId();
+                
+                var akcije = await Context.Akcije
+                                        .Where(a => a.ProducerID == userID)
+                                        .ToListAsync();
+                return Ok(akcije);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
