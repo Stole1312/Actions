@@ -90,7 +90,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onAddFriend, 
                         <p className={styles["profile-bio"]}>{userToShow?.bio || "I <3 Actions"}</p>
                         <div className={styles["meta-info"]}>
                             <span className={styles["meta-item"]}>
-                                <CalendarIcon className={styles["meta-icon"]} /> Član od {formatMemberSince(userToShow?.created)}
+                                <CalendarIcon className={styles["meta-icon"]} /> Član od {formatMemberSince(userToShow.created)}
                             </span>
                         </div>
 

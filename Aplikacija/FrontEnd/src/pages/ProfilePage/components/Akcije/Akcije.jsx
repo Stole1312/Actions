@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { isLastDayOfMonth } from "date-fns";
 
 export default function Akcije({ userID, akcijeCount }) {
-    console.log(userID);
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
     const [skip, setSkip] = useState(0);
     const take = 3;
