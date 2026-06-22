@@ -1,0 +1,10 @@
+.page-container {
+    max-width: 95%;
+    margin: 30px auto;
+    padding: 0 20px; /* Osiguranje da na manjim ekranima ne lepi uz ivice */
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* Razmak između glavne kartice i statistika */
+    width: 100%;
+    box-sizing: border-box;
+}

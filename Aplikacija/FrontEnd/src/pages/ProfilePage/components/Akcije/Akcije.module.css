@@ -1,0 +1,75 @@
+/* Kontejner koji drži dugmiće poravnate i jedno pored drugog */
+.footer-buttons-container {
+    display: flex;
+    flex-direction: column; /* Gura elemente jedan ispod drugog */
+    align-items: center;    /* Centrira i dugme i tekst po horizontali */
+    gap: 16px;              /* Razmak između dugmeta i teksta ispod njega */
+    width: 100%;
+    margin-top: 30px;
+}
+
+/* Ako imaš više dugmića u istom redu (npr. i "Učitaj još" i "Sakriji" u isto vreme), 
+   možemo ih grupisati, ali ako se pojavljuje samo jedno, kolona radi posao. */
+
+/* Stil za tekst koji je sada ispod */
+.all-loaded-text {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-style: italic;
+    text-align: center;
+    margin-top: 4px; /* Mala fina korekcija razmaka */
+}
+
+/* Dugme za učitavanje (Pill stil sa slike) */
+.load-more-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f1f5f9;
+    color: #334155;
+    font-size: 0.95rem;
+    font-weight: 550;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.load-more-button:hover {
+    background-color: #e2e8f0;
+}
+
+/* NOVO: Elegantno dugme za skupljanje (može biti providno sa borderom ili crvenkasto, ovde je neutralno sa tankim borderom) */
+.collapse-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: transparent;
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 550;
+    border: 1px solid #cbd5e1;
+    padding: 11px 32px; /* 11px da se poravna sa ovim zbog bordera */
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.collapse-button:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+.arrow-up {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px;
+    width: 100%;
+}

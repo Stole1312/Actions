@@ -1,0 +1,217 @@
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 32px;
+    width: 100%; /* Uzima punu širinu parent kontejnera */
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    gap: 20px;
+}
+
+/* Ostatak tvog CSS-a ostaje isti, samo obriši margin i max-width iz .profile-card */
+
+/* Gornji red gde su slika, ime i dugmad raspoređeni levo-desno */
+.top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Grupa za sliku i ime */
+.left-meta {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.avatar-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: #f59e0b solid 2px; 
+}
+
+.change-pic-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #f59e0b; 
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0;
+}
+.change-pic-btn:hover {
+    background-color: #d97706;
+}
+
+.icon-camera {
+    width: 16px;
+    height: 16px;
+    color: #ffffff;
+    stroke-width: 2;
+}
+
+.name-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-verified {
+    width: 20px;
+    height: 20px;
+    color: #f59e0b;
+    fill: #f59e0b;
+    stroke: #ffffff;
+    stroke-width: 2;
+}
+
+.profile-role {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Donja sekcija koja gura biografiju i datum skroz ispod avatara */
+.bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.profile-bio {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 600px;
+}
+
+.meta-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.meta-icon {
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+}
+
+.right-section {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.share-btn, .edit-btn, .add-friend-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5;
+}
+
+.share-btn, .logout-btn {
+    background-color: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.share-btn,.logout-btn:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.edit-btn, .add-friend-btn {
+    background-color: #f59e0b;
+    color: #ffffff;
+    border: none;
+}
+.edit-btn:hover, .add-friend-btn:hover {
+    background-color: #d97706;
+}
+
+/* Mobilna verzija: sve ide u jedan vertikalni niz */
+@media (max-width: 640px) {
+    .top-section {
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .left-meta {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .profile-name {
+        justify-content: center;
+    }
+    
+    .bottom-section {
+        text-align: center;
+        align-items: center;
+    }
+    
+    .right-section {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.logout-btn{
+    width: 40px;
+    border-radius: 20px;
+}

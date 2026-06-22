@@ -1,0 +1,89 @@
+.stats-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    width: 100%; /* Širi se tačno koliko i gornja kartica */
+    box-sizing: border-box;
+}
+
+/* Prilagođavanje za tablete i mobilne */
+@media (max-width: 768px) {
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+}
+
+.stat-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px; /* Zaobljene ivice kao na slici */
+    padding: 24px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    min-width: 160px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Krug u kome se nalazi ikonica */
+.icon-wrapper {
+    background-color: #fef3c7; /* Jako svetla narandžasta/žuta pozadina */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.stat-icon {
+    width: 20px;
+    height: 20px;
+    color: #f59e0b; /* Tvoja amber/narandžasta boja */
+    stroke-width: 2;
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a; /* Skoro crna */
+    margin: 0 0 4px 0;
+    letter-spacing: -0.5px;
+}
+
+.stat-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b; /* Siva boja za tekst */
+    margin: 0;
+}
+
+@media (max-width: 400px) {
+    .stats-container {
+        grid-template-columns: 1fr; /* Sve u jednu kolonu na skroz malim ekranima */
+    }
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    color: #64748b;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
