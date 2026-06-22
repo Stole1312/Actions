@@ -10,7 +10,8 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
 export default function MpHeader(props) {
-    const profilePicture = localStorage.getItem("profilePicture");
+    const user = JSON.parse(localStorage.getItem("user"));
+    const profilePicture = user.profilePicture;
     
     const [suggestions, setSuggestions] = useState([]); 
     const [showSuggestions, setShowSuggestions] = useState(false);

@@ -41,8 +41,7 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }){
 
             const data = await response.json();
             localStorage.setItem("token", data.token);
-            localStorage.setItem("username", data.userViewModel.username);
-            localStorage.setItem("profilePicture", data.userViewModel.profilePicture);
+            localStorage.setItem("user", JSON.stringify(data.userViewModel));
 
             alert('Uspešno ste se ulogovali!');
             onLoginSuccess();

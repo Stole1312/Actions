@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import MpHeader from "./components/Header/MpHeader"
-import ActionCard from "./components/Card/ActionCard" // Uvezi novu komponentu za karticu
+import ActionCard from "../../components/Card/ActionCard" 
 import styles from "./MainPage.module.css"
 
 export default function MainPage(props) {
@@ -19,11 +19,12 @@ export default function MainPage(props) {
     const [backendMessage, setBackendMessage] = useState("");
     const take = 9;
 
+    const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
+
     const [types, setTypes] = useState([]);
     useEffect(() => {
         async function fetchTypes() {
             try {
-                const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
                 const response = await fetch(`${baseUrl}/Action/GetActionTypes`, {
                     method: 'GET',
                     headers: { 'Content-Type': 'application/json' }
@@ -37,8 +38,6 @@ export default function MainPage(props) {
         }
         fetchTypes();
     }, []);
-
-    const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
 
     async function handleGetAkcije(skipLocal,isLoadMore) {
         const latitude = selectedCoordinates ? selectedCoordinates.lat : null;
@@ -60,7 +59,8 @@ export default function MainPage(props) {
                     Status: null,
                     CheapestFirst: cheapestFirst,
                     Skip: skipLocal,
-                    Take: take
+                    Take: take,
+                    ProducerID: null
                 }),
             });
 
@@ -123,7 +123,7 @@ export default function MainPage(props) {
             <main className={styles["cards-grid"]}>
                 {actions.length > 0 ? (
                     actions.map((action) => (
-                        <ActionCard key={action.id} action={action} types={types}/>
+                        <ActionCard action={action} types={types}/>
                     ))
                 ) : (
                     <p className={styles["no-results"]}>Nema pronađenih akcija za zadate filtere.</p>

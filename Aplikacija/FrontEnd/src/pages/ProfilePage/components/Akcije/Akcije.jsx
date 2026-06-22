@@ -1,6 +1,8 @@
 import styles from "./Akcije.module.css"
 import ActionCard from "../../../../components/Card/ActionCard"
+import ActionCardSkeleton from "../LoadingSkeleton/ActionCardSkeleton";
 import { useState, useEffect } from "react";
+import { isLastDayOfMonth } from "date-fns";
 
 export default function Akcije({ userID, akcijeCount }) {
     console.log(userID);
@@ -12,8 +14,9 @@ export default function Akcije({ userID, akcijeCount }) {
     const [hasMore, setHasMore] = useState(false);
     const [actions, setActions] = useState([]);
     const [types, setTypes] = useState([]);
+
+    const [isLoading, setIsLoading] = useState(false);
     
-    // NOVO STATIŠKO STANJE: Da li je korisnik sakrio ostale redove
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     useEffect(() => {
@@ -35,6 +38,7 @@ export default function Akcije({ userID, akcijeCount }) {
     async function handleGetAkcije(currentSkip, isLoadMore = false) {
         if (!userID) return;
         
+        setIsLoading(true);
         try {
             const url = baseUrl + "/Action/FilterAkcija";
             const response = await fetch(`${url}`, {
@@ -70,6 +74,8 @@ export default function Akcije({ userID, akcijeCount }) {
             }
         } catch (err) {
             console.error("KRAH:", err.message);
+        }finally{
+            setIsLoading(false);
         }
     }
 
@@ -81,7 +87,7 @@ export default function Akcije({ userID, akcijeCount }) {
     }, [userID]); 
 
     async function handleLoadMore() {
-        // Ako je bilo skupljeno, a klikne se Load More, prvo raširi prikaz
+        // Ako je bilo skupljeno, a klikne se Load More, prvo rasiri prikaz
         if (isCollapsed) {
             setIsCollapsed(false);
             return;
@@ -91,13 +97,12 @@ export default function Akcije({ userID, akcijeCount }) {
         handleGetAkcije(nextSkip, true);
     }
 
-    // Određujemo koje akcije zapravo crtamo na ekranu
-    // Ako je isCollapsed true, metodom slice uzimamo samo prve 3 akcije (prvi red)
+    // Ako je isCollapsed true, metodom uzimamo samo prve 3 akcije - prvi red
     const displayedActions = isCollapsed ? actions.slice(0, 3) : actions;
 
     return (
         <div className={styles["akcije-main-div"]}>
-            <p className={styles["section-title"]}>Moje Akcije</p>
+            {!isLoading && <p className={styles["section-title"]}>Moje Akcije</p>}
             
             <main className={styles["cards-grid"]}>
                 {displayedActions.length > 0 ? (
@@ -105,12 +110,18 @@ export default function Akcije({ userID, akcijeCount }) {
                         <ActionCard key={action.id} action={action} types={types} />
                     ))
                 ) : (
-                    <p className={styles["no-results"]}>Korisnik nema Akcija</p>
+                    !isLoading && <p className={styles["no-results"]}>Korisnik nema Akcija</p>
                 )} 
+                {isLoading && (
+                    <>
+                        <ActionCardSkeleton />
+                        <ActionCardSkeleton />
+                        <ActionCardSkeleton />
+                    </>
+                )}                
             </main>    
             
             <div className={styles["footer-buttons-container"]}>
-                {/* 1. DUGME: "Učitaj još" se vidi ako ima još na bekend-u ILI ako smo trenutno skupili prikaz */}
                 {(hasMore || isCollapsed) && actions.length > 0 && (
                     <button className={styles["load-more-button"]} onClick={handleLoadMore}>
                         {isCollapsed ? "Prikaži sve učitane akcije" : "Učitaj još akcija"} 
@@ -118,7 +129,6 @@ export default function Akcije({ userID, akcijeCount }) {
                     </button>
                 )}
 
-                {/* 2. DUGME: "Sakriji akcije" se pojavljuje samo ako u memoriji imamo više od 3 akcije (više od 1 reda) i nismo već skupljeni */}
                 {actions.length > 3 && !isCollapsed && (
                     <button className={styles["collapse-button"]} onClick={() => setIsCollapsed(true)}>
                         Sakriji akcije <span className={styles["arrow-up"]}>▲</span>
