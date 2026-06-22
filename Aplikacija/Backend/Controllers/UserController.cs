@@ -415,7 +415,8 @@ namespace Backend.Controllers
                 Role = u.Role,
                 Bio = u.Bio,
                 VerificationStatus = u.VerificationStatus,
-                ProfilePicture = u.ProfilePicture
+                ProfilePicture = u.ProfilePicture,
+                Created = u.Created
             };
         }
 

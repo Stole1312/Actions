@@ -41,7 +41,6 @@ export default function ProfilePage(props){
                     throw new Error("Greška pri učitavanju korisnika");
                 })
                 .then(data => {
-                    console.log("Fetch uspeo, stigao user:", data);
                     setUserToShow(data);
                 })
                 .catch(err => console.error(err));  
@@ -53,7 +52,6 @@ export default function ProfilePage(props){
         if (!userToShow) return;
 
         const currentId = userToShow.id;
-        console.log(userToShow);
 
         fetch(`${baseUrl}/User/GetUserStats`, {
                 method: "POST",
