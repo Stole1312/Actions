@@ -73,6 +73,7 @@
 }
 
 .chat-card {
+    cursor: pointer;
     flex-shrink: 0;
     outline: none;
     height: 70px;
@@ -381,4 +382,11 @@
     font-size: 0.875rem;
     font-weight: 400;
     color: #78716c;
+}
+
+.chat-sidebar-loading-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

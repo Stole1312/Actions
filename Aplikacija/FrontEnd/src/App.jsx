@@ -22,6 +22,8 @@ export default function App() {
     //Ovaj state je za unreadMessages za NavBar i za chat
     const [totalUnread, setTotalUnread] = useState(0)
     const [connection, setConnection] = useState(null)
+    //Ovaj state pamti koj chat treba da se otvori u chatPage
+    const [friendForChat, setFriendForChat] = useState(null)
 
     useEffect(() => {
         localStorage.setItem("currentView", currentView)
@@ -167,6 +169,8 @@ export default function App() {
                     <ChatPage
                         connection={connection}
                         refreshUnreadCount={fetchUnreadCount}
+                        friendForChat={friendForChat}
+                        clearFriendForChat={() => setFriendForChat(null)}
                     />
                 </div>
             )}
@@ -183,7 +187,12 @@ export default function App() {
                         selected={"friendsPage"}
                         totalUnread={totalUnread}
                     />
-                    <FriendsPage />
+                    <FriendsPage
+                        openChatWithFriend={(friend) => {
+                            setFriendForChat(friend)
+                            setCurrentView("chatPage")
+                        }}
+                    />
                 </div>
             )}
         </div>

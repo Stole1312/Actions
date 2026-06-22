@@ -1,0 +1,152 @@
+.section-container {
+    flex: 1;
+    height: 100vh;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+.main-title {
+    flex-shrink: 0;
+
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    height: 23px;
+    padding: 26px 0 16px 0;
+}
+
+.main-title > h1 {
+    font-size: 0.938rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.following-number {
+    background-color: #f5f4f0;
+    min-width: 20px;
+    height: 20px;
+    padding: 2px 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9999px;
+    box-sizing: border-box;
+
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #78716c;
+}
+
+.following-search-container {
+    position: absolute;
+    right: 50px;
+
+    height: 30px;
+    border-radius: 16px;
+    background-color: #f5f4f0;
+    border: 1px solid #e7e5e0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.following-search-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.following-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.following-users-list-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    padding: 0 50px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.following-user-card {
+    width: 225px;
+    height: 85px;
+    flex-shrink: 0;
+
+    border-radius: 24px;
+    border: 1px solid #e7e5e0;
+    padding: 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.following-user-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.following-user-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.following-user-info-container > p {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #111110;
+}
+
+.following-user-info-container > span {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.following-users-loading-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.no-following-users {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #78716c;
+}
