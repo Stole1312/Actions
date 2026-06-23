@@ -23,11 +23,13 @@ export default function FriendsSection(props) {
     const filteredFriends = props.friends?.filter((friend) =>
         friend.username?.toLowerCase().includes(searchFriendText.toLowerCase()),
     )
-        console.log(filteredFriends);
 
     const friendsElements = filteredFriends?.map((friend) => (
         <div className={styles["friend-card"]} key={friend.friendID}>
-            <div className={styles["friend-info-container"]} onClick={() => props.onUserClick(friend.friendID)}>{/* pozoves ga gde ti treba*/}
+            <div
+                className={styles["friend-info-container"]}
+                onClick={() => props.onUserClick(friend.friendID)}
+            >
                 <img
                     src={friend.profilePicture}
                     alt=""

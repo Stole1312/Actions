@@ -89,6 +89,8 @@ export default function SearchSection(props) {
                     : user,
             ),
         )
+
+        props.loadFollowingUsers()
     }
 
     async function unfollowUser(producerId) {
@@ -114,6 +116,8 @@ export default function SearchSection(props) {
                     : user,
             ),
         )
+
+        props.loadFollowingUsers()
     }
 
     async function sendFriendRequest(receiverId) {
@@ -149,6 +153,7 @@ export default function SearchSection(props) {
                 src={user.profilePicture}
                 alt=""
                 className={styles["user-profile-picture"]}
+                onClick={() => props.onUserClick(user.id)}
             />
             <div className={styles["user-info-container"]}>
                 <p>{user.username}</p>

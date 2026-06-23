@@ -180,7 +180,7 @@ export default function FriendsPage(props) {
                     friends={friends}
                     openChatWithFriend={props.openChatWithFriend}
                     removeFriend={removeFriend}
-                    onUserClick={props.onUserClick} //Prosledis dalje ono iz App.jsx
+                    onUserClick={props.onUserClick}
                 />
             )}
 
@@ -189,6 +189,7 @@ export default function FriendsPage(props) {
                     number={pendingRequests?.length}
                     pendingRequests={pendingRequests}
                     respondFriendRequest={respondFriendRequest}
+                    onUserClick={props.onUserClick}
                 />
             )}
 
@@ -197,6 +198,7 @@ export default function FriendsPage(props) {
                     number={sentRequests?.length}
                     sentRequests={sentRequests}
                     cancelFriendRequest={cancelFriendRequest}
+                    onUserClick={props.onUserClick}
                 />
             )}
 
@@ -204,11 +206,17 @@ export default function FriendsPage(props) {
                 <FollowingPage
                     number={followingUsers?.length}
                     followingUsers={followingUsers}
+                    onUserClick={props.onUserClick}
+                    loadFollowingUsers={loadFollowingUsers}
                 />
             )}
 
             {currentView === "searchPage" && (
-                <SearchSection loadSentRequests={loadSentRequests} />
+                <SearchSection
+                    loadSentRequests={loadSentRequests}
+                    onUserClick={props.onUserClick}
+                    loadFollowingUsers={loadFollowingUsers}
+                />
             )}
         </div>
     )

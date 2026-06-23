@@ -25,6 +25,7 @@ export default function SendedSection(props) {
                 src={sr.receiverProfilePicture}
                 alt=""
                 className={styles["request-card-icon"]}
+                onClick={() => props.onUserClick(sr.reciverID)}
             />
             <div className={styles["user-info-container"]}>
                 <p>{sr.receiverUsername}</p>

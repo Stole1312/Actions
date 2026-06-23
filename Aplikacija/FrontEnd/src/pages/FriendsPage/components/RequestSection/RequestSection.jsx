@@ -25,6 +25,7 @@ export default function RequestSection(props) {
                 src={pr.initiatorProfilePicture}
                 alt=""
                 className={styles["request-card-icon"]}
+                onClick={() => props.onUserClick(pr.initiatorID)}
             />
             <div className={styles["user-info-container"]}>
                 <p>{pr.initiatorUsername}</p>
