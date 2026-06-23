@@ -6,6 +6,8 @@ namespace Backend.Models
     {
         [Key]
         public int ID{get;set;}
+        
+        [ForeignKey(nameof(Sender))]
         public int InitiatorID { get; set; }
         public int ReciverID { get; set; }
         public ReportReason Reason { get; set; }

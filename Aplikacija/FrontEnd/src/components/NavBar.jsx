@@ -5,6 +5,7 @@ import {
     CalendarIcon,
     UsersIcon,
     ChatBubbleOvalLeftIcon,
+    WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline"
 import { PlusIcon } from "@heroicons/react/24/solid"
 import { useEffect, useState } from "react"
@@ -18,6 +19,26 @@ export default function NavBar(props) {
                 <p>Platforma za dešavanja</p>
             </div>
             <div className={styles["nav-buttons-container"]}>
+                {props.role === 2 && (
+                    <button
+                        className={styles["moderator-page-button"]}
+                        onClick={() => props.setCurrentView("moderatorPage")}
+                        style={
+                            props.selected === "moderatorPage"
+                                ? {
+                                      backgroundColor: "#5B21B6",
+                                      color: "white",
+                                      pointerEvents: "none",
+                                  }
+                                : {}
+                        }
+                    >
+                        <WrenchScrewdriverIcon
+                            className={styles["nav-icons"]}
+                        />
+                        Moderator panel
+                    </button>
+                )}
                 <button
                     onClick={() => props.setCurrentView("main")}
                     style={
@@ -33,9 +54,12 @@ export default function NavBar(props) {
                     <HomeIcon className={styles["nav-icons"]} />
                     Početna
                 </button>
-                <button>
-                    <CalendarIcon className={styles["nav-icons"]} /> Moje Akcije
-                </button>
+                {props.role === 1 && (
+                    <button>
+                        <CalendarIcon className={styles["nav-icons"]} /> Moje
+                        Akcije
+                    </button>
+                )}
                 <button
                     onClick={() => props.setCurrentView("friendsPage")}
                     style={
@@ -81,7 +105,7 @@ export default function NavBar(props) {
                         </div>
                     )}
                 </button>
-                <button                     
+                <button
                     onClick={() => props.setCurrentView("myProfilePage")}
                     style={
                         props.selected === "myProfilePage"
@@ -91,7 +115,8 @@ export default function NavBar(props) {
                                   pointerEvents: "none",
                               }
                             : {}
-                    }>
+                    }
+                >
                     <UserIcon className={styles["nav-icons"]} />
                     Profil
                 </button>

@@ -367,17 +367,14 @@ namespace Backend.Migrations
                     b.Property<int>("ReciverID")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SenderID")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("ReciverID");
+                    b.HasIndex("InitiatorID");
 
-                    b.HasIndex("SenderID");
+                    b.HasIndex("ReciverID");
 
                     b.ToTable("Reports");
                 });
@@ -661,15 +658,15 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Models.Report", b =>
                 {
-                    b.HasOne("Backend.Models.User", "Reciver")
+                    b.HasOne("Backend.Models.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("ReciverID")
+                        .HasForeignKey("InitiatorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Models.User", "Sender")
+                    b.HasOne("Backend.Models.User", "Reciver")
                         .WithMany()
-                        .HasForeignKey("SenderID")
+                        .HasForeignKey("ReciverID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

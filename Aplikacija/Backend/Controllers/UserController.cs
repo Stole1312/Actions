@@ -437,5 +437,17 @@ namespace Backend.Controllers
             //pravi ga u string
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        [HttpGet("GetTotalUsers")]
+        public async Task<ActionResult> GetTotalUsers()
+        {
+            var totalUsers = await Context.Users.CountAsync();
+
+            return Ok(new
+            {
+                totalUsers = totalUsers
+            });
+        }
     }
 }

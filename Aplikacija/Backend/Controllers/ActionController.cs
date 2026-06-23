@@ -419,5 +419,22 @@ namespace Backend.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize(Roles = "Moderator,Admin")]
+        [HttpGet("GetActiveActionsCount")]
+        public async Task<ActionResult> GetActiveActionsCount()
+        {
+            var currentTime = DateTime.UtcNow;
+
+            var activeActionsCount = await Context.Akcije.CountAsync(a =>
+                a.DTEnd >= currentTime &&
+                a.Status != ActionStatus.Cancled
+            );
+
+            return Ok(new
+            {
+                activeActionsCount = activeActionsCount
+            });
+        }
     }
 }
