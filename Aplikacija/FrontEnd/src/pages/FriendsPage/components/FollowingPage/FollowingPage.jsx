@@ -1,12 +1,32 @@
 import { useState } from "react"
 import styles from "./FollowingPage.module.css"
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
+import {
+    MagnifyingGlassIcon,
+    MinusCircleIcon,
+} from "@heroicons/react/24/outline"
 import { formatTimeAgo } from "../formatTimeAgo"
 import { BeatLoader } from "react-spinners"
+import { authFetch } from "../../../../api"
 
 export default function FollowingPage(props) {
     //STATES
     const [searchFollowingUsers, setSearchFollowingUsers] = useState("")
+
+    //FUNCTIONS
+    async function unfollowUser(producerId) {
+        const response = await authFetch(
+            `/Social/UnfollowProducer/${producerId}`,
+            {
+                method: "DELETE",
+            },
+        )
+        if (!response.ok) {
+            console.log("Greška pri odpracivanju")
+            return false
+        }
+
+        props.loadFollowingUsers()
+    }
 
     //VARIABLES
     const filteredFollowingUsers = props.followingUsers?.filter((fu) =>
@@ -19,11 +39,19 @@ export default function FollowingPage(props) {
                 src={fu.profilePicture}
                 alt=""
                 className={styles["following-user-card-icon"]}
+                onClick={() => props.onUserClick(fu.producerID)}
             />
             <div className={styles["following-user-info-container"]}>
                 <p>{fu.username}</p>
                 <span>{formatTimeAgo(fu.followedSince)}</span>
             </div>
+            <button
+                className={styles["unfollow-button"]}
+                onClick={() => unfollowUser(fu.producerID)}
+            >
+                <MinusCircleIcon className={styles["user-button-icon"]} />
+                Odprati
+            </button>
         </div>
     ))
 

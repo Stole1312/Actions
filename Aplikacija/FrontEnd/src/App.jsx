@@ -24,9 +24,9 @@ export default function App() {
     const [connection, setConnection] = useState(null)
     //Ovaj state pamti koj chat treba da se otvori u chatPage
     const [friendForChat, setFriendForChat] = useState(null)
-    
+
     //Pamti ID korisnika koji treba da se prikaze
-    const [userID, setUserID]=useState(null)
+    const [userID, setUserID] = useState(null)
 
     useEffect(() => {
         localStorage.setItem("currentView", currentView)
@@ -172,7 +172,7 @@ export default function App() {
                             setCurrentView("login")
                         }}
                         yourProfile={false}
-                        userID = {userID}
+                        userID={userID}
                     />
                 </div>
             )}
@@ -215,11 +215,15 @@ export default function App() {
                             setFriendForChat(friend)
                             setCurrentView("chatPage")
                         }}
-                        onUserClick={(friendID)=>{//Tamo gde ce ti treba da odes na page dodas ovo
-                            setUserID(friendID)// Sledeci korak ti je u FriendsPage.jsx
-                            sessionStorage.setItem("viewingUserID", JSON.stringify(friendID));//ovo se stavlja da ja kad refreshujem stranicu idalje
-                            setCurrentView("profilePage")                                      // mogu da nadjem kog treba da gledam 
-                        }}                                                                      // ako imas pitanja za ovo mog ti pojasnim
+                        onUserClick={(friendID) => {
+                            //Tamo gde ce ti treba da odes na page dodas ovo
+                            setUserID(friendID) // Sledeci korak ti je u FriendsPage.jsx
+                            sessionStorage.setItem(
+                                "viewingUserID",
+                                JSON.stringify(friendID),
+                            ) //ovo se stavlja da ja kad refreshujem stranicu idalje
+                            setCurrentView("profilePage") // mogu da nadjem kog treba da gledam
+                        }} // ako imas pitanja za ovo mog ti pojasnim
                     />
                 </div>
             )}

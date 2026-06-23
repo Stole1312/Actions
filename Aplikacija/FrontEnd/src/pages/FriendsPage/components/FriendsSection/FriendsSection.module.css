@@ -73,6 +73,7 @@
 }
 
 .friend-info-container {
+    cursor: pointer;
     display: flex;
     flex-direction: row;
     gap: 15px;
