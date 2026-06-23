@@ -15,6 +15,24 @@ export default function ProfilePage(props){
         const savedID = sessionStorage.getItem("viewingUserID");
         return savedID ? JSON.parse(savedID) : null;
     });
+
+    const [reportTypes, setReportTypes] = useState([]);
+    useEffect(() => {
+        async function fetchTypes() {
+            try {
+                const response = await fetch(`${baseUrl}/User/GetReportTypes`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                setReportTypes(data);
+            } catch (error) {
+                console.error("Greška pri povlačenju tipova:", error);
+            }
+        }
+        fetchTypes();
+    }, []);
     
     // ceka userID
     useEffect(() => {
@@ -82,9 +100,8 @@ export default function ProfilePage(props){
             <ProfileOverview 
                 userToShow={userToShow}
                 yourProfile={props.yourProfile}
-                onAddFriend={props.onAddFriend}
-                onEditProfile={props.onEditProfile}
                 onLogout={props.onLogout}
+                reportTypes ={reportTypes}
             />
             <ProfileStats stats={userStats}/>
             <Akcije userID={userToShow.id} akcijeCount={userStats.akcijeCout}/>

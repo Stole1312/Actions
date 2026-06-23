@@ -322,3 +322,122 @@
         justify-content: center;
     }
 }
+
+.modal-container {
+    background: #1e1f29 !important; /* Tamna pozadina */
+    border: 1px solid #2f303d !important;
+    color: #f1f5f9 !important;
+}
+
+.modal-header h3 {
+    color: #f1f5f9 !important;
+}
+
+.modal-body {
+    color: #94a3b8 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Razmak između teksta, dropdown-a i textarea */
+    margin-bottom: 24px !important;
+}
+
+/* Instrukcija iznad inputa */
+.modal-instructions {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* Kontejner oko svakog input polja */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Prelep, moderan tamni Dropdown */
+.modal-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #f1f5f9;
+    background-color: #2a2b36;
+    border: 1px solid #3f4052;
+    border-radius: 14px;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    appearance: none; /* Sklanja sistemsku strelicu za čistiji izgled */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+.modal-select:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+/* Prelepo, prostrano polje za unos teksta */
+.modal-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #f1f5f9;
+    background-color: #2a2b36;
+    border: 1px solid #3f4052;
+    border-radius: 14px;
+    outline: none;
+    resize: none; /* Zabranjuje ručno rastezanje i ruženje UI-ja */
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.modal-textarea:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
+/* Brojač karaktera pozicioniran diskretno desno ispod textarea */
+.char-counter {
+    align-self: flex-end;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* Stilovi za dugmiće u tamnoj temi */
+.modal-btn-reject {
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+    border: 1px solid #3f4052 !important;
+}
+
+.modal-btn-reject:hover {
+    background-color: #2a2b36 !important;
+    color: #f1f5f9 !important;
+}
+
+/* Kada je Report dugme onemogućeno (disabled) dok se ne izabere razlog */
+.modal-btn-accept:disabled {
+    background-color: #2a2b36 !important;
+    color: #475569 !important;
+    border: 1px solid #3f4052 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Sređivanje ikone za zatvaranje (X) u gornjem desnom uglu */
+.modal-close-x {
+    color: #64748b !important;
+}
+
+.modal-close-x:hover {
+    color: #f1f5f9 !important;
+}
