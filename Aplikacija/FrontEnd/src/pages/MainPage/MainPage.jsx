@@ -123,7 +123,7 @@ export default function MainPage(props) {
             <main className={styles["cards-grid"]}>
                 {actions.length > 0 ? (
                     actions.map((action) => (
-                        <ActionCard action={action} types={types}/>
+                        <ActionCard action={action} key={action.id} types={types}/>
                     ))
                 ) : (
                     <p className={styles["no-results"]}>Nema pronađenih akcija za zadate filtere.</p>
