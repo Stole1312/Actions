@@ -85,9 +85,9 @@ public class FeedbackController : ControllerBase
                 return BadRequest("Current user does not exist!");
 
             //Ako korisnik nije admin i vlasnik komentara, odnosno korisnik je organizator akcije, ne moze da brise komentar
-            bool isAdmin = currentUser.Role == UserRoles.Admin;
+            bool isModerator = currentUser.Role == UserRoles.Moderator;
             bool isCommentOwner = comment.UserID == currentUserId;
-            if (!isAdmin && !isCommentOwner)
+            if (!isModerator && !isCommentOwner)
                 return BadRequest("You can delete only your own comment!");
 
             Context.Comments.Remove(comment);
@@ -247,9 +247,9 @@ public class FeedbackController : ControllerBase
                 return BadRequest("Current user does not exist!");
 
             //Poruku moze izbrisati admin ili osoba koja je ostavila rejting
-            bool isAdmin = currentUser.Role == UserRoles.Admin;
+            bool isModerator = currentUser.Role == UserRoles.Moderator;
             bool isRatingOwner = rating.UserID == currentUserId;
-            if (!isAdmin && !isRatingOwner)
+            if (!isModerator && !isRatingOwner)
                 return BadRequest("You can delete only your own rating!");
 
             var akcija = await Context.Akcije.FindAsync(rating.AkcijaID);
@@ -291,7 +291,7 @@ public class FeedbackController : ControllerBase
             if(currentUserId == reportedUserId)
                 return BadRequest("You can not report yourself!");
 
-            var reportedUser = Context.Users.FindAsync(reportedUserId);
+            var reportedUser = await Context.Users.FindAsync(reportedUserId);
             if(ReportUser == null)
                 return BadRequest("User does not exist!");
 
@@ -316,7 +316,7 @@ public class FeedbackController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Moderator,Admin")]
     [HttpGet("GetReports")]
     public async Task<ActionResult> GetReports()
     {
@@ -357,7 +357,7 @@ public class FeedbackController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Moderator,Admin")]
     [HttpGet("ChangeReportStatus/{reportId}")]
     public async Task<ActionResult> ChangeReportStatus(int reportId, [FromBody] UserRequestStatus status)
     {
@@ -396,9 +396,9 @@ public class FeedbackController : ControllerBase
                 return BadRequest("Current user does not exist!");
 
             //Samo admin i vlasnik svog reporta mogu obrisati report
-            bool isAdmin = currentUser.Role == UserRoles.Admin;
+            bool isModerator = currentUser.Role == UserRoles.Moderator;
             bool isReportOwner = report.InitiatorID == currentUserId;
-            if(!isAdmin && !isReportOwner)
+            if(!isModerator && !isReportOwner)
                 return BadRequest("You can delete only your report!");
 
             Context.Reports.Remove(report);

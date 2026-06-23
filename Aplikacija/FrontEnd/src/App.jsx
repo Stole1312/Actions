@@ -9,6 +9,7 @@ import NavBar from "./components/NavBar.jsx"
 import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx"
 import ChatPage from "./pages/ChatPage/ChatPage.jsx"
 import FriendsPage from "./pages/FriendsPage/FriendsPage.jsx"
+import ModeratorPanelPage from "./pages/ModeratorPanelPage/ModeratorPanelPage.jsx"
 
 export default function App() {
     const [currentView, setCurrentView] = useState(() => {
@@ -28,6 +29,17 @@ export default function App() {
     //Pamti ID korisnika koji treba da se prikaze
     const [userID, setUserID] = useState(null)
 
+    const [loggedUser, setLoggedUser] = useState(() => {
+        const savedUser = localStorage.getItem("user")
+
+        try {
+            return savedUser ? JSON.parse(savedUser) : null
+        } catch {
+            return null
+        }
+    })
+
+    //SIDE EFFECTS
     useEffect(() => {
         localStorage.setItem("currentView", currentView)
     }, [currentView])
@@ -40,7 +52,6 @@ export default function App() {
         }
     }, [previousView])
 
-    //SIDE EFFECTS
     //Ubacio sam ovo da kad uradish refresh da te ne vrati na login vec da ostanes na trenutnu stranicu
     useEffect(() => {
         if (currentView === "login" || currentView === "signup") return
@@ -82,13 +93,20 @@ export default function App() {
         setTotalUnread(unread)
     }
 
+    //VARIABLES
+    const isProducer = loggedUser?.role === 1
+    const isModerator = loggedUser?.role === 2
+
     return (
         <div className="auth-wrapper">
             {currentView === "login" && (
                 <div className="auth_page">
                     <LoginForm
                         onSwitchToSignUp={() => setCurrentView("signup")}
-                        onLoginSuccess={() => setCurrentView("main")}
+                        onLoginSuccess={(user) => {
+                            setLoggedUser(user)
+                            setCurrentView("main")
+                        }}
                     />
                 </div>
             )}
@@ -112,6 +130,7 @@ export default function App() {
                         }}
                         selected={"main"}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
                     />
                     <MainPage
                         onMyProfileClick={() => {
@@ -128,6 +147,7 @@ export default function App() {
                         setCurrentView={setCurrentView}
                         addActionButton={true}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
                     />
                     <AddActionPage
                         handleGoBackClick={() => {
@@ -146,6 +166,12 @@ export default function App() {
                         setCurrentView={setCurrentView}
                         selected={"myProfilePage"}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
+                        handleAddActionClick={() => {
+                            setCurrentView("addAction")
+                            setPreviousView("myProfilePage")
+                        }}
+                        selected={"myProfilePage"}
                     />
                     <ProfilePage
                         onLogout={() => {
@@ -164,6 +190,12 @@ export default function App() {
                         currentView={currentView}
                         setCurrentView={setCurrentView}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
+                        handleAddActionClick={() => {
+                            setCurrentView("addAction")
+                            setPreviousView("profilePage")
+                        }}
+                        selected={"profilePage"}
                     />
                     <ProfilePage
                         yourProfile={false}
@@ -183,6 +215,7 @@ export default function App() {
                         }}
                         selected={"chatPage"}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
                     />
                     <ChatPage
                         connection={connection}
@@ -204,6 +237,7 @@ export default function App() {
                         }}
                         selected={"friendsPage"}
                         totalUnread={totalUnread}
+                        role={loggedUser?.role}
                     />
                     <FriendsPage
                         openChatWithFriend={(friend) => {
@@ -220,6 +254,23 @@ export default function App() {
                             setCurrentView("profilePage") // mogu da nadjem kog treba da gledam
                         }} // ako imas pitanja za ovo mog ti pojasnim
                     />
+                </div>
+            )}
+
+            {currentView === "moderatorPage" && (
+                <div className="app-layout">
+                    <NavBar
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        handleAddActionClick={() => {
+                            setCurrentView("addAction")
+                            setPreviousView("moderatorPage")
+                        }}
+                        selected={"moderatorPage"}
+                        totalUnread={totalUnread}
+                        role={loggedUser?.role}
+                    />
+                    <ModeratorPanelPage />
                 </div>
             )}
         </div>

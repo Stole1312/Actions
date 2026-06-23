@@ -1,0 +1,45 @@
+.moderator-panel-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.page-header {
+    height: 70px;
+    border-bottom: 1px solid #e7e5e0;
+    padding: 16px 32px;
+    box-sizing: border-box;
+}
+
+.header-title-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.header-title-container > h1 {
+    margin: 0;
+    font-size: 1.063rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.header-title-container > p {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.main-container {
+    flex: 1;
+    background-color: #fafaf8;
+    padding: 24px 28px;
+    box-sizing: border-box;
+}
+
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}

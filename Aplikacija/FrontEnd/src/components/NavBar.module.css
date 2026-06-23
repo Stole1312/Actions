@@ -52,6 +52,14 @@
     background-color: #f59e0b;
     color: #ffffff; /* da se lakse cita kad cove hoveruje*/
 }
+.nav-buttons-container > .moderator-page-button {
+    background-color: #7c3aed;
+    color: white;
+    margin-bottom: 20px;
+}
+.nav-buttons-container > .moderator-page-button:hover {
+    background-color: #6d28d9;
+}
 
 .nav-icons {
     width: 17px;
