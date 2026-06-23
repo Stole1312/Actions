@@ -405,6 +405,18 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpGet("GetReportTypes")]
+        public async Task<ActionResult> GetReportTypes()
+        {
+            var types = Enum.GetValues(typeof(ReportReason))
+                    .Cast<ReportReason>()
+                    .Select(e => new {
+                        Id = (int)e,
+                        Name = e.ToString()
+                    });
+            return Ok(types);
+        }
+
         private UserViewModel MapUserToViewModel(User u)
         {
             return new UserViewModel
@@ -418,7 +430,7 @@ namespace Backend.Controllers
                 ProfilePicture = u.ProfilePicture,
                 Created = u.Created
             };
-        }
+        }        
 
         private string GenerateJwtToken(List<Claim> claims)
         {

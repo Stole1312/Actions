@@ -18,7 +18,8 @@ import styles from "./ProfileOverview.module.css"
 import { useState, useEffect } from "react"
 import { authFetch } from "../../../../api"
 
-export default function ProfileOverview({ userToShow, yourProfile, onEditProfile, onShareProfile, onLogout, onFollow }){  
+export default function ProfileOverview({ userToShow, yourProfile, onLogout, reportTypes }){  
+
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
     const tokenUsera = localStorage.getItem("token");
 
@@ -102,8 +103,16 @@ export default function ProfileOverview({ userToShow, yourProfile, onEditProfile
 
     const [areFriends, setAreFriends]=useState("None");
     const [requestID, setRequestID] =useState(-1);
+
+    //STATEOVI ZA PROZORE
     const [showFriendModal, setShowFriendModal] = useState(false);
     const [showUnfollowModal, setShowUnfollowModal]=useState(false);
+    const [showReportModal, setShowReportModal]=useState(false);
+    const [showVerifyModal,setShowVerifyModal]=useState(false);
+
+    //STATEOVI ZA REPORT
+    const [selectedReportType, setSelectedReportType] = useState("");
+    const [reportDescription, setReportDescription] = useState("");
 
     useEffect(() => {
         async function checkFriendStatus() {
@@ -126,7 +135,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onEditProfile
         }
 
         checkFriendStatus();
-    }, [areFriends]);
+    }, [userToShow?.id, yourProfile]);
     
     async function respondFriendRequest(requestId, status) {
         const response = await authFetch(
@@ -240,6 +249,28 @@ export default function ProfileOverview({ userToShow, yourProfile, onEditProfile
         }
     };
 
+    async function handleReport(reason, description) {
+        console.log(reason);
+        console.log(description);
+        const response = await authFetch(`/Feedback/ReportUser/${userToShow.id}`,{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify({
+                Reason: reason,
+                Description: description
+            })
+        });
+        if (!response.ok) {
+            // Ako bekhend vrati BadRequest(e.Message), ovde ces videti sta je tacno puklo
+            const errorText = await response.text();
+            console.error("Server je odbio zahtev:", errorText);
+        } else {
+            console.log("Korisnik uspešno prijavljen!");
+        }
+    }
+
     return(
         <div className={styles["profile-card"]}>
             <div className={styles["top-section"]}>
@@ -260,27 +291,26 @@ export default function ProfileOverview({ userToShow, yourProfile, onEditProfile
                         userToShow.verificationStatus !=2 && <button className={styles["share-btn"]} onClick={onShareProfile}>
                             <CheckCircleIcon className={styles["btn-icon"]} /> Verify
                         </button> :
-                        <button className={styles["share-btn"]} onClick={onShareProfile}>
+                        <button className={styles["share-btn"]} onClick={()=>setShowReportModal(true)}>
                             <FlagIcon className={styles["btn-icon"]} /> Report
                         </button>
                     }
 
                     {!yourProfile && userToShow.role == 1 &&
-                        follows ? 
-                            <button className={styles["edit-btn"]} onClick={()=>setShowUnfollowModal(true)}>
-                                    <SolidHeartIcon className={styles["btn-icon"]} /> Following                       
-                            </button> :
-                            <button className={styles["edit-btn"]} onClick={()=>handleFollow(userToShow.id)}>
-                                    <HeartIcon className={styles["btn-icon"]} /> Follow                       
-                            </button>
+                        (
+                            follows ? 
+                                <button className={styles["edit-btn"]} onClick={()=>setShowUnfollowModal(true)}>
+                                        <SolidHeartIcon className={styles["btn-icon"]} /> Following                       
+                                </button> :
+                                <button className={styles["edit-btn"]} onClick={()=>handleFollow(userToShow.id)}>
+                                        <HeartIcon className={styles["btn-icon"]} /> Follow                       
+                                </button>
+                        )
                     }
 
-                    <button className={styles["share-btn"]} onClick={onShareProfile}>
-                        <LinkIcon className={styles["btn-icon"]} /> Share
-                    </button>
                     
                     {yourProfile ? (
-                        <button className={styles["edit-btn"]} onClick={onEditProfile}>
+                        <button className={styles["edit-btn"]} onClick={console.log("TO DO")}>
                             <PencilIcon className={styles["btn-icon"]} /> Edit 
                         </button>
                     ) : (
@@ -355,6 +385,79 @@ export default function ProfileOverview({ userToShow, yourProfile, onEditProfile
                             </button>
                         </div>
                         <button className={styles["modal-close-x"]} onClick={() => setShowUnfollowModal(false)}>
+                            <XMarkIcon />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {showReportModal && (
+                <div className={styles["modal-overlay"]}>
+                    <div className={styles["modal-container"]}>
+                        <div className={styles["modal-header"]}>
+                            <FlagIcon className={styles["modal-icon"]} />
+                            <h3>Report</h3>
+                        </div>
+                        <div className={styles["modal-body"]}>
+                            <p className={styles["modal-instructions"]}>
+                                Odaberite razlog reporta i kratko ga opišite:
+                            </p>
+                            
+                            <div className={styles["form-group"]}>
+                                <select 
+                                    className={styles["modal-select"]}
+                                    value={selectedReportType}
+                                    onChange={(e) => setSelectedReportType(e.target.value)}
+                                >
+                                    <option value="" disabled>Izaberite razlog...</option>
+                                    {reportTypes?.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className={styles["form-group"]}>
+                                <textarea
+                                    className={styles["modal-textarea"]}
+                                    placeholder="Unesite opis (obavezno)..."
+                                    maxLength={250}
+                                    value={reportDescription}
+                                    onChange={(e) => setReportDescription(e.target.value)}
+                                    rows={4}
+                                />
+                                <div className={styles["char-counter"]}>
+                                    {reportDescription.length} / 250
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles["modal-actions"]}>
+                            <button className={styles["modal-btn-reject"]} onClick={() => {
+                                setShowReportModal(false);
+                                setSelectedReportType("");
+                                setReportDescription("");
+                            }}>
+                                Odustani
+                            </button>
+                            <button 
+                                className={styles["modal-btn-accept"]} 
+                                disabled={!selectedReportType || !reportDescription.trim()}
+                                onClick={() => { 
+                                    handleReport(Number(selectedReportType), reportDescription);
+                                    setShowReportModal(false);
+                                    setSelectedReportType("");
+                                    setReportDescription("");
+                                }}
+                            >
+                                Report
+                            </button>
+                        </div>
+                        <button className={styles["modal-close-x"]} onClick={() => {
+                            setShowReportModal(false);
+                            setSelectedReportType("");
+                            setReportDescription("");
+                        }}>
                             <XMarkIcon />
                         </button>
                     </div>

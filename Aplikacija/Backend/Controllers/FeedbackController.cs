@@ -292,14 +292,14 @@ public class FeedbackController : ControllerBase
                 return BadRequest("You can not report yourself!");
 
             var reportedUser = await Context.Users.FindAsync(reportedUserId);
-            if(ReportUser == null)
+            if(reportedUser == null)
                 return BadRequest("User does not exist!");
 
             var report = new Report
             {
                 InitiatorID = currentUserId,
                 ReciverID = reportedUserId,
-                Reason = ruDTO.Reason,
+                Reason = (ReportReason)ruDTO.Reason,
                 Description = ruDTO.Description,
                 Created = DateTime.UtcNow,
                 Status = UserRequestStatus.Pending
