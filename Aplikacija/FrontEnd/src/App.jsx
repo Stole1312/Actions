@@ -166,11 +166,6 @@ export default function App() {
                         totalUnread={totalUnread}
                     />
                     <ProfilePage
-                        onLogout={() => {
-                            localStorage.clear()
-                            setPreviousView(null)
-                            setCurrentView("login")
-                        }}
                         yourProfile={false}
                         userID={userID}
                     />

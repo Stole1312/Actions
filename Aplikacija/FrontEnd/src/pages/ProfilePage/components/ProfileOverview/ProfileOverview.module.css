@@ -5,15 +5,13 @@
     border: 1px solid #e2e8f0;
     border-radius: 24px;
     padding: 32px;
-    width: 100%; /* Uzima punu širinu parent kontejnera */
+    width: 100%; 
     box-sizing: border-box;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     gap: 20px;
+    position: relative;
 }
 
-/* Ostatak tvog CSS-a ostaje isti, samo obriši margin i max-width iz .profile-card */
-
-/* Gornji red gde su slika, ime i dugmad raspoređeni levo-desno */
 .top-section {
     display: flex;
     justify-content: space-between;
@@ -21,7 +19,6 @@
     width: 100%;
 }
 
-/* Grupa za sliku i ime */
 .left-meta {
     display: flex;
     gap: 24px;
@@ -101,7 +98,6 @@
     margin: 0;
 }
 
-/* Donja sekcija koja gura biografiju i datum skroz ispod avatara */
 .bottom-section {
     display: flex;
     flex-direction: column;
@@ -168,7 +164,7 @@
     color: #475569;
     border: 1px solid #cbd5e1;
 }
-.share-btn,.logout-btn:hover {
+.share-btn:hover, .logout-btn:hover {
     background-color: #f8fafc;
     border-color: #94a3b8;
 }
@@ -182,7 +178,123 @@
     background-color: #d97706;
 }
 
-/* Mobilna verzija: sve ide u jedan vertikalni niz */
+.logout-btn{
+    width: 40px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4); 
+    backdrop-filter: blur(4px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-container {
+    background: #ffffff; 
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 28px;
+    width: 90%;
+    max-width: 420px;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.modal-icon {
+    width: 24px;
+    height: 24px;
+    color: #f59e0b; 
+}
+
+.modal-body {
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 28px 0;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.modal-btn-reject, .modal-btn-accept {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.modal-btn-reject {
+    background-color: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.modal-btn-reject:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.modal-btn-accept {
+    background-color: #f59e0b;
+    color: #ffffff;
+}
+
+.modal-btn-accept:hover {
+    background-color: #d97706;
+}
+
+.modal-close-x {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.modal-close-x:hover {
+    color: #0f172a;
+}
+
 @media (max-width: 640px) {
     .top-section {
         flex-direction: column;
@@ -209,9 +321,4 @@
         width: 100%;
         justify-content: center;
     }
-}
-
-.logout-btn{
-    width: 40px;
-    border-radius: 20px;
 }
