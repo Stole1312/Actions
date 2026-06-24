@@ -1,12 +1,15 @@
 .report-section {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     border: 1px solid #e7e5e0;
+    overflow: hidden;
 }
 
 .main-title {
-    flex: 1;
+    flex-shrink: 0;
+
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -70,8 +73,17 @@
 }
 
 .header-container {
+    flex-shrink: 0;
+
     display: grid;
-    grid-template-columns: 1.5fr 1.7fr 1.6fr 2.5fr 1.5fr 1.7fr;
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(0, 1.4fr)
+        minmax(0, 1.4fr)
+        minmax(0, 2.5fr)
+        minmax(0, 1.3fr)
+        minmax(0, 1.5fr)
+        minmax(0, 1.2fr);
 
     height: 40px;
     background-color: #f5f4f0;
@@ -90,11 +102,24 @@
 
 .report-card {
     display: grid;
-    grid-template-columns: 1.5fr 1.7fr 1.6fr 2.5fr 1.5fr 1.7fr;
+    grid-template-columns:
+        minmax(0, 1.4fr)
+        minmax(0, 1.4fr)
+        minmax(0, 1.4fr)
+        minmax(0, 2.5fr)
+        minmax(0, 1.3fr)
+        minmax(0, 1.5fr)
+        minmax(0, 1.2fr);
 
     height: 50px;
+    min-height: 50px;
+
     background-color: #ffffff;
     border-bottom: 1px solid #e7e5e0;
+}
+
+.report-card > * {
+    min-width: 0;
 }
 
 .report-user-container {
@@ -132,12 +157,62 @@
     color: #78716c;
 }
 
-.description-section-container > p {
-    margin: 0;
-    padding: 19px 16px;
+.description-section-container {
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+
+    display: flex;
+
     box-sizing: border-box;
+}
+
+.description-section-container > p {
+    min-width: 0;
+    width: 100%;
+
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     font-size: 0.688rem;
     font-weight: 400;
     color: #78716c;
+}
+
+.report-status-container {
+    display: flex;
+    align-items: center;
+}
+
+.actions-buttons-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+
+    padding-left: 16px;
+    box-sizing: border-box;
+}
+
+.action-button {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    border: 1px solid #e7e5e0;
+    background-color: #fafaf8;
+}
+
+.actions-button-icon {
+    width: 12px;
+    height: 12px;
+    color: #77706b;
+    stroke-width: 4;
+}
+
+.reports-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }

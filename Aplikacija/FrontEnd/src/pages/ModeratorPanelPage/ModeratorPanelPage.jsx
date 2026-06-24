@@ -115,7 +115,7 @@ export default function ModeratorPanelPage() {
                             verificationRequests?.length
                         }
                     />
-                    <ReportsSection />
+                    <ReportsSection reports={reports} />
                 </section>
             </main>
         </div>
