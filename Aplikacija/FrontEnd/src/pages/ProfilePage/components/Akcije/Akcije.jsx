@@ -4,7 +4,7 @@ import ActionCardSkeleton from "../LoadingSkeleton/ActionCardSkeleton";
 import { useState, useEffect } from "react";
 import { isLastDayOfMonth } from "date-fns";
 
-export default function Akcije({ userID, akcijeCount }) {
+export default function Akcije({ userID, akcijeCount, mojeAkcije}) {
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
     const [skip, setSkip] = useState(0);
     const take = 3;
@@ -106,7 +106,7 @@ export default function Akcije({ userID, akcijeCount }) {
             <main className={styles["cards-grid"]}>
                 {displayedActions.length > 0 ? (
                     displayedActions.map((action) => (
-                        <ActionCard key={action.id} action={action} types={types} />
+                        <ActionCard key={action.id} action={action} types={types} mojeAkcije={mojeAkcije}/>
                     ))
                 ) : (
                     !isLoading && <p className={styles["no-results"]}>Korisnik nema Akcija</p>

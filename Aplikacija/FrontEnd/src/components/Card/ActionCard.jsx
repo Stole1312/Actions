@@ -3,7 +3,7 @@ import styles from "./ActionCard.module.css"
 import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon } from "@heroicons/react/24/outline"
 import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
 
-export default function ActionCard({ action, types}) {
+export default function ActionCard({ action, types, mojeAkcije}) {
 
     const foundType = types.find(t => t.id === action.type);
     const typeName = foundType ? foundType.name : "Ostalo";
@@ -107,7 +107,11 @@ export default function ActionCard({ action, types}) {
                         </span>
                     </div>
 
-                    <button className={styles["join-button"]} onClick={handleJoinClick}>Prijavi se</button>
+                    {!mojeAkcije ?
+                        <button className={styles["join-button"]} onClick={handleJoinClick}>Prijavi se</button>
+                        :
+                        <button className={styles["join-button"]} onClick={console.log("ce ode na detalji akcije")}>Uredi</button>
+                    }
                 </div>
             </div>
         </div>
