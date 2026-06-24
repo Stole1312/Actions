@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx"
 import ChatPage from "./pages/ChatPage/ChatPage.jsx"
 import FriendsPage from "./pages/FriendsPage/FriendsPage.jsx"
 import ModeratorPanelPage from "./pages/ModeratorPanelPage/ModeratorPanelPage.jsx"
+import NotificationPopup from "./components/NotificationPopup/NotificationPopup.jsx"
 
 export default function App() {
     const [currentView, setCurrentView] = useState(() => {
@@ -38,6 +39,8 @@ export default function App() {
             return null
         }
     })
+
+    const [notification, setNotification] = useState(null)
 
     //SIDE EFFECTS
     useEffect(() => {
@@ -82,6 +85,15 @@ export default function App() {
             })
     }, [currentView])
 
+    useEffect(() => {
+        if (currentView === "login" || currentView === "signup") {
+            setNotification(null)
+            return
+        }
+
+        fetchUnreadNotification()
+    }, [currentView])
+
     //FUNCTIONS
     async function fetchUnreadCount() {
         const response = await authFetch("/Communication/GetMyChats")
@@ -91,6 +103,46 @@ export default function App() {
 
         const unread = chats.reduce((sum, chat) => sum + chat.unreadCount, 0)
         setTotalUnread(unread)
+    }
+
+    async function fetchUnreadNotification() {
+        const response = await authFetch("/Feedback/GetUnreadNotification")
+
+        if (response.status === 204) {
+            setNotification(null)
+            return
+        }
+
+        if (!response.ok) {
+            console.log("Greška pri učitavanju obaveštenja")
+            return
+        }
+
+        const data = await response.json()
+
+        setNotification(data)
+    }
+
+    async function closeNotification() {
+        if (!notification) {
+            return
+        }
+
+        const response = await authFetch(
+            `/Feedback/MarkNotificationAsRead/${notification.id}`,
+            {
+                method: "PUT",
+            },
+        )
+
+        if (!response.ok) {
+            console.log("Greška pri zatvaranju obaveštenja")
+            return
+        }
+
+        setNotification(null)
+
+        await fetchUnreadNotification()
     }
 
     //VARIABLES
@@ -177,6 +229,8 @@ export default function App() {
                         onLogout={() => {
                             localStorage.clear()
                             setPreviousView(null)
+                            setLoggedUser(null)
+                            setNotification(null)
                             setCurrentView("login")
                         }}
                         yourProfile={true}
@@ -267,8 +321,27 @@ export default function App() {
                         totalUnread={totalUnread}
                         role={loggedUser?.role}
                     />
-                    <ModeratorPanelPage />
+                    <ModeratorPanelPage
+                        openReportedUserProfile={(reportedUserId) => {
+                            setUserID(reportedUserId)
+
+                            sessionStorage.setItem(
+                                "viewingUserID",
+                                JSON.stringify(reportedUserId),
+                            )
+
+                            setPreviousView("moderatorPage")
+                            setCurrentView("profilePage")
+                        }}
+                    />
                 </div>
+            )}
+
+            {notification && (
+                <NotificationPopup
+                    notification={notification}
+                    closeNotification={closeNotification}
+                />
             )}
         </div>
     )

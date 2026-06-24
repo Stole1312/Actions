@@ -11,10 +11,29 @@ import StatusDropdown from "./components/StatusDropDown/StatusDropdown"
 import { reportReasons } from "./components/reportReasons.js"
 import { formatTimeAgo } from "./components/formatTimeAgo.js"
 import ReportDescription from "./components/ReportDescription/ReportDescription.jsx"
+import ProcessReportPopup from "./components/ProcessReportPopup/ProcessReportPopup.jsx"
+import { BeatLoader } from "react-spinners"
 
 export default function ReportsSection(props) {
     //STATES
     const [searchReportText, setSearchReportText] = useState("")
+    const [reportToProcess, setReportToProcess] = useState(null)
+    const [deletingReportId, setDeletingReportId] = useState(null)
+
+    //FUNCTIONS
+    async function handleDeleteReport(reportId) {
+        if (deletingReportId !== null) {
+            return
+        }
+
+        setDeletingReportId(reportId)
+
+        try {
+            await props.deleteReport(reportId)
+        } finally {
+            setDeletingReportId(null)
+        }
+    }
 
     //VARIABLES
     const reportsElements = props.reports?.map((report) => (
@@ -44,20 +63,47 @@ export default function ReportsSection(props) {
                 <StatusDropdown
                     status={report.status}
                     reportId={report.id}
-                    updateStatus={() => {}}
+                    updateStatus={props.updateReportStatus}
                 />
             </div>
             <div className={styles["actions-buttons-container"]}>
-                <button className={styles["action-button"]}>
+                <button
+                    className={styles["action-button"]}
+                    onClick={() =>
+                        props.openReportedUserProfile(report.reportedUser.id)
+                    }
+                >
                     <EyeIcon className={styles["actions-button-icon"]} />
                 </button>
-                <button className={styles["action-button"]}>
+                <button
+                    className={styles["action-button"]}
+                    onClick={() => setReportToProcess(report)}
+                    style={
+                        Number(report.status) === 0
+                            ? {
+                                  pointerEvents: "none",
+                                  opacity: 0.4,
+                              }
+                            : undefined
+                    }
+                >
                     <CheckIcon
                         className={styles["actions-button-icon"]}
                         style={{ color: "#065F46" }}
                     />
                 </button>
-                <button className={styles["action-button"]}>
+                <button
+                    className={styles["action-button"]}
+                    onClick={() => handleDeleteReport(report.id)}
+                    style={
+                        deletingReportId === report.id
+                            ? {
+                                  pointerEvents: "none",
+                                  opacity: 0.5,
+                              }
+                            : undefined
+                    }
+                >
                     <TrashIcon
                         className={styles["actions-button-icon"]}
                         style={{ color: "#EF4444" }}
@@ -97,7 +143,27 @@ export default function ReportsSection(props) {
                 <p>Status</p>
                 <p>Akcija</p>
             </div>
-            <div className={styles["reports-list"]}>{reportsElements}</div>
+            <div className={styles["reports-list"]}>
+                {props.reports === null ? (
+                    <div className={styles["reports-loading-container"]}>
+                        <BeatLoader size={25} color="#F59E0B" />
+                    </div>
+                ) : props.reports.length === 0 ? (
+                    <div className={styles["reports-loading-container"]}>
+                        <p>Trenutno ne postoje reportovi</p>
+                    </div>
+                ) : (
+                    reportsElements
+                )}
+
+                {reportToProcess && (
+                    <ProcessReportPopup
+                        reportToProcess={reportToProcess}
+                        setReportToProcess={setReportToProcess}
+                        processReport={props.processReport}
+                    />
+                )}
+            </div>
         </section>
     )
 }

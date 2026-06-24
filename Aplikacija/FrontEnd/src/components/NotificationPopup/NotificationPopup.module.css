@@ -1,0 +1,73 @@
+.notification-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background-color: rgba(17, 17, 16, 0.45);
+}
+
+.notification-card {
+    width: 420px;
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(17, 17, 16, 0.2);
+}
+
+.notification-card > h1 {
+    margin: 0 0 16px;
+
+    color: #111110;
+    font-size: 1.125rem;
+    text-align: center;
+}
+
+.notification-card > p {
+    margin: 16px 0 24px;
+
+    color: #62605c;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.status {
+    padding: 6px 12px;
+
+    border-radius: 9999px;
+
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.approved-status {
+    color: #065f46;
+    background-color: #d1fae5;
+}
+
+.rejected-status {
+    color: #991b1b;
+    background-color: #fee2e2;
+}
+
+.close-button {
+    height: 40px;
+    padding: 0 24px;
+
+    color: #ffffff;
+    background-color: #7c3aed;
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+}

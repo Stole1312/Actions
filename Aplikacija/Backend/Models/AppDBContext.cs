@@ -13,6 +13,7 @@ namespace Backend.Models
         public DbSet<Friends> Friends { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<VerificationRequest> VerificationRequests { get; set; }
         public DbSet<DeoAkcije> DeoAkcije { get; set; }
         public DbSet<SlikaSaAkcije> SlikeSaAkcije { get; set; }

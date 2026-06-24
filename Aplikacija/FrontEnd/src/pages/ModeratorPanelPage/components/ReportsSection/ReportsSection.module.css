@@ -197,6 +197,7 @@
 }
 
 .action-button {
+    cursor: pointer;
     width: 28px;
     height: 28px;
     border-radius: 10px;
@@ -215,4 +216,12 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+}
+
+.reports-loading-container {
+    margin-top: 100px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

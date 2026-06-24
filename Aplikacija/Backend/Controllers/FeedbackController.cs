@@ -358,20 +358,183 @@ public class FeedbackController : ControllerBase
     }
 
     [Authorize(Roles = "Moderator,Admin")]
-    [HttpGet("ChangeReportStatus/{reportId}")]
-    public async Task<ActionResult> ChangeReportStatus(int reportId, [FromBody] UserRequestStatus status)
+    [HttpPut("ChangeReportStatus/{reportId}")]
+    public async Task<ActionResult> ChangeReportStatus( int reportId, [FromBody] UserRequestStatus status )
     {
         try
         {
+            if (!Enum.IsDefined(typeof(UserRequestStatus), status))
+                return BadRequest("Invalid report status!");
+
             var report = await Context.Reports.FindAsync(reportId);
-            if(report == null)
-                return BadRequest("Report does not exist!");
+            if (report == null)
+                return NotFound("Report does not exist!");
 
             report.Status = status;
 
             await Context.SaveChangesAsync();
 
-            return Ok("Report status updated successfully!");
+            return Ok(new
+            {
+                reportId = report.ID,
+                status = report.Status
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("GetUnreadNotification")]
+    public async Task<ActionResult> GetUnreadNotification()
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var notification = await Context.UserNotifications
+                .AsNoTracking()
+                .Where(notification =>
+                    notification.UserID == currentUserId &&
+                    notification.IsRead == false
+                )
+                .OrderBy(notification => notification.Created)
+                .Select(notification => new
+                {
+                    notification.ID,
+                    notification.Title,
+                    notification.Message,
+                    notification.Type,
+                    notification.ReportStatus,
+                    notification.Created
+                })
+                .FirstOrDefaultAsync();
+
+            if (notification == null)
+            {
+                return NoContent();
+            }
+
+            return Ok(notification);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpPut("MarkNotificationAsRead/{notificationId}")]
+    public async Task<ActionResult> MarkNotificationAsRead(int notificationId)
+    {
+        try
+        {
+            int currentUserId = GetCurrentUserId();
+
+            var notification = await Context.UserNotifications
+                .FirstOrDefaultAsync(notification =>
+                    notification.ID == notificationId &&
+                    notification.UserID == currentUserId
+                );
+
+            if (notification == null)
+                return NotFound("Notification does not exist!");
+
+            notification.IsRead = true;
+
+            await Context.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize(Roles = "Moderator,Admin")]
+    [HttpPost("ResolveReport/{reportId}")] public async Task<ActionResult> ResolveReport( int reportId, [FromBody] ResolveReportDTO resolveReportDTO)
+    {
+        try
+        {
+            var report = await Context.Reports.FindAsync(reportId);
+            if (report == null)
+                return BadRequest("Report does not exist!");
+
+            if (report.Status == UserRequestStatus.Pending)
+                return BadRequest("Report status must be changed before processing!");
+
+            if (!Enum.IsDefined(typeof(ModerationAction), resolveReportDTO.Action))
+                return BadRequest("Invalid moderation action!");
+
+            var reportedUser = await Context.Users.FindAsync(report.ReciverID);
+            if (reportedUser == null)
+                return BadRequest("Reported user does not exist!");
+
+            if ( report.Status == UserRequestStatus.Rejected && resolveReportDTO.Action != ModerationAction.None)
+                return BadRequest("Rejected report cannot punish the reported user!");
+
+            if (report.Status == UserRequestStatus.Approved && resolveReportDTO.Action == ModerationAction.None)
+                return BadRequest("You must choose warn or ban for an approved report!");
+
+            string reportResultMessage = report.Status == UserRequestStatus.Approved
+                    ? $"Vaša prijava korisnika {reportedUser.Username} je prihvaćena."
+                    : $"Vaša prijava korisnika {reportedUser.Username} je odbijena.";
+
+            var reportResultNotification = new UserNotification
+            {
+                UserID = report.InitiatorID,
+                Title = "Prijava je obrađena",
+                Message = reportResultMessage,
+                Type = NotificationType.ReportResult,
+                ReportStatus = report.Status,
+                IsRead = false,
+                Created = DateTime.UtcNow
+            };
+
+            await Context.UserNotifications.AddAsync(reportResultNotification);
+
+            if (resolveReportDTO.Action == ModerationAction.Warn)
+            {
+                var warningNotification = new UserNotification
+                {
+                    UserID = report.ReciverID,
+                    Title = "Upozorenje moderatora",
+                    Message = "Dobili ste upozorenje jer je prijava protiv vašeg naloga prihvaćena.",
+                    Type = NotificationType.Warning,
+                    ReportStatus = null,
+                    IsRead = false,
+                    Created = DateTime.UtcNow
+                };
+
+                await Context.UserNotifications.AddAsync(warningNotification);
+            }
+            else if (resolveReportDTO.Action == ModerationAction.Ban)
+            {
+                reportedUser.isBanned = true;
+
+                var banNotification = new UserNotification
+                {
+                    UserID = report.ReciverID,
+                    Title = "Nalog je banovan",
+                    Message =
+                        "Vaš nalog je banovan jer je prijava protiv vašeg naloga prihvaćena.",
+                    Type = NotificationType.Ban,
+                    ReportStatus = null,
+                    IsRead = false,
+                    Created = DateTime.UtcNow
+                };
+
+                await Context.UserNotifications.AddAsync(banNotification);
+            }
+
+            Context.Reports.Remove(report);
+
+            await Context.SaveChangesAsync();
+
+            return Ok("Report processed successfully!");
         }
         catch (Exception e)
         {
