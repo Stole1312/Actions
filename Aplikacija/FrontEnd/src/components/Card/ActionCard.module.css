@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
 }
 
 .card-container:hover {
@@ -86,6 +87,11 @@
 
 .location-text {
     text-transform: capitalize;
+    white-space: nowrap;     
+    overflow: hidden;        
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
 }
 
 /* Donji deo / Footer kartice */
@@ -127,4 +133,41 @@
 
 .join-button:hover {
     background-color: #d97706;
+}
+
+/* Omotač koji drži svih 5 zvezdica u jednom horizontalnom redu */
+.zvezdice-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px; /* Razmak između zvezdica */
+    margin: 8px 0;
+    width: fit-content;
+}
+
+/* Kontejner za jednu zvezdicu */
+.star-container {
+    position: relative; /* Omogućava da se puna zvezdica zalepi preko prazne */
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Prazna siva zvezdica */
+.empty-star {
+    width: 24px !important;
+    height: 24px !important;
+    color: #d1d5db; /* Svetlo siva boja */
+}
+
+/* Puna zlatna zvezdica koja seda TAČNO preko prazne */
+.filled-star {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px !important;
+    height: 24px !important;
+    color: #f59e0b; /* Zlatna boja */
 }

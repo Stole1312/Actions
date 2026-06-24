@@ -50,6 +50,12 @@ namespace Backend.Controllers
                 if (producer == null)
                     return BadRequest($"There is no user with ID: {userID}");
 
+                if(producer.Role == UserRoles.User)
+                {
+                    producer.Role = UserRoles.Producer;
+                    Context.Users.Update(producer);
+                }
+
                 // Default slika ako korisnik ne uploaduje svoju
                 string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/AkcijaPictures/defaultAkcija.jpg";
                 string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
@@ -233,10 +239,6 @@ namespace Backend.Controllers
                 // po tipu
                 if (filter.Type.HasValue)
                     query = query.Where(a => a.Type == filter.Type.Value);
-
-                // po statusu (upcoming ongoing)
-                if (filter.Status.HasValue)
-                    query = query.Where(a => a.Status == filter.Status.Value);
                 
                 // opseg datuma - od kog do kog datuma zelim da akcija POCINJE
                 if (filter.OdKada.HasValue)
@@ -271,6 +273,55 @@ namespace Backend.Controllers
                 int ukupnoPronadjeno = await query.CountAsync();
                 // uzimam 9 akcija nakon sto skipijem kolko vec treba
                 var rezultati = await query.Skip(filter.Skip).Take(filter.Take).ToListAsync();
+
+                // SVAKI PUT KAD UCITAVAM AKCIJE PROVERAVAM DAL SE TREBA MENJA NESTO U BAZI
+                bool imaIzmenaUBazi = false;
+                foreach(Akcija a in rezultati)
+                {
+                    if(a.Status != ActionStatus.Cancled && a.Status!=ActionStatus.Over)
+                    {
+
+                        ActionStatus noviStatus = a.Status;
+                        DateTime trenutnoVremeUTojZoni = DateTime.UtcNow; // Fallback ako nema koordinata
+
+                        // Proveravam dal akcija ima validne koordinate
+                        if (a.Latitude != 0 && a.Longitude != 0)
+                        {
+                            try
+                            {
+                                //  GeoTimeZone ce nadje IANA naziv zone (npr "Europe/Belgrade") na osnovu koordinata
+                                var rezultatZone = TimeZoneLookup.GetTimeZone(a.Latitude, a.Longitude);
+                                string ianaZonaId = rezultatZone.Result;
+
+                                //  .Net razlicito cita vremenske zone na razlicitim OS-ovima pa mora ovako, 
+                                // koristimo TimeZoneInfo da bezbedno povučemo zonu
+                                TimeZoneInfo zonaAkcije = TimeZoneInfo.FindSystemTimeZoneById(ianaZonaId);
+
+                                trenutnoVremeUTojZoni = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaAkcije);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Greška pri određivanju zone za akciju {a.ID}: {ex.Message}");
+                                trenutnoVremeUTojZoni = DateTime.UtcNow;
+                            }
+                        }
+
+                        if (a.DTStart > trenutnoVremeUTojZoni)
+                            noviStatus = ActionStatus.Upcoming;
+                        else if (a.DTEnd < trenutnoVremeUTojZoni)
+                            noviStatus = ActionStatus.Over; 
+                        else
+                            noviStatus = ActionStatus.Ongoing; 
+
+                        if (a.Status != noviStatus)
+                        {
+                            a.Status = noviStatus;
+                            imaIzmenaUBazi = true; 
+                        }
+                    }
+                }
+                if (imaIzmenaUBazi)
+                    await Context.SaveChangesAsync();
 
                 bool imaJos = (filter.Skip + rezultati.Count) < ukupnoPronadjeno;
 
