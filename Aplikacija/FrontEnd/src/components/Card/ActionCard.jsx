@@ -1,6 +1,7 @@
 import styles from "./ActionCard.module.css"
 // Ako imaš Heroicons instaliran, iskoristi ih za datum i lokaciju kao u headeru:
-import { CalendarIcon, MapPinIcon, UserGroupIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon } from "@heroicons/react/24/outline"
+import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
 
 export default function ActionCard({ action, types}) {
 
@@ -36,6 +37,29 @@ export default function ActionCard({ action, types}) {
     // Podrazumevana slika ako je actionPicture null
     const fallbackImage = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=600&auto=format&fit=crop";
 
+    function showStars() {
+        const stars = [];
+
+        for (let i = 0; i < 5; i++) {
+            const fillValue = Math.max(0, Math.min(1, action.averageRating - i));
+            const fillPercentage = fillValue * 100;
+
+            stars.push(
+                <div key={i} className={styles["star-container"]}>
+                    <StarIcon className={styles["empty-star"]} />
+                    
+                    {fillPercentage > 0 && (
+                        <FilledStarIcon 
+                            className={styles["filled-star"]} 
+                            style={{ clipPath: `inset(0 ${100 - fillPercentage}% 0 0)` }} 
+                        />
+                    )}
+                </div>
+            );
+        }
+        return <div className={styles["zvezdice-wrapper"]}>{stars}</div>;
+    }
+
     return (
         <div className={styles["card-container"]} onClick={handleCardClick}>
             <div className={styles["image-container"]}>
@@ -65,6 +89,15 @@ export default function ActionCard({ action, types}) {
                     <MapPinIcon className={styles["card-icon"]} />
                     <span className={styles["location-text"]}>{action.location}</span>
                 </div>
+
+                {action.status === 2 ?
+
+                    showStars() : 
+                    <div className={styles["info-row"]}>
+                        <StarIcon className={styles["card-icon"]}/>
+                        <span>Akcija jos uvek nije gotova</span>
+                    </div>
+                }
 
                 <div className={styles["card-footer"]}>
                     <div className={styles["participants-info"]}>
