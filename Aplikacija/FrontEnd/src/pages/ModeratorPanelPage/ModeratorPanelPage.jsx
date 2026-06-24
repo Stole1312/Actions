@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 import NavSection from "./components/NavSection/NavSection.jsx"
 import ReportsSection from "./components/ReportsSection/ReportsSection.jsx"
 
-export default function ModeratorPanelPage() {
+export default function ModeratorPanelPage(props) {
     //STATES
     const [totalUsers, setTotalUsers] = useState(null)
     const [activeActionsCount, setActiveActionsCount] = useState(null)
@@ -75,6 +75,83 @@ export default function ModeratorPanelPage() {
         setVerificationRequests(data)
     }
 
+    async function updateReportStatus(reportId, newStatus) {
+        const response = await authFetch(
+            `/Feedback/ChangeReportStatus/${reportId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newStatus),
+            },
+        )
+
+        if (!response.ok) {
+            console.log("Greška pri promeni statusa prijave")
+            return
+        }
+
+        setReports((currentReports) =>
+            currentReports.map((report) =>
+                report.id === reportId
+                    ? {
+                          ...report,
+                          status: newStatus,
+                      }
+                    : report,
+            ),
+        )
+    }
+
+    async function processReport(reportId, action) {
+        const response = await authFetch(
+            `/Feedback/ResolveReport/${reportId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    action: action,
+                }),
+            },
+        )
+
+        if (!response.ok) {
+            const errorMessage = await response.text()
+            console.log("Greška pri obradi prijave:", errorMessage)
+
+            return false
+        }
+
+        setReports((currentReports) =>
+            currentReports.filter((report) => report.id !== reportId),
+        )
+
+        return true
+    }
+
+    async function deleteReport(reportId) {
+        const response = await authFetch(`/Feedback/DeleteReport/${reportId}`, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            const errorMessage = await response.text()
+
+            console.log("Greška pri brisanju prijave:", errorMessage)
+
+            return false
+        }
+
+        setReports((currentReports) =>
+            currentReports.filter((report) => report.id !== reportId),
+        )
+
+        return true
+    }
+
     return (
         <div className={styles["moderator-panel-page-container"]}>
             <section className={styles["page-header"]}>
@@ -115,7 +192,13 @@ export default function ModeratorPanelPage() {
                             verificationRequests?.length
                         }
                     />
-                    <ReportsSection />
+                    <ReportsSection
+                        reports={reports}
+                        updateReportStatus={updateReportStatus}
+                        processReport={processReport}
+                        openReportedUserProfile={props.openReportedUserProfile}
+                        deleteReport={deleteReport}
+                    />
                 </section>
             </main>
         </div>
