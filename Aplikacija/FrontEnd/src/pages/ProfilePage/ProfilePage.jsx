@@ -107,7 +107,7 @@ export default function ProfilePage(props){
                 setZelimRefresh={setZelimRefresh}
             />
             <ProfileStats stats={userStats}/>
-            <Akcije userID={userToShow.id} akcijeCount={userStats.akcijeCout}/>
+            <Akcije userID={userToShow.id} akcijeCount={userStats.akcijeCout} mojeAkcije={props.yourProfile}/>
         </div>
     )
 }
