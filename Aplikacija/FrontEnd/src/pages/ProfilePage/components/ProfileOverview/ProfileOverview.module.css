@@ -337,7 +337,7 @@
     color: #94a3b8 !important;
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Razmak između teksta, dropdown-a i textarea */
+    gap: 16px; 
     margin-bottom: 24px !important;
 }
 
@@ -369,7 +369,7 @@
     cursor: pointer;
     box-sizing: border-box;
     transition: all 0.2s ease;
-    appearance: none; /* Sklanja sistemsku strelicu za čistiji izgled */
+    appearance: none; 
     background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
@@ -391,7 +391,7 @@
     border: 1px solid #3f4052;
     border-radius: 14px;
     outline: none;
-    resize: none; /* Zabranjuje ručno rastezanje i ruženje UI-ja */
+    resize: none; 
     box-sizing: border-box;
     transition: all 0.2s ease;
     font-family: inherit;
@@ -433,11 +433,107 @@
     transform: none !important;
 }
 
-/* Sređivanje ikone za zatvaranje (X) u gornjem desnom uglu */
+/* Sređivanje ikone za zatvaranje (X) u gornjem desnem uglu */
 .modal-close-x {
     color: #64748b !important;
 }
 
 .modal-close-x:hover {
     color: #f1f5f9 !important;
+}
+
+/* PODRAZUMEVANA KOCKASTA ZONA ZA SVAKI ELEMENT (ZA DRUGI MODAL OSTAJE ISTA) */
+.image-upload-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #475569; 
+    border-radius: 12px;        
+    padding: 32px 24px;
+    background-color: #22252a;  
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 15px;
+}
+
+.image-upload-zone:hover {
+    border-color: #f59e0b;      
+    background-color: #2a2e35;  
+}
+
+.image-upload-input {
+    display: none;
+}
+
+.image-upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.image-upload-icon {
+    width: 48px;
+    height: 48px;
+    color: #94a3b8;            
+    transition: color 0.2s ease;
+}
+
+.image-upload-zone:hover .image-upload-icon {
+    color: #f59e0b;            
+}
+
+.image-upload-text {
+    font-size: 14px;
+    color: #cbd5e1;            
+    font-weight: 400;
+    line-height: 1.5;
+    word-break: break-all;
+}
+
+/* Spoljni kontejner koji smo uveli u JSX za Smile modal */
+.form-group-avatar {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* Selektujemo image-upload-zone isključivo kada se nalazi unutar form-group-avatar */
+.form-group-avatar .image-upload-zone {
+    border-radius: 50% !important;   /* Pretvara u krug */
+    aspect-ratio: 1 / 1 !important;  /* Prisili na kvadratni odnos pre zaobljenja */
+    width: 160px !important;         /* Fiksne dimenzije da se dobije savršen krug */
+    height: 160px !important;
+    padding: 16px !important;
+    background-color: #2a2b36 !important; /* Pozadina usklađena sa tamnim modalom */
+    margin: 0 auto !important;       /* Savršeno centriranje */
+    overflow: hidden !important;     /* Da sakrije sadržaj van kruga */
+}
+
+.form-group-avatar .image-upload-zone:hover {
+    background-color: #2f303d !important;
+    transform: scale(1.02);
+}
+
+/* Posebna podešavanja za ikonicu u krugu */
+.form-group-avatar .image-upload-icon {
+    width: 36px !important;
+    height: 36px !important;
+    margin-bottom: 2px;
+}
+
+/* Tekst unutar kruga koji inteligentno skraćuje predugačka imena */
+.form-group-avatar .image-upload-text {
+    font-size: 12px !important;
+    color: #94a3b8 !important;
+    white-space: nowrap !important;
+    max-width: 130px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* Dodaje "..." na kraj */
+    display: block !important;
 }

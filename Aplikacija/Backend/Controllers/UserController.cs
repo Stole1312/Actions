@@ -153,37 +153,83 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("EditUser")]
-        public async Task<ActionResult> EditUser([FromForm] UserRegisterVM editedUser)
+        public async Task<ActionResult> EditUser([FromForm] UserEditVM editedUser)
         {
             try
             {
-                var userInDB = await Context.Users.FindAsync(editedUser.ID);
+                var id = GetCurrentUserId();
+                var userInDB = await Context.Users.FindAsync(id);
 
                 if (userInDB == null)
-                    return NotFound($"usr with ID {editedUser.ID} was not found.");
+                    return NotFound($"usr with ID {id} was not found.");
 
-                userInDB.Username = editedUser.Username;
-                userInDB.Email = editedUser.Email;
-                userInDB.Role = editedUser.Role;
-                userInDB.VerificationStatus = editedUser.VerificationStatus;
-                userInDB.Bio=editedUser.Bio ?? userInDB.Bio;
+                // 1. Provera za Username 
+                if (!string.IsNullOrEmpty(editedUser.Username) && editedUser.Username != userInDB.Username)
+                {
+                    var usernameExists = await Context.Users.AnyAsync(u => u.Username == editedUser.Username && u.ID != id);
+                    if (usernameExists)
+                        return BadRequest("Korisničko ime je već zauzeto.");
+                }
+
+                // 2. Provera za Email 
+                if (!string.IsNullOrEmpty(editedUser.Email) && editedUser.Email != userInDB.Email)
+                {
+                    var emailExists = await Context.Users.AnyAsync(u => u.Email == editedUser.Email && u.ID != id);
+                    if (emailExists)
+                        return BadRequest("Email adresa je već u upotrebi.");
+                }    
+
+                userInDB.Username = editedUser.Username ?? userInDB.Username;
+                userInDB.Email = editedUser.Email ?? userInDB.Email;
+                userInDB.Bio = editedUser.Bio ?? userInDB.Bio;
 
                 if (editedUser.ProfilePictureFile != null && editedUser.ProfilePictureFile.Length > 0)
                 {
                     string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL missing.");
                     string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey missing.");
                     string bucketName = _configuration["Supabase:BucketName"] ?? "avatars";
+                    string supabaseServiceKey = _configuration["Supabase:ServiceRoleKey"] ?? throw new Exception("Supabase ServiceRoleKey missing.");
 
                     // Inicijalizacija Supabase Storage klijenta
                     var storageClient = new Supabase.Storage.Client(supabaseUrl + "/storage/v1", new Dictionary<string, string>
                     {
-                        { "Authorization", $"Bearer {supabaseKey}" },
-                        { "apikey", supabaseKey }
+                        { "Authorization", $"Bearer {supabaseServiceKey}" },
+                        { "apikey", supabaseServiceKey }
                     });
 
-                    // Generisanje jedinstvenog imena fajla
+                    if (!string.IsNullOrEmpty(userInDB.ProfilePicture))
+                    {
+                        string defaultAvatarUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/ProfilePictures/defaultAvatar.jpg";
+
+                            // Brisemo staru sliku samo ako nije u pitanju default avatar
+                            if (userInDB.ProfilePicture != defaultAvatarUrl)
+                            {
+                                try
+                                {
+                                    // Izvlazimo samo ime fajla iz URL-a (sve nakon zadnjeg kosog kosa '/')
+                                    var oldFileName = userInDB.ProfilePicture.Substring(userInDB.ProfilePicture.LastIndexOf('/') + 1);
+                                    
+                                    // Pozivamo brisanje iz bucketa
+                                    await storageClient.From(bucketName).Remove(new List<string> { oldFileName });
+                                }
+                                catch (Exception storageEx)
+                                {
+                                    Console.WriteLine($"Neuspešno brisanje stare slike: {storageEx.Message}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Stara slika je podrazumevani avatar, preskače se brisanje sa Storage-a.");
+                            }
+                    }
+
+                    // Generisanje jedinstvenog imena fajla za novu sliku
                     var extension = Path.GetExtension(editedUser.ProfilePictureFile.FileName);
+                    if (string.IsNullOrEmpty(extension)) 
+                        extension = ".jpg"; // fallback ako frontend zezne naziv
+                    
                     var fileName = $"{editedUser.Username}_edit_{DateTime.UtcNow.Ticks}{extension}";
 
                     // Pretvaranje IFormFile u niz bajtova
@@ -196,6 +242,7 @@ namespace Backend.Controllers
 
                     // Postavljanje NOVOG URL-a u objekat baze
                     userInDB.ProfilePicture = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+
                 }
 
                 await Context.SaveChangesAsync();
@@ -219,10 +266,9 @@ namespace Backend.Controllers
                 otvorene Requestove. Na klik im se otvara request i renderuju dva dugmeta (Accept/Decile) i Dokumnet
         */
 
-        //Omogucava korisniku User i Producer da postave request
-        [Authorize(Roles = "User, Producer")]
-        [HttpPost("SubmitvVerificationRequest/{id}")]
-        public async Task<ActionResult> SubmitVerificationRequest(int id, [FromBody] string document)
+        [Authorize]
+        [HttpPost("SubmitVerificationRequest/{id}")]
+        public async Task<ActionResult> SubmitVerificationRequest(int id, [FromForm] VerificationRequestDto dto)
         {
             try
             {
@@ -230,12 +276,65 @@ namespace Backend.Controllers
                 if(sender == null)
                     return BadRequest($"There is no user with ID: {id}");
 
+                if (dto.Document == null || dto.Document.Length == 0)
+                            return BadRequest("Document file is missing.");   
+
+                string imageUrl;
+                string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
+                string supabaseKey = _configuration["Supabase:AnonKey"] ?? throw new Exception("Supabase AnonKey is missing in appsettings.");
+                string bucketName = _configuration["Supabase:DokumentacijaBucketName"] ?? "VerifikacijaDokumentacija";
+
+                if (dto.Document != null && dto.Document.Length > 0)
+                {
+                    try
+                    {
+                        var storageClient = new Supabase.Storage.Client(supabaseUrl, new Dictionary<string, string>
+                        {
+                            { "Authorization", $"Bearer {supabaseKey}" },
+                            { "apikey", supabaseKey }
+                        });
+
+                        var extension = Path.GetExtension(dto.Document.FileName);
+                        if (string.IsNullOrEmpty(extension)) extension = ".jpg";
+                        var fileName = $"{Guid.NewGuid()}{extension}";
+
+                        using var ms = new MemoryStream();
+                        await dto.Document.CopyToAsync(ms);
+                        var fileBytes = ms.ToArray();
+
+                        using var httpClient = new HttpClient();
+                        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {supabaseKey}");
+                        httpClient.DefaultRequestHeaders.Add("apikey", supabaseKey);
+
+                        var content = new ByteArrayContent(fileBytes);
+                        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                            dto.Document.ContentType
+                        );
+
+                        var uploadUrl = $"{supabaseUrl}/storage/v1/object/{bucketName}/{fileName}";
+
+                        var uploadResponse = await httpClient.PostAsync(uploadUrl, content);
+                        var responseBody = await uploadResponse.Content.ReadAsStringAsync();
+
+                        if (!uploadResponse.IsSuccessStatusCode)
+                            return BadRequest($"Upload failed: {responseBody}");
+
+                        imageUrl = $"{supabaseUrl}/storage/v1/object/public/{bucketName}/{fileName}";
+                    }
+                    catch (Exception e)
+                    {
+                        return NotFound(e.Message);
+                    }
+                }
+                else
+                    return BadRequest("Document file is missing.");
+        
                 var request = new VerificationRequest
                 {
                     Created = DateTime.UtcNow,
                     Status = UserRequestStatus.Pending,
                     InitiatorID = id,
-                    Document=document,
+                    Document=imageUrl,
                     Sender = sender
                 };
 

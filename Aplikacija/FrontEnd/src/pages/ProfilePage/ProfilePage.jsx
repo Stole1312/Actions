@@ -34,6 +34,8 @@ export default function ProfilePage(props){
         fetchTypes();
     }, []);
     
+    //Kad ocu ja da izazovem refresh - kad prmeni profilnu npr
+    const [zelimRefresh, setZelimRefresh]=useState(false);
     // ceka userID
     useEffect(() => {
 
@@ -63,7 +65,7 @@ export default function ProfilePage(props){
                 })
                 .catch(err => console.error(err));  
         }
-    }, [props.userID, props.yourProfile]);
+    }, [props.userID, props.yourProfile, zelimRefresh]);
 
     // ceka userToShow
     useEffect(() => {
@@ -102,6 +104,7 @@ export default function ProfilePage(props){
                 yourProfile={props.yourProfile}
                 onLogout={props.onLogout}
                 reportTypes ={reportTypes}
+                setZelimRefresh={setZelimRefresh}
             />
             <ProfileStats stats={userStats}/>
             <Akcije userID={userToShow.id} akcijeCount={userStats.akcijeCout}/>
