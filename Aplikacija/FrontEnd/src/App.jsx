@@ -197,10 +197,7 @@ export default function App() {
                         }}
                         selected={"profilePage"}
                     />
-                    <ProfilePage
-                        yourProfile={false}
-                        userID={userID}
-                    />
+                    <ProfilePage yourProfile={false} userID={userID} />
                 </div>
             )}
 

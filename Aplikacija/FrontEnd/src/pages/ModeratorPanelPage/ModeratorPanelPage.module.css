@@ -33,8 +33,10 @@
 
 .main-container {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     background-color: #fafaf8;
-    padding: 24px 28px;
+    padding: 20px 28px;
     box-sizing: border-box;
 }
 
@@ -42,4 +44,10 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
+    padding-bottom: 5px;
+}
+
+.report-verification-container {
+    flex: 1;
+    background-color: #fafaf8;
 }
