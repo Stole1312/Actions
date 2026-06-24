@@ -1,0 +1,143 @@
+.report-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e7e5e0;
+}
+
+.main-title {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    height: 50px;
+    padding: 15px 16px;
+    box-sizing: border-box;
+    gap: 12px;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.main-title-icon {
+    width: 15px;
+    height: 15px;
+    color: #f59e0b;
+}
+
+.main-title > h1 {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.main-title > p {
+    margin: 0;
+    margin-left: 10px;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.reports-search-container {
+    margin-left: auto;
+    width: 25%;
+    height: 25px;
+    border-radius: 16px;
+    background-color: #f5f4f0;
+    border: 1px solid #e7e5e0;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reports-search-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.reports-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.header-container {
+    display: grid;
+    grid-template-columns: 1.5fr 1.7fr 1.6fr 2.5fr 1.5fr 1.7fr;
+
+    height: 40px;
+    background-color: #f5f4f0;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.header-container > p {
+    margin: 0;
+    padding: 12px 16px;
+    box-sizing: border-box;
+
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #78716c;
+}
+
+.report-card {
+    display: grid;
+    grid-template-columns: 1.5fr 1.7fr 1.6fr 2.5fr 1.5fr 1.7fr;
+
+    height: 50px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.report-user-container {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+
+    padding-left: 16px;
+    box-sizing: border-box;
+}
+
+.report-user-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.report-user-container > p {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 500;
+    color: #111110;
+}
+
+.report-card > p {
+    margin: 0;
+    padding: 19px 16px;
+    box-sizing: border-box;
+
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.description-section-container > p {
+    margin: 0;
+    padding: 19px 16px;
+    box-sizing: border-box;
+
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}

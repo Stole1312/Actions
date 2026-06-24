@@ -8,6 +8,8 @@ import {
 } from "@heroicons/react/24/outline"
 import { authFetch } from "../../api.js"
 import { useEffect, useState } from "react"
+import NavSection from "./components/NavSection/NavSection.jsx"
+import ReportsSection from "./components/ReportsSection/ReportsSection.jsx"
 
 export default function ModeratorPanelPage() {
     //STATES
@@ -15,6 +17,8 @@ export default function ModeratorPanelPage() {
     const [activeActionsCount, setActiveActionsCount] = useState(null)
     const [reports, setReports] = useState(null)
     const [verificationRequests, setVerificationRequests] = useState(null)
+
+    const [currentView, setCurrentView] = useState("reportsView")
 
     //SIDE EFFECTS
     useEffect(() => {
@@ -92,7 +96,7 @@ export default function ModeratorPanelPage() {
                         number={activeActionsCount}
                     />
                     <HeaderCard
-                        title="Prijavljenih sadržaja"
+                        title="Prijavljenih korisnika"
                         icon={FlagIcon}
                         number={reports?.length}
                     />
@@ -101,6 +105,17 @@ export default function ModeratorPanelPage() {
                         icon={CheckBadgeIcon}
                         number={verificationRequests?.length}
                     />
+                </section>
+                <section className={styles["report-verification-container"]}>
+                    <NavSection
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        numberOfReports={reports?.length}
+                        numberOfVerificationRequests={
+                            verificationRequests?.length
+                        }
+                    />
+                    <ReportsSection />
                 </section>
             </main>
         </div>
