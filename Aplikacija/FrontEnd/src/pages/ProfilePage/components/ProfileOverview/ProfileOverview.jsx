@@ -125,7 +125,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
 
                 if (response.ok) {
                     const status = await response.json(); 
-                    console.log(status);
                     setRequestID(status.requestID)
                     setAreFriends(status.status);
                 }
@@ -172,7 +171,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
         if(yourProfile || !areFriends) return;
 
         if(areFriends==="None"){
-            console.log("test");
             const response = await authFetch(`/Social/SendFriendRequest/${friendID}`, {
                 method: "POST",
             });
@@ -250,8 +248,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
     };
 
     async function handleReport(reason, description) {
-        console.log(reason);
-        console.log(description);
         const response = await authFetch(`/Feedback/ReportUser/${userToShow.id}`,{
             method:"POST",
             headers: {
@@ -288,7 +284,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["right-section"]}>
 
                     {yourProfile ? 
-                        userToShow.verificationStatus !=2 && <button className={styles["share-btn"]} onClick={onShareProfile}>
+                        userToShow.verificationStatus !=2 && <button className={styles["share-btn"]} onClick={console.log("TO DO")}>
                             <CheckCircleIcon className={styles["btn-icon"]} /> Verify
                         </button> :
                         <button className={styles["share-btn"]} onClick={()=>setShowReportModal(true)}>
