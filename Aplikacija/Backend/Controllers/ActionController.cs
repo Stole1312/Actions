@@ -50,6 +50,12 @@ namespace Backend.Controllers
                 if (producer == null)
                     return BadRequest($"There is no user with ID: {userID}");
 
+                if(producer.Role == UserRoles.User)
+                {
+                    producer.Role = UserRoles.Producer;
+                    Context.Users.Update(producer);
+                }
+
                 // Default slika ako korisnik ne uploaduje svoju
                 string imageUrl = "https://zedivwyrdzaglvdyahoj.supabase.co/storage/v1/object/public/AkcijaPictures/defaultAkcija.jpg";
                 string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");

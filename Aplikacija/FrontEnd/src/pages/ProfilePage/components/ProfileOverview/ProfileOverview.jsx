@@ -18,9 +18,6 @@ import { HeartIcon as SolidHeartIcon} from "@heroicons/react/24/solid"
 import styles from "./ProfileOverview.module.css"
 import { useState, useEffect } from "react"
 import { authFetch } from "../../../../api"
-/* ========================================== */
-/* NOVE PROMENE: Importovanje Cropper komponente */
-/* ========================================== */
 import Cropper from "react-easy-crop"
 import { GrFormDown } from "react-icons/gr"
 
@@ -144,9 +141,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
         editEmail !== (userToShow?.email || "") || 
         editBio !== (userToShow?.bio || "");
 
-    /* ========================================================================= */
-    /* NOVE PROMENE: State-ovi za potrebe kropovanja slike (pozicija, zum, pikseli) */
-    /* ========================================================================= */
+    // Cropovanje slike
     const [imageSrc, setImageSrc] = useState(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -320,16 +315,10 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
         }
     }
 
-    /* ========================================================================= */
-    /* NOVE PROMENE: Funkcija koja se poziva kada korisnik završi pozicioniranje slike */
-    /* ========================================================================= */
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
     };
 
-    /* ========================================================================= */
-    /* NOVE PROMENE: Pomoćna funkcija koja preko Canvas-a seče sliku i pravi Blob */
-    /* ========================================================================= */
     const getCroppedImg = (imageSrc, pixelCrop) => {
         return new Promise((resolve, reject) => {
             const image = new Image();
@@ -366,9 +355,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
         });
     };
 
-    /* ========================================================================= */
-    /* NOVE PROMENE: Handler koji pre samog slanja iseče sliku i šalje je dalje   */
-    /* ========================================================================= */
+
     async function handlePictureChange() {
         try {
             if (!imageSrc || !croppedAreaPixels) return;
@@ -387,9 +374,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
         }
     }
 
-    /* ========================================================================= */
-    /* NOVE PROMENE: Čišćenje svih stanja kada korisnik odustane ili zatvori modal */
-    /* ========================================================================= */
     const handleCloseChangePictureModal = () => {
         setShowChangePicture(false);
         setImageSrc(null);
