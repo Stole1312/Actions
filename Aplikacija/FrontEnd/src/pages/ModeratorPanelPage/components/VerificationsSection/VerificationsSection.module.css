@@ -1,0 +1,85 @@
+.verifications-container {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e7e5e0;
+}
+
+.main-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    height: 52px;
+    padding: 16px 24px;
+    gap: 12px;
+
+    border-bottom: 1px solid #e7e5e0;
+    box-sizing: border-box;
+}
+
+.main-title-icon {
+    color: #f59e0b;
+    width: 15px;
+    height: 15px;
+    stroke-width: 3;
+}
+
+.main-title > h1 {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.main-title > p {
+    margin: 0;
+    margin-left: 10px;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.verification-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    height: 111px;
+    padding: 20px 24px;
+    gap: 20px;
+
+    border-bottom: 1px solid #e7e5e0;
+    box-sizing: border-box;
+}
+
+.verification-user-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+}
+
+.user-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.user-info-container > h1 {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 700;
+    color: #111110;
+}
+
+.user-info-container > p {
+    margin: 0;
+    font-size: 0.813rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.user-info-badges-container {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}

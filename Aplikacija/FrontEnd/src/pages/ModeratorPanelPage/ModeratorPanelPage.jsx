@@ -10,6 +10,7 @@ import { authFetch } from "../../api.js"
 import { useEffect, useState } from "react"
 import NavSection from "./components/NavSection/NavSection.jsx"
 import ReportsSection from "./components/ReportsSection/ReportsSection.jsx"
+import VerificationsSection from "./components/VerificationsSection/VerificationsSection.jsx"
 
 export default function ModeratorPanelPage(props) {
     //STATES
@@ -192,13 +193,20 @@ export default function ModeratorPanelPage(props) {
                             verificationRequests?.length
                         }
                     />
-                    <ReportsSection
-                        reports={reports}
-                        updateReportStatus={updateReportStatus}
-                        processReport={processReport}
-                        openReportedUserProfile={props.openReportedUserProfile}
-                        deleteReport={deleteReport}
-                    />
+                    {currentView === "reportsView" && (
+                        <ReportsSection
+                            reports={reports}
+                            updateReportStatus={updateReportStatus}
+                            processReport={processReport}
+                            openReportedUserProfile={
+                                props.openReportedUserProfile
+                            }
+                            deleteReport={deleteReport}
+                        />
+                    )}
+                    {currentView === "verificationView" && (
+                        <VerificationsSection />
+                    )}
                 </section>
             </main>
         </div>
