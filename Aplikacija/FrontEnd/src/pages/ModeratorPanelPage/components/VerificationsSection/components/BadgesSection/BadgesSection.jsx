@@ -6,8 +6,10 @@ export default function BadgesSection(props) {
     return (
         <div className={styles["user-info-badge"]}>
             <Icon className={styles["icon"]} />
-            {props.number && <p>{props.number}</p>}
-            <p>{props.text}</p>
+            <p>
+                {props.number !== undefined && `${props.number} `}
+                {props.text}
+            </p>
         </div>
     )
 }

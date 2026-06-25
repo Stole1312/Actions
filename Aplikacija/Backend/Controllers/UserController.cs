@@ -468,8 +468,33 @@ namespace Backend.Controllers
         public async Task<ActionResult> GetPendingVerifications()
         {
             var pending = await Context.VerificationRequests
-                .Include(v => v.Sender)
                 .Where(v => v.Status == VerifiedStatus.Pending)
+                .OrderByDescending(v => v.Created)
+                .Select(v => new
+                {
+                    v.ID,
+                    v.Created,
+                    v.Status,
+                    v.Document,
+
+                    Sender = new
+                    {
+                        v.Sender.ID,
+                        v.Sender.Username,
+                        v.Sender.Bio,
+                        v.Sender.ProfilePicture,
+                        v.Sender.Created,
+
+                        AkcijeCount = Context.Akcije.Count(
+                            a => a.ProducerID == v.InitiatorID
+                        ),
+
+                        Rating = Context.Akcije
+                            .Where(a => a.ProducerID == v.InitiatorID)
+                            .Select(a => (double?)a.AverageRating)
+                            .Average() ?? 0
+                    }
+                })
                 .ToListAsync();
 
             return Ok(pending);
@@ -488,11 +513,11 @@ namespace Backend.Controllers
             request.ReviewerID = moderatorId;
             request.Reviewer = await Context.Users.FindAsync(moderatorId);
 
-            if (newStatus == VerifiedStatus.Verified && newStatus == VerifiedStatus.Rejected)
+            if (newStatus == VerifiedStatus.Verified || newStatus == VerifiedStatus.Rejected)
             {
                 var user = await Context.Users.FindAsync(request.InitiatorID);
                 if (user != null)
-                    user.VerificationStatus = VerifiedStatus.Verified;
+                    user.VerificationStatus = newStatus;
             }
 
             await Context.SaveChangesAsync();

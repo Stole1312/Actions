@@ -1,7 +1,11 @@
 .verifications-container {
+    flex: 1;
+    min-height: 0;
+
     display: flex;
     flex-direction: column;
     border: 1px solid #e7e5e0;
+    overflow: hidden;
 }
 
 .main-title {
@@ -39,7 +43,19 @@
     color: #78716c;
 }
 
+.verifications-list {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-y: auto;
+}
+
 .verification-card {
+    flex-shrink: 0;
+
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -59,6 +75,9 @@
 }
 
 .user-info-container {
+    flex: 1;
+    min-width: 0;
+
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -82,4 +101,98 @@
     display: flex;
     flex-direction: row;
     gap: 16px;
+}
+
+.user-info-buttons-container {
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-info-buttons-container > button {
+    height: 33px;
+    padding: 8px 12px;
+    box-sizing: border-box;
+
+    border-radius: 16px;
+    outline: none;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+}
+
+.profile-view-button {
+    background-color: #fafaf8;
+    border: 1px solid #e7e5e0;
+
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}
+
+.reject-button {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #ef4444;
+}
+
+.accept-button {
+    border: none;
+    background-color: #10b981;
+
+    font-size: 0.688rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.profile-view-icon,
+.reject-icon,
+.accept-icon {
+    width: 12px;
+    height: 12px;
+    stroke-width: 3;
+    color: black;
+}
+.profile-view-icon {
+    color: #78716c;
+}
+.reject-icon {
+    color: #ef4444;
+}
+.accept-icon {
+    color: #ffffff;
+}
+
+.document-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.document-button {
+    padding: 0;
+    border: none;
+
+    background-color: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.document-button:hover {
+    text-decoration: underline;
+    text-decoration-color: #78716c;
+}
+
+.verifications-loading-container {
+    margin-top: 60px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

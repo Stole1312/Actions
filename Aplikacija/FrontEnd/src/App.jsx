@@ -322,7 +322,7 @@ export default function App() {
                         role={loggedUser?.role}
                     />
                     <ModeratorPanelPage
-                        openReportedUserProfile={(reportedUserId) => {
+                        openUserProfile={(reportedUserId) => {
                             setUserID(reportedUserId)
 
                             sessionStorage.setItem(

@@ -1,0 +1,127 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+    box-sizing: border-box;
+
+    background-color: rgba(17, 17, 16, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.modal {
+    width: min(900px, 100%);
+    height: min(750px, 90vh);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    border-radius: 16px;
+    background-color: #ffffff;
+
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 20px;
+    border-bottom: 1px solid #e7e5e0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 0.938rem;
+    color: #111110;
+}
+
+.modal-header p {
+    margin: 4px 0 0;
+    font-size: 0.688rem;
+    color: #78716c;
+}
+
+.close-button {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    background-color: #f5f4f0;
+    color: #78716c;
+    cursor: pointer;
+}
+
+.close-button > svg {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2.5;
+}
+
+.close-button:hover {
+    background-color: #e7e5e0;
+    color: #111110;
+}
+
+.document-container {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+
+    background-color: #f5f4f0;
+}
+
+.document-image {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.document-pdf {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.unsupported-document {
+    text-align: center;
+}
+
+.unsupported-document p {
+    color: #78716c;
+}
+
+.unsupported-document a {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: #f59e0b;
+}
