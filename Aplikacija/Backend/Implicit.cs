@@ -18,3 +18,6 @@ global using Microsoft.AspNetCore.SignalR;
 global using System.ComponentModel;
 global using Supabase.Storage;
 global using GeoTimeZone;
+global using MailKit.Net.Smtp;
+global using MimeKit;
+global using MailKit.Security;

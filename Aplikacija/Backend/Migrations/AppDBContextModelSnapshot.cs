@@ -495,6 +495,30 @@ namespace Backend.Migrations
                     b.ToTable("UserNotifications");
                 });
 
+            modelBuilder.Entity("Backend.Models.VerificationCode", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("VerificationCodes");
+                });
+
             modelBuilder.Entity("Backend.Models.VerificationRequest", b =>
                 {
                     b.Property<int>("ID")

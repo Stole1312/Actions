@@ -23,5 +23,6 @@ namespace Backend.Models
         public DbSet<Message> Messages { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Follow> Follows { get; set; }
+        public DbSet<VerificationCode> VerificationCodes { get; set; }
     }
 }
