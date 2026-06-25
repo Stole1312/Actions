@@ -2,7 +2,8 @@ import styles from "./ActionCard.module.css"
 // Ako imaš Heroicons instaliran, iskoristi ih za datum i lokaciju kao u headeru:
 import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon, CheckBadgeIcon } from "@heroicons/react/24/outline"
 import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
+import { authFetch } from "../../api";
 
 export default function ActionCard({ action, types, mojeAkcije}) {
 
@@ -10,6 +11,28 @@ export default function ActionCard({ action, types, mojeAkcije}) {
     const typeName = foundType ? foundType.name : "Ostalo";
 
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
+
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+    //Provera dal je korisnik vec prijavljen na akciju
+    const [prijavljen, setPrijavljen]=useState(false);
+    useEffect(()=>{
+        async function getPrijavljen() {
+            try{
+                const response = await authFetch(`/Action/HaveIApplied/${action.id}`,{
+                    method:"GET"
+                });
+                if(response.ok){
+                    const data=await response.json();
+                    setPrijavljen(data);
+                }
+            }catch(err){
+                console.error("Greska pri proveri prijave", err.message);
+            }
+        }
+        if(action.id)
+            getPrijavljen();
+    },[action.id]);
 
     // Formatiranje datuma u čitljiv oblik (npr: "Čet, 30. apr · 09:44")
     const formatDate = (dateString) => {
@@ -28,7 +51,6 @@ export default function ActionCard({ action, types, mojeAkcije}) {
     const [producer,setProducer]=useState(null);
     useEffect(()=>{
         async function fetchProducer() {
-            console.log(action.producerID);
             try{
                 if (!action?.producerID) return;
 
@@ -48,7 +70,6 @@ export default function ActionCard({ action, types, mojeAkcije}) {
 
                 const data = await response.json();
                 setProducer(data);
-                console.log(data);
             }catch(err){
                 throw new Error("Greska pri povlacenju producenta")
             }
@@ -65,9 +86,23 @@ export default function ActionCard({ action, types, mojeAkcije}) {
     };
 
     // Funkcija za prijavu (samo dugme)
-    const handleJoinClick = (e) => {
-        e.stopPropagation(); // <-- OVO SPREČAVA KLIK NA CELU KARTICU
-        console.log(`Prijavljujem se na akciju: ${action.title}`);
+    const handleJoinClick = async (e) => {
+        try{
+            const response = await authFetch(`/Action/ApplyAkcija/${action.id}`,{
+                method:"POST"
+            });
+            if(response.ok){
+                setPrijavljen(true);
+                action.currentNumParticipants+=1;
+            }else {
+                const greskaSaServera = await response.text();
+                alert(`Greška pri prijavi: ${greskaSaServera}`);
+            }
+        } catch (error) {
+            console.error("Mrežna greška pri prijavi:", error.message);
+            alert("Došlo je do greške na serveru.");
+        }
+
     };
 
     // Podrazumevana slika ako je actionPicture null
@@ -150,8 +185,8 @@ export default function ActionCard({ action, types, mojeAkcije}) {
                         </span>
                     </div>
 
-                    {!mojeAkcije ?
-                        <button className={styles["join-button"]} onClick={handleJoinClick}>Prijavi se</button>
+                    {(!mojeAkcije && producer?.id !== currentUser.id) ?
+                        <button className={styles["join-button"]} onClick={handleJoinClick}> {prijavljen ? "Prijavljeni ste" : "Prijavi se"}</button>
                         :
                         <button className={styles["join-button"]} onClick={console.log("ce ode na detalji akcije")}>Uredi</button>
                     }
