@@ -19,7 +19,6 @@ import styles from "./ProfileOverview.module.css"
 import { useState, useEffect } from "react"
 import { authFetch } from "../../../../api"
 import Cropper from "react-easy-crop"
-import { GrFormDown } from "react-icons/gr"
 
 export default function ProfileOverview({ userToShow, yourProfile, onLogout, reportTypes,setZelimRefresh }){  
 
@@ -134,6 +133,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
             setEditEmail(userToShow.email || "");
             setEditBio(userToShow.bio || "");
         }
+        console.log(userToShow);
     }, [userToShow]);
 
     const isFormChanged = 
@@ -311,7 +311,12 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
             const errorText = await response.text();
             console.error("Server je odbio zahtev:", errorText);
         } else {
-            console.log("Korisnik uspešno prijavljen!");
+            localStorage.setItem("user", JSON.stringify({
+                ...userToShow,
+                verificationStatus: 1
+            }));
+            setZelimRefresh(prethodno => !prethodno);
+            console.log("Korisnik uspešno prijavljen za verifikaciju");
         }
     }
 
@@ -437,7 +442,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["right-section"]}>
 
                     {yourProfile ? 
-                        userToShow.verificationStatus !=2 && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
+                        userToShow.verificationStatus !==1 && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
                             <CheckCircleIcon className={styles["btn-icon"]} /> Verify
                         </button> :
                         <button className={styles["share-btn"]} onClick={()=>setShowReportModal(true)}>
@@ -786,7 +791,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["modal-overlay"]}>
                     <div className={styles["modal-container"]}>
                         <div className={styles["modal-header"]}>
-                            {/* Možeš zameniti ikonicu sa npr. PencilIcon ako je imaš, ili zadrži istu */}
                             <FlagIcon className={styles["modal-icon"]} />
                             <h3>Izmena Profila</h3>
                         </div>
@@ -864,15 +868,15 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                             </button>
                         </div>
                         
-                        <button 
-                            className={styles["modal-close-x"]} 
-                            onClick={() => {
-                                setShowEditModal(false);
-                                setEditUsername(userToShow?.username || "");
-                                setEditEmail(userToShow?.email || "");
-                                setEditBio(userToShow?.bio || "");
-                            }}
-                        >
+                            <button 
+                                className={styles["modal-close-x"]} 
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditUsername(userToShow?.username || "");
+                                    setEditEmail(userToShow?.email || "");
+                                    setEditBio(userToShow?.bio || "");
+                                }}
+                            >
                             <XMarkIcon />
                         </button>
                     </div>

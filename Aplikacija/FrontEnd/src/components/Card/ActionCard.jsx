@@ -1,12 +1,38 @@
 import styles from "./ActionCard.module.css"
 // Ako imaš Heroicons instaliran, iskoristi ih za datum i lokaciju kao u headeru:
-import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon, CheckBadgeIcon } from "@heroicons/react/24/outline"
 import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
+import { act, useEffect, useState } from "react";
+import { authFetch } from "../../api";
 
 export default function ActionCard({ action, types, mojeAkcije}) {
 
     const foundType = types.find(t => t.id === action.type);
     const typeName = foundType ? foundType.name : "Ostalo";
+
+    const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
+
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+
+    //Provera dal je korisnik vec prijavljen na akciju
+    const [prijavljen, setPrijavljen]=useState(false);
+    useEffect(()=>{
+        async function getPrijavljen() {
+            try{
+                const response = await authFetch(`/Action/HaveIApplied/${action.id}`,{
+                    method:"GET"
+                });
+                if(response.ok){
+                    const data=await response.json();
+                    setPrijavljen(data);
+                }
+            }catch(err){
+                console.error("Greska pri proveri prijave", err.message);
+            }
+        }
+        if(action.id)
+            getPrijavljen();
+    },[action.id]);
 
     // Formatiranje datuma u čitljiv oblik (npr: "Čet, 30. apr · 09:44")
     const formatDate = (dateString) => {
@@ -22,16 +48,61 @@ export default function ActionCard({ action, types, mojeAkcije}) {
         return `${formattedDate} · ${time}`;
     };
 
+    const [producer,setProducer]=useState(null);
+    useEffect(()=>{
+        async function fetchProducer() {
+            try{
+                if (!action?.producerID) return;
+
+                const response = await fetch(`${baseUrl}/User/GetUserByID`, { 
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify(action.producerID) 
+                });
+
+                if (!response.ok) {
+                    const tekstGreske = await response.text(); 
+                    throw new Error(`Status: ${response.status} - ${tekstGreske}`);
+                    return;
+                }
+
+                const data = await response.json();
+                setProducer(data);
+            }catch(err){
+                throw new Error("Greska pri povlacenju producenta")
+            }
+        } 
+        if(action.producerID)
+            fetchProducer();
+    },[action.producerID])
+
     // Funkcija za odlazak na detalje akcije
     const handleCardClick = () => {
+        console.log(action);
         console.log(`Otvaram detalje za akciju sa ID-jem: ${action.id}`);
         // Ovde će ići ruter: navigate(`/akcija/${action.id}`)
     };
 
     // Funkcija za prijavu (samo dugme)
-    const handleJoinClick = (e) => {
-        e.stopPropagation(); // <-- OVO SPREČAVA KLIK NA CELU KARTICU
-        console.log(`Prijavljujem se na akciju: ${action.title}`);
+    const handleJoinClick = async (e) => {
+        try{
+            const response = await authFetch(`/Action/ApplyAkcija/${action.id}`,{
+                method:"POST"
+            });
+            if(response.ok){
+                setPrijavljen(true);
+                action.currentNumParticipants+=1;
+            }else {
+                const greskaSaServera = await response.text();
+                alert(`Greška pri prijavi: ${greskaSaServera}`);
+            }
+        } catch (error) {
+            console.error("Mrežna greška pri prijavi:", error.message);
+            alert("Došlo je do greške na serveru.");
+        }
+
     };
 
     // Podrazumevana slika ako je actionPicture null
@@ -71,6 +142,13 @@ export default function ActionCard({ action, types, mojeAkcije}) {
                 
                 {/* Značke preko slike */}
                 <span className={styles["badge-type"]}>{typeName}</span>
+
+                {
+                    producer && producer.verificationStatus===2 &&(
+                    <span className={styles["badge-verified"]}>
+                        <CheckBadgeIcon className={styles["verified-icon"]}/>
+                    </span>)
+                }
                 
                 <span className={`${styles["badge-price"]} ${action.price === 0 ? styles["free"] : ""}`}>
                     {action.price > 0 ? `${action.price} RSD` : "Besplatno"}
@@ -107,8 +185,8 @@ export default function ActionCard({ action, types, mojeAkcije}) {
                         </span>
                     </div>
 
-                    {!mojeAkcije ?
-                        <button className={styles["join-button"]} onClick={handleJoinClick}>Prijavi se</button>
+                    {(!mojeAkcije && producer?.id !== currentUser.id) ?
+                        <button className={styles["join-button"]} onClick={handleJoinClick}> {prijavljen ? "Prijavljeni ste" : "Prijavi se"}</button>
                         :
                         <button className={styles["join-button"]} onClick={console.log("ce ode na detalji akcije")}>Uredi</button>
                     }

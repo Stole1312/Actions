@@ -31,6 +31,26 @@ namespace Backend.Controllers
             return int.Parse(userIdClaim);
         }
 
+        [Authorize]
+        [HttpGet("HaveIApplied/{akcijaID}")]
+        public async Task<ActionResult<bool>> HaveIApplied(int akcijaID)
+        {
+            try
+            {
+                var userID = GetCurrentUserId();
+
+                var hasApplied = await Context.DeoAkcije
+                    .AnyAsync(d => d.AkcijaID == akcijaID && d.UserID == userID);
+
+                return Ok(hasApplied);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+
         [HttpPost("AddAkcija")]
         public async Task<ActionResult> AddAkcija([FromForm] AddAkcijaDTO akcijaDTO)
         {
@@ -336,6 +356,7 @@ namespace Backend.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("ApplyAkcija/{akcijaID}")]
         public async Task<ActionResult> ApplyAkcija(int akcijaID)
         {
