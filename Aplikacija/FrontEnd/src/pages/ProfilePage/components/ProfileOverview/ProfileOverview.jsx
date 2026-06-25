@@ -19,7 +19,6 @@ import styles from "./ProfileOverview.module.css"
 import { useState, useEffect } from "react"
 import { authFetch } from "../../../../api"
 import Cropper from "react-easy-crop"
-import { GrFormDown } from "react-icons/gr"
 
 export default function ProfileOverview({ userToShow, yourProfile, onLogout, reportTypes,setZelimRefresh }){  
 
@@ -786,7 +785,6 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["modal-overlay"]}>
                     <div className={styles["modal-container"]}>
                         <div className={styles["modal-header"]}>
-                            {/* Možeš zameniti ikonicu sa npr. PencilIcon ako je imaš, ili zadrži istu */}
                             <FlagIcon className={styles["modal-icon"]} />
                             <h3>Izmena Profila</h3>
                         </div>
@@ -864,15 +862,15 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                             </button>
                         </div>
                         
-                        <button 
-                            className={styles["modal-close-x"]} 
-                            onClick={() => {
-                                setShowEditModal(false);
-                                setEditUsername(userToShow?.username || "");
-                                setEditEmail(userToShow?.email || "");
-                                setEditBio(userToShow?.bio || "");
-                            }}
-                        >
+                            <button 
+                                className={styles["modal-close-x"]} 
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditUsername(userToShow?.username || "");
+                                    setEditEmail(userToShow?.email || "");
+                                    setEditBio(userToShow?.bio || "");
+                                }}
+                            >
                             <XMarkIcon />
                         </button>
                     </div>

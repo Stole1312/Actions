@@ -27,6 +27,114 @@ namespace Backend.Controllers
             return int.Parse(userIdClaim);
         }
 
+        [HttpPost("StepOneCheck")]
+        public async Task<ActionResult> StepOneCheck([FromForm] UserRegisterVM usr)
+        {
+            if (string.IsNullOrWhiteSpace(usr.Username)) return BadRequest("User must have a username");
+            if (string.IsNullOrWhiteSpace(usr.Email)) return BadRequest("User must have an email adresse");
+            if (string.IsNullOrWhiteSpace(usr.Password)) return BadRequest("User must have a password");
+
+            var checkUserName = await Context.Users.FirstOrDefaultAsync(u => u.Username == usr.Username);
+            if (checkUserName != null) return BadRequest("Username is already taken");
+            var checkUserEmail = await Context.Users.FirstOrDefaultAsync(u => u.Email == usr.Email);
+            if(checkUserEmail !=null) return BadRequest("This email is already registered");
+
+            var random = new Random();
+            int broj = random.Next(0, 1000000);
+            
+            // D6 - da bi vratio 000123 umesto 123
+            string kod = broj.ToString("D6");
+
+            //BRISEMO STARE
+            var stariKodovi = Context.VerificationCodes.Where(c => c.Email == usr.Email);
+            Context.VerificationCodes.RemoveRange(stariKodovi);
+
+            var noviKod = new VerificationCode
+            {
+                Email = usr.Email,
+                Code = kod,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Tajmer ne mora gleda vremenske zone
+            };
+
+            //STAVLJAM NOVI
+            Context.VerificationCodes.Add(noviKod);
+            await Context.SaveChangesAsync();
+
+            string mojEmail = _configuration["MailSettings:Email"]?? throw new Exception("Mail is missing from appsettings.");
+            string mojaSifra = _configuration["MailSettings:Password"]?? throw new Exception("Password is missing from appsettings.");
+
+            try
+                {
+                    var emailPoruka = new MimeMessage();
+                    emailPoruka.From.Add(new MailboxAddress("Akcije", mojEmail)); 
+                    emailPoruka.To.Add(new MailboxAddress(usr.Username, usr.Email));                      
+                    emailPoruka.Subject = "Verifikacioni kod za registraciju";
+
+                    emailPoruka.Body = new TextPart("html")
+                    {
+                        Text = $@"
+                            <div style='font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;'>
+                                <h3 style='color: #1a1a1a;'>Dobrodošli na Akcije!</h3>
+                                <p style='color: #444;'>Molimo vas da potvrdite svoj email unoseći sledeći kod u aplikaciju:</p>
+                                <div style='background: #fff7ed; border: 2.5px dashed #f59e0b; display: inline-block; padding: 10px 30px; margin: 15px 0; border-radius: 8px;'>
+                                    <h2 style='color: #f59e0b; font-size: 32px; letter-spacing: 4px; margin: 0;'>{kod}</h2>
+                                </div>
+                                <p style='font-size: 12px; color: #9ca3af;'>Kod je validan narednih 15 minuta.</p>
+                            </div>"
+                    };
+
+                    // Konekcija na SMTP
+                    using (var klijent = new SmtpClient())
+                    {
+                        await klijent.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+                        
+                        await klijent.AuthenticateAsync(mojEmail, mojaSifra);
+                        
+                        await klijent.SendAsync(emailPoruka);
+                        await klijent.DisconnectAsync(true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Context.VerificationCodes.Remove(noviKod);
+                    await Context.SaveChangesAsync();
+                    
+                    return StatusCode(500, $"Greška pri slanju verifikacionog mejla: {ex.Message}");
+                }
+            return Ok();
+        }
+
+        [HttpPost("StepTwoCheck")]
+        public async Task<ActionResult> StepTwoCheck([FromBody] string code)
+        {
+            if (string.IsNullOrWhiteSpace(code)) 
+                    return BadRequest("Morate uneti verifikacioni kod.");
+
+                var zapisIzBaze = await Context.VerificationCodes
+                    .FirstOrDefaultAsync(c => c.Code == code.Trim());
+
+                if (zapisIzBaze == null) 
+                    return BadRequest("Uneti kod je netačan.");
+
+                if (DateTime.UtcNow > zapisIzBaze.ExpiresAt)
+                {
+                    Context.VerificationCodes.Remove(zapisIzBaze);
+                    await Context.SaveChangesAsync();
+                    
+                    return BadRequest("Verifikacioni kod je istekao. Molimo pokrenite registraciju ponovo.");
+                }
+
+                string potvrdjeniEmail = zapisIzBaze.Email;
+
+                Context.VerificationCodes.Remove(zapisIzBaze);
+                await Context.SaveChangesAsync();
+
+                return Ok(new { 
+                    message = "Email uspešno verifikovan!", 
+                    email = potvrdjeniEmail 
+                });
+        }
+
         //ce da se koristi i za regiset
         [HttpPost("AddUser")]
         public async Task<ActionResult> AddUser([FromForm] UserRegisterVM usr)
@@ -398,6 +506,9 @@ namespace Backend.Controllers
                 if (user == null)
                     return Unauthorized("Wrong username");
 
+                if(user.isBanned)
+                    return Unauthorized("You have been banned!");
+
                 bool correctPassword = BCrypt.Net.BCrypt.Verify(userData.Password, user.Password);
 
                 if (!correctPassword)
@@ -559,6 +670,35 @@ namespace Backend.Controllers
             {
                 totalUsers = totalUsers
             });
+        }
+
+        private async Task PosaljiVerifikacioniKod(string primalacEmail, string kod, string naslov, TextPart  tekst)
+        {
+            string mail = Environment.GetEnvironmentVariable("MAIL") 
+                ?? throw new Exception("MAIL ključ nedostaje u .env fajlu.");
+                
+            string sifra = Environment.GetEnvironmentVariable("SIFRA") 
+                ?? throw new Exception("SIFRA ključ nedostaje u .env fajlu.");
+            var message = new MimeMessage();
+            // Ovde unosiš ime tvoje aplikacije i tvoj zvanični mail sa kog šalješ
+            message.From.Add(new MailboxAddress("Akcije", mail));
+            message.To.Add(new MailboxAddress("", primalacEmail));
+            message.Subject = naslov;
+
+            // Izgled mejla koji stiže korisniku
+            message.Body = tekst;
+
+            using (var client = new SmtpClient())
+            {                
+                // Povezivanje na Gmail SMTP server (host, port, SSL)
+                await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                
+                // Ovde unosiš tvoj mail i lozinku (Google App Password, ne tvoju glavnu šifru!)
+                await client.AuthenticateAsync(mail, sifra);
+                
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
         }
     }
 }
