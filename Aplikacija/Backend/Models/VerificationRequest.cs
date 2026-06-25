@@ -10,7 +10,7 @@ namespace Backend.Models
         public int? ReviewerID { get; set; }
         public required string Document{get;set;}
         public DateTime Created { get; set; }
-        public UserRequestStatus Status{get;set;}
+        public VerifiedStatus Status{get;set;}
         // Navigation properties
         public User Sender { get; set; } = null!;
         public User? Reviewer { get; set; } = null!;
