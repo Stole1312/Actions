@@ -1,0 +1,20 @@
+.user-info-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+}
+
+.icon {
+    width: 12px;
+    height: 12px;
+    color: #78716c;
+    stroke-width: 3;
+}
+
+.user-info-badge > p {
+    margin: 0;
+    font-size: 0.688rem;
+    font-weight: 400;
+    color: #78716c;
+}

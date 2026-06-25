@@ -10,6 +10,7 @@ import { authFetch } from "../../api.js"
 import { useEffect, useState } from "react"
 import NavSection from "./components/NavSection/NavSection.jsx"
 import ReportsSection from "./components/ReportsSection/ReportsSection.jsx"
+import VerificationsSection from "./components/VerificationsSection/VerificationsSection.jsx"
 
 export default function ModeratorPanelPage(props) {
     //STATES
@@ -152,6 +153,30 @@ export default function ModeratorPanelPage(props) {
         return true
     }
 
+    async function reviewVerification(requestId, newStatus) {
+        const loggedUser = JSON.parse(localStorage.getItem("user"))
+        if (!loggedUser) {
+            console.log("Ulogovani moderator nije pronađen")
+            return false
+        }
+
+        const response = await authFetch(
+            `/User/ReviewVerification/${requestId}?newStatus=${newStatus}&moderatorId=${loggedUser.id}`,
+            {
+                method: "PUT",
+            },
+        )
+        if (!response.ok) {
+            console.log("Greška pri obradi zahteva za verifikaciju:")
+            return false
+        }
+
+        setVerificationRequests((currentRequests) =>
+            currentRequests.filter((request) => request.id !== requestId),
+        )
+        return true
+    }
+
     return (
         <div className={styles["moderator-panel-page-container"]}>
             <section className={styles["page-header"]}>
@@ -192,13 +217,22 @@ export default function ModeratorPanelPage(props) {
                             verificationRequests?.length
                         }
                     />
-                    <ReportsSection
-                        reports={reports}
-                        updateReportStatus={updateReportStatus}
-                        processReport={processReport}
-                        openReportedUserProfile={props.openReportedUserProfile}
-                        deleteReport={deleteReport}
-                    />
+                    {currentView === "reportsView" && (
+                        <ReportsSection
+                            reports={reports}
+                            updateReportStatus={updateReportStatus}
+                            processReport={processReport}
+                            openReportedUserProfile={props.openUserProfile}
+                            deleteReport={deleteReport}
+                        />
+                    )}
+                    {currentView === "verificationView" && (
+                        <VerificationsSection
+                            verificationRequests={verificationRequests}
+                            openUserProfile={props.openUserProfile}
+                            reviewVerification={reviewVerification}
+                        />
+                    )}
                 </section>
             </main>
         </div>
