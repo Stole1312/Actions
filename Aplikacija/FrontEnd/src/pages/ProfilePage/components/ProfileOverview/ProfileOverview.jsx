@@ -133,6 +133,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
             setEditEmail(userToShow.email || "");
             setEditBio(userToShow.bio || "");
         }
+        console.log(userToShow);
     }, [userToShow]);
 
     const isFormChanged = 
@@ -310,7 +311,12 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
             const errorText = await response.text();
             console.error("Server je odbio zahtev:", errorText);
         } else {
-            console.log("Korisnik uspešno prijavljen!");
+            localStorage.setItem("user", JSON.stringify({
+                ...userToShow,
+                verificationStatus: 1
+            }));
+            setZelimRefresh(prethodno => !prethodno);
+            console.log("Korisnik uspešno prijavljen za verifikaciju");
         }
     }
 
@@ -436,7 +442,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["right-section"]}>
 
                     {yourProfile ? 
-                        userToShow.verificationStatus !=2 && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
+                        userToShow.verificationStatus !==1 && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
                             <CheckCircleIcon className={styles["btn-icon"]} /> Verify
                         </button> :
                         <button className={styles["share-btn"]} onClick={()=>setShowReportModal(true)}>

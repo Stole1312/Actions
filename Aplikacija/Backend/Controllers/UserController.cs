@@ -384,8 +384,13 @@ namespace Backend.Controllers
                 if(sender == null)
                     return BadRequest($"There is no user with ID: {id}");
 
+                if(sender.VerificationStatus != VerifiedStatus.None && sender.VerificationStatus != VerifiedStatus.Rejected)
+                    return BadRequest("User is verified or waiting for response of administration");
+
                 if (dto.Document == null || dto.Document.Length == 0)
                             return BadRequest("Document file is missing.");   
+
+                sender.VerificationStatus = VerifiedStatus.Pending;
 
                 string imageUrl;
                 string supabaseUrl = _configuration["Supabase:Url"] ?? throw new Exception("Supabase URL is missing in appsettings.");
@@ -440,13 +445,13 @@ namespace Backend.Controllers
                 var request = new VerificationRequest
                 {
                     Created = DateTime.UtcNow,
-                    Status = UserRequestStatus.Pending,
+                    Status = VerifiedStatus.Pending,
                     InitiatorID = id,
                     Document=imageUrl,
                     Sender = sender
                 };
 
-                Context.VerificationRequests.Add(request);
+                await Context.VerificationRequests.AddAsync(request);
                 await Context.SaveChangesAsync();
 
                 return Ok("Request has been forwarded to administration");
@@ -464,7 +469,7 @@ namespace Backend.Controllers
         {
             var pending = await Context.VerificationRequests
                 .Include(v => v.Sender)
-                .Where(v => v.Status == UserRequestStatus.Pending)
+                .Where(v => v.Status == VerifiedStatus.Pending)
                 .ToListAsync();
 
             return Ok(pending);
@@ -473,7 +478,7 @@ namespace Backend.Controllers
         //Omogucava da moderator/admin pogleda
         [Authorize(Roles = "Moderator, Admin")]
         [HttpPut("ReviewVerification/{id}")]
-        public async Task<ActionResult> ReviewVerification(int id, [FromQuery] UserRequestStatus newStatus, [FromQuery] int moderatorId)
+        public async Task<ActionResult> ReviewVerification(int id, [FromQuery] VerifiedStatus newStatus, [FromQuery] int moderatorId)
         {
             var request = await Context.VerificationRequests.FindAsync(id);
             if (request == null)
@@ -483,7 +488,7 @@ namespace Backend.Controllers
             request.ReviewerID = moderatorId;
             request.Reviewer = await Context.Users.FindAsync(moderatorId);
 
-            if (newStatus == UserRequestStatus.Approved)
+            if (newStatus == VerifiedStatus.Verified && newStatus == VerifiedStatus.Rejected)
             {
                 var user = await Context.Users.FindAsync(request.InitiatorID);
                 if (user != null)
