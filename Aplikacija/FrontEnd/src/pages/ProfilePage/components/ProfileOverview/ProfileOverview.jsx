@@ -19,7 +19,6 @@ import styles from "./ProfileOverview.module.css"
 import { useState, useEffect } from "react"
 import { authFetch } from "../../../../api"
 import Cropper from "react-easy-crop"
-import { GrFormDown } from "react-icons/gr"
 
 export default function ProfileOverview({ userToShow, yourProfile, onLogout, reportTypes,setZelimRefresh }){  
 

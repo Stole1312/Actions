@@ -1,12 +1,15 @@
 import styles from "./ActionCard.module.css"
 // Ako imaš Heroicons instaliran, iskoristi ih za datum i lokaciju kao u headeru:
-import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon } from "@heroicons/react/24/outline"
+import { CalendarIcon, MapPinIcon, UserGroupIcon, StarIcon, CheckBadgeIcon } from "@heroicons/react/24/outline"
 import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
+import { useEffect, useState } from "react";
 
 export default function ActionCard({ action, types, mojeAkcije}) {
 
     const foundType = types.find(t => t.id === action.type);
     const typeName = foundType ? foundType.name : "Ostalo";
+
+    const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
 
     // Formatiranje datuma u čitljiv oblik (npr: "Čet, 30. apr · 09:44")
     const formatDate = (dateString) => {
@@ -22,8 +25,41 @@ export default function ActionCard({ action, types, mojeAkcije}) {
         return `${formattedDate} · ${time}`;
     };
 
+    const [producer,setProducer]=useState(null);
+    useEffect(()=>{
+        async function fetchProducer() {
+            console.log(action.producerID);
+            try{
+                if (!action?.producerID) return;
+
+                const response = await fetch(`${baseUrl}/User/GetUserByID`, { 
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify(action.producerID) 
+                });
+
+                if (!response.ok) {
+                    const tekstGreske = await response.text(); 
+                    throw new Error(`Status: ${response.status} - ${tekstGreske}`);
+                    return;
+                }
+
+                const data = await response.json();
+                setProducer(data);
+                console.log(data);
+            }catch(err){
+                throw new Error("Greska pri povlacenju producenta")
+            }
+        } 
+        if(action.producerID)
+            fetchProducer();
+    },[action.producerID])
+
     // Funkcija za odlazak na detalje akcije
     const handleCardClick = () => {
+        console.log(action);
         console.log(`Otvaram detalje za akciju sa ID-jem: ${action.id}`);
         // Ovde će ići ruter: navigate(`/akcija/${action.id}`)
     };
@@ -71,6 +107,13 @@ export default function ActionCard({ action, types, mojeAkcije}) {
                 
                 {/* Značke preko slike */}
                 <span className={styles["badge-type"]}>{typeName}</span>
+
+                {
+                    producer && producer.verificationStatus===2 &&(
+                    <span className={styles["badge-verified"]}>
+                        <CheckBadgeIcon className={styles["verified-icon"]}/>
+                    </span>)
+                }
                 
                 <span className={`${styles["badge-price"]} ${action.price === 0 ? styles["free"] : ""}`}>
                     {action.price > 0 ? `${action.price} RSD` : "Besplatno"}
