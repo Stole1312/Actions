@@ -4,6 +4,7 @@ import {
     UserMinusIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 import { useState } from "react"
 import { BeatLoader } from "react-spinners"
 import RemoveFriendPopUp from "../RemoveFriendPopUp/RemoveFriendPopUp"
@@ -36,7 +37,14 @@ export default function FriendsSection(props) {
                     alt=""
                     className={styles["friend-card-icon"]}
                 />
-                <p>{friend.username}</p>
+                <div className={styles["user-info"]}>
+                    <p>{friend.username}</p>
+                    {friend.verificationStatus === 2 && (
+                        <CheckBadgeIcon
+                            className={styles["user-info-verification-icon"]}
+                        />
+                    )}
+                </div>
             </div>
             <div className={styles["friend-card-buttons-container"]}>
                 <button

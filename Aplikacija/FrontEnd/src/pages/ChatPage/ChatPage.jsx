@@ -2,7 +2,11 @@ import { useEffect, useState, useRef } from "react"
 import styles from "./ChatPage.module.css"
 import { authFetch } from "../../api"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid"
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline"
+import {
+    PaperAirplaneIcon,
+    EllipsisHorizontalIcon,
+    TrashIcon,
+} from "@heroicons/react/24/outline"
 import { BeatLoader, ClipLoader } from "react-spinners"
 
 export default function ChatPage(props) {
@@ -12,6 +16,7 @@ export default function ChatPage(props) {
     const [selectedChat, setSelectedChat] = useState(null)
     const [messages, setMessages] = useState(null)
     const [messageText, setMessageText] = useState("")
+    const [openedMessageMenuId, setOpenedMessageMenuId] = useState(null)
 
     //SIDE EFFECTS
     useEffect(() => {
@@ -267,6 +272,27 @@ export default function ChatPage(props) {
         )
     }
 
+    async function deleteMessage(messageId) {
+        const response = await authFetch(
+            `/Communication/DeleteMessage/${messageId}`,
+            {
+                method: "DELETE",
+            },
+        )
+
+        if (!response.ok) {
+            console.log("Greška pri brisanju poruke")
+            return
+        }
+
+        setMessages((prevMessages) =>
+            (prevMessages ?? []).filter((message) => message.id !== messageId),
+        )
+
+        setOpenedMessageMenuId(null)
+        fetchMyChats()
+    }
+
     //VARIABLES
     const filteredChats = chats?.filter((chat) =>
         chat.otherUser?.username
@@ -385,13 +411,82 @@ export default function ChatPage(props) {
                     }
                 >
                     <div
-                        className={
+                        className={`${styles["message-content-row"]} ${
                             message.senderID === currentUserId
-                                ? styles["message-bubble-mine"]
-                                : styles["message-bubble-other"]
-                        }
+                                ? styles["message-content-row-mine"]
+                                : styles["message-content-row-other"]
+                        }`}
                     >
-                        <p>{message.content}</p>
+                        {message.senderID === currentUserId &&
+                            !message.isPending && (
+                                <div
+                                    className={`${styles["message-actions"]} ${
+                                        openedMessageMenuId === message.id
+                                            ? styles["message-actions-open"]
+                                            : ""
+                                    }`}
+                                >
+                                    <button
+                                        type="button"
+                                        className={
+                                            styles["message-options-button"]
+                                        }
+                                        onClick={(event) => {
+                                            event.stopPropagation()
+
+                                            setOpenedMessageMenuId(
+                                                (currentId) =>
+                                                    currentId === message.id
+                                                        ? null
+                                                        : message.id,
+                                            )
+                                        }}
+                                    >
+                                        <EllipsisHorizontalIcon
+                                            className={
+                                                styles["message-options-icon"]
+                                            }
+                                        />
+                                    </button>
+
+                                    {openedMessageMenuId === message.id && (
+                                        <div
+                                            className={
+                                                styles["message-options-menu"]
+                                            }
+                                            onClick={(event) =>
+                                                event.stopPropagation()
+                                            }
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    deleteMessage(message.id)
+                                                }
+                                            >
+                                                <TrashIcon
+                                                    className={
+                                                        styles[
+                                                            "delete-message-icon"
+                                                        ]
+                                                    }
+                                                />
+                                                Obriši poruku
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                        <div
+                            className={
+                                message.senderID === currentUserId
+                                    ? styles["message-bubble-mine"]
+                                    : styles["message-bubble-other"]
+                            }
+                        >
+                            <p>{message.content}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -450,20 +545,25 @@ export default function ChatPage(props) {
                     </div>
                 ) : (
                     <>
-                        <div
-                            className={styles["chat-window-header"]}
-                            onClick={() =>
-                                props.onUserClick(selectedChat.otherUser.id)
-                            }
-                        >
-                            <img
-                                src={selectedChat.otherUser.profilePicture}
-                                alt=""
-                                className={styles["chat-window-user-img"]}
-                            />
-                            <p>{selectedChat.otherUser.username}</p>
+                        <div className={styles["chat-window-header-container"]}>
+                            <div
+                                className={styles["chat-window-header"]}
+                                onClick={() =>
+                                    props.onUserClick(selectedChat.otherUser.id)
+                                }
+                            >
+                                <img
+                                    src={selectedChat.otherUser.profilePicture}
+                                    alt=""
+                                    className={styles["chat-window-user-img"]}
+                                />
+                                <p>{selectedChat.otherUser.username}</p>
+                            </div>
                         </div>
-                        <div className={styles["messages-container"]}>
+                        <div
+                            className={styles["messages-container"]}
+                            onClick={() => setOpenedMessageMenuId(null)}
+                        >
                             {messages === null ? (
                                 <div
                                     className={

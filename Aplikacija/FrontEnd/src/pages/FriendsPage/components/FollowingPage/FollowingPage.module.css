@@ -125,7 +125,20 @@
     gap: 5px;
 }
 
-.following-user-info-container > p {
+.user-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-info-verification-icon {
+    width: 15px;
+    height: 15px;
+    color: #f59e0b;
+}
+
+.user-info > p {
     margin: 0;
     font-size: 0.813rem;
     font-weight: 600;
