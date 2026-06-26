@@ -442,7 +442,7 @@ export default function ProfileOverview({ userToShow, yourProfile, onLogout, rep
                 <div className={styles["right-section"]}>
 
                     {yourProfile ? 
-                        userToShow.verificationStatus !==1 && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
+                        (userToShow.verificationStatus !==1 && userToShow.verificationStatus!==2) && <button className={styles["share-btn"]} onClick={()=>setShowVerifyModal(true)}>
                             <CheckCircleIcon className={styles["btn-icon"]} /> Verify
                         </button> :
                         <button className={styles["share-btn"]} onClick={()=>setShowReportModal(true)}>

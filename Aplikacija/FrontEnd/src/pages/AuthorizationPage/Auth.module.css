@@ -293,3 +293,231 @@
     padding: 6px;
     border-bottom: 1px solid #fca5a5;
 }
+
+.modal-container {
+    background: #1e1f29 !important; /* Tamna pozadina */
+    border: 1px solid #2f303d !important;
+    color: #f1f5f9 !important;
+}
+
+.modal-header h3 {
+    color: #f1f5f9 !important;
+}
+
+.modal-body {
+    color: #94a3b8 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px; 
+    margin-bottom: 24px !important;
+}
+
+/* Instrukcija iznad inputa */
+.modal-instructions {
+    margin: 0;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+/* Kontejner oko svakog input polja */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-overlay {
+    position: fixed; /* Ostaje fixed */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6); /* Malo tamniji overlay za bolji kontrast */
+    backdrop-filter: blur(4px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; /* Izuzetno visok z-index da probije sve slojeve */
+    
+    /* 🔥 DODATAK KOJI REŠAVA PROBLEM: */
+    inset: 0; 
+}
+
+.modal-container {
+    background: #1e1f29 !important; /* Tamna pozadina */
+    border: 1px solid #2f303d !important;
+    color: #f1f5f9 !important;
+    width: 100%;
+    max-width: 400px; /* Ograničavamo širinu da ne divlja */
+    padding: 32px 24px 24px;
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centriramo sve elemente unutra */
+    text-align: center;
+    box-sizing: border-box;
+    animation: modalAppear 0.25s ease-out; /* Blaga animacija pojavljivanja */
+}
+
+/* Animacija za lepši ulazak modala */
+@keyframes modalAppear {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Zaglavlje modala gde su ikona i naslov */
+.modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+/* Sređivanje ogromnog zupčanika (Cog6ToothIcon) */
+.modal-icon {
+    width: 54px !important;  /* Precizno definisana veličina */
+    height: 54px !important;
+    color: #f59e0b;          /* Narandžasto-zlatna boja brenda */
+    animation: spinSlow 12s linear infinite; /* Prefinjena rotacija zupčanika */
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.modal-header h3 {
+    color: #f1f5f9 !important;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Tekst / Opis unutar modala */
+.modal-body {
+    color: #94a3b8 !important;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 24px 0 !important;
+}
+
+/* Red koji drži dugmiće (Cancel i Confirm) */
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Zajednički stilovi za oba dugmeta u modalu */
+.modal-actions button {
+    flex: 1; /* Dele prostor 50/50 */
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Stil za Cancel dugme */
+.modal-btn-reject {
+    background-color: transparent !important;
+    color: #94a3b8 !important;
+    border: 1px solid #3f4052 !important;
+}
+
+.modal-btn-reject:hover {
+    background-color: #2a2b36 !important;
+    color: #f1f5f9 !important;
+}
+
+/* Stil za Confirm dugme */
+.modal-btn-accept {
+    background-color: #f59e0b !important; /* Poklapanje sa tvojom primarnom bojom */
+    color: #ffffff !important;
+}
+
+.modal-btn-accept:hover {
+    background-color: #d97706 !important;
+    transform: translateY(-1px);
+}
+
+.modal-btn-accept:active {
+    transform: translateY(0);
+}
+
+/* Dugmence X u gornjem desnom uglu za brzo zatvaranje */
+.modal-close-x {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #64748b !important;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close-x:hover {
+    color: #f1f5f9 !important;
+    background-color: #2a2b36;
+}
+
+/* Veličina same X ikonice unutar dugmeta */
+.modal-close-x svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* Razmak između inputa u modalu */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Stil za labele u tamnom modalu */
+.modal-body label {
+    display: block;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8; /* Svetlo siva za tamnu temu */
+    margin-bottom: 5px;
+}
+
+/* Prilagođavanje inputa za tamni modal */
+.modal-body input[type="text"],
+.modal-body input[type="password"] {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    background-color: #2a2b36 !important; /* Tamna pozadina za input */
+    border: 1px solid #3f4052 !important;
+    border-radius: 8px;
+    color: #f1f5f9 !important;
+    box-sizing: border-box;
+}
+
+.modal-body input[type="text"]:focus,
+.modal-body input[type="password"]:focus {
+    border-color: #f59e0b !important;
+    outline: none;
+}
