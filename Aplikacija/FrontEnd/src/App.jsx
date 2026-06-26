@@ -94,6 +94,58 @@ export default function App() {
         fetchUnreadNotification()
     }, [currentView])
 
+    //Upozorenje kada korisnik zeli da napusti sajt zato sto je sajt SPA
+    useEffect(() => {
+        const guardKey = "__exitGuard"
+
+        // Ne dodajemo novi guard svaki put kada se uradi reload
+        if (!window.history.state?.[guardKey]) {
+            window.history.replaceState(
+                {
+                    ...window.history.state,
+                    [guardKey]: "base",
+                },
+                "",
+                window.location.href,
+            )
+
+            window.history.pushState(
+                {
+                    [guardKey]: "guard",
+                },
+                "",
+                window.location.href,
+            )
+        }
+
+        function handleBack(event) {
+            if (event.state?.[guardKey] !== "base") return
+
+            const shouldLeave = window.confirm(
+                "Da li sigurno želite da napustite sajt?",
+            )
+
+            if (shouldLeave) {
+                window.removeEventListener("popstate", handleBack)
+                window.history.back()
+            } else {
+                window.history.pushState(
+                    {
+                        [guardKey]: "guard",
+                    },
+                    "",
+                    window.location.href,
+                )
+            }
+        }
+
+        window.addEventListener("popstate", handleBack)
+
+        return () => {
+            window.removeEventListener("popstate", handleBack)
+        }
+    }, [])
+
     //FUNCTIONS
     async function fetchUnreadCount() {
         const response = await authFetch("/Communication/GetMyChats")
@@ -273,6 +325,14 @@ export default function App() {
                         refreshUnreadCount={fetchUnreadCount}
                         friendForChat={friendForChat}
                         clearFriendForChat={() => setFriendForChat(null)}
+                        onUserClick={(friendID) => {
+                            setUserID(friendID)
+                            sessionStorage.setItem(
+                                "viewingUserID",
+                                JSON.stringify(friendID),
+                            )
+                            setCurrentView("profilePage")
+                        }}
                     />
                 </div>
             )}
@@ -296,14 +356,13 @@ export default function App() {
                             setCurrentView("chatPage")
                         }}
                         onUserClick={(friendID) => {
-                            //Tamo gde ce ti treba da odes na page dodas ovo
-                            setUserID(friendID) // Sledeci korak ti je u FriendsPage.jsx
+                            setUserID(friendID)
                             sessionStorage.setItem(
                                 "viewingUserID",
                                 JSON.stringify(friendID),
-                            ) //ovo se stavlja da ja kad refreshujem stranicu idalje
-                            setCurrentView("profilePage") // mogu da nadjem kog treba da gledam
-                        }} // ako imas pitanja za ovo mog ti pojasnim
+                            )
+                            setCurrentView("profilePage")
+                        }}
                     />
                 </div>
             )}
@@ -341,6 +400,7 @@ export default function App() {
                 <NotificationPopup
                     notification={notification}
                     closeNotification={closeNotification}
+                    setCurrentView={setCurrentView}
                 />
             )}
         </div>

@@ -423,8 +423,17 @@ public class SocialController : ControllerBase
                     ProducerID = f.ProducerId,
                     Username = f.Producer!.Username,
                     ProfilePicture = f.Producer.ProfilePicture,
-                    FollowedSince = f.CreatedAt
+                    FollowedSince = f.CreatedAt,
+
+                    ActionsCount = Context.Akcije.Count(a =>
+                        a.ProducerID == f.ProducerId
+                    ),
+
+                    FollowersCount = Context.Follows.Count(follower =>
+                        follower.ProducerId == f.ProducerId
+                    )
                 })
+                .OrderByDescending(user => user.FollowersCount)
                 .ToListAsync();
 
             return Ok(following);

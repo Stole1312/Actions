@@ -73,3 +73,16 @@
     background-color: #dc2626;
     border: 1px solid #dc2626;
 }
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.button-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 3;
+}

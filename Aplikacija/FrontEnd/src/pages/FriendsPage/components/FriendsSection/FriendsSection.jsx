@@ -7,6 +7,7 @@ import {
 import { useState } from "react"
 import { BeatLoader } from "react-spinners"
 import RemoveFriendPopUp from "../RemoveFriendPopUp/RemoveFriendPopUp"
+import FollowingMiniSection from "../FollowingMiniSection/FollowingMiniSection"
 
 export default function FriendsSection(props) {
     //STATES
@@ -106,7 +107,13 @@ export default function FriendsSection(props) {
                 )}
             </main>
 
-            <section className={styles["following-section"]}></section>
+            <section className={styles["following-section"]}>
+                <FollowingMiniSection
+                    topFollowingUsers={props.topFollowingUsers}
+                    setCurrentView={props.setCurrentView}
+                    onUserClick={props.onUserClick}
+                />
+            </section>
         </section>
     )
 }
