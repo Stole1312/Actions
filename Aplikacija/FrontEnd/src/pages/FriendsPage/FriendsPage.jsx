@@ -126,6 +126,8 @@ export default function FriendsPage(props) {
         )
     }
 
+    const topFollowingUsers = followingUsers?.slice(0, 4)
+
     return (
         <div className={styles["friends-page-container"]}>
             <nav className={styles["main-nav-page-container"]}>
@@ -178,9 +180,11 @@ export default function FriendsPage(props) {
                 <FriendsSection
                     number={friends?.length}
                     friends={friends}
+                    topFollowingUsers={topFollowingUsers}
                     openChatWithFriend={props.openChatWithFriend}
                     removeFriend={removeFriend}
                     onUserClick={props.onUserClick}
+                    setCurrentView={setCurrentView}
                 />
             )}
 
@@ -190,6 +194,8 @@ export default function FriendsPage(props) {
                     pendingRequests={pendingRequests}
                     respondFriendRequest={respondFriendRequest}
                     onUserClick={props.onUserClick}
+                    topFollowingUsers={topFollowingUsers}
+                    setCurrentView={setCurrentView}
                 />
             )}
 
@@ -199,6 +205,8 @@ export default function FriendsPage(props) {
                     sentRequests={sentRequests}
                     cancelFriendRequest={cancelFriendRequest}
                     onUserClick={props.onUserClick}
+                    topFollowingUsers={topFollowingUsers}
+                    setCurrentView={setCurrentView}
                 />
             )}
 

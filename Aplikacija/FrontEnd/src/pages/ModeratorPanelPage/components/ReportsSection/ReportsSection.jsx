@@ -37,7 +37,17 @@ export default function ReportsSection(props) {
 
     //VARIABLES
     const reportsElements = props.reports?.map((report) => (
-        <div className={styles["report-card"]} key={report.id}>
+        <div
+            className={styles["report-card"]}
+            key={report.id}
+            style={
+                report.status === 0
+                    ? { borderLeft: "3px solid #F59E0B" }
+                    : report.status === 2
+                      ? { borderLeft: "3px solid #10b981" }
+                      : { borderLeft: "3px solid #ef4444" }
+            }
+        >
             <div className={styles["report-user-container"]}>
                 <img
                     src={report.sender.profilePicture}
@@ -119,20 +129,6 @@ export default function ReportsSection(props) {
                 <FlagIcon className={styles["main-title-icon"]} />
                 <h1>Prijavljeni korisnici</h1>
                 <p>Promeni status klikom na dropdown</p>
-                <div className={styles["reports-search-container"]}>
-                    <MagnifyingGlassIcon
-                        className={styles["reports-search-icon"]}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Pretraži..."
-                        value={searchReportText}
-                        onChange={(event) =>
-                            setSearchReportText(event.target.value)
-                        }
-                        className={styles["reports-search-input"]}
-                    />
-                </div>
             </div>
             <div className={styles["header-container"]}>
                 <p>Prijavio</p>

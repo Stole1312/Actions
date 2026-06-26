@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/24/outline"
 import { formatTimeAgo } from "../formatTimeAgo.js"
 import { BeatLoader } from "react-spinners"
+import FollowingMiniSection from "../FollowingMiniSection/FollowingMiniSection.jsx"
 
 export default function SendedSection(props) {
     //STATES
@@ -82,7 +83,13 @@ export default function SendedSection(props) {
                 )}
             </main>
 
-            <section className={styles["following-section"]}></section>
+            <section className={styles["following-section"]}>
+                <FollowingMiniSection
+                    topFollowingUsers={props.topFollowingUsers}
+                    setCurrentView={props.setCurrentView}
+                    onUserClick={props.onUserClick}
+                />
+            </section>
         </section>
     )
 }

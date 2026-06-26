@@ -98,7 +98,34 @@ export default function ChatPage(props) {
                 return
             }
 
-            setMessages((prevMessages) => [...prevMessages, message])
+            setMessages((prevMessages) => {
+                const currentMessages = prevMessages ?? []
+
+                const messageAlreadyExists = currentMessages.some(
+                    (existingMessage) => existingMessage.id === message.id,
+                )
+
+                if (messageAlreadyExists) {
+                    return currentMessages
+                }
+
+                const pendingMessageIndex = currentMessages.findIndex(
+                    (existingMessage) =>
+                        existingMessage.isPending &&
+                        existingMessage.chatID === message.chatID &&
+                        existingMessage.senderID === message.senderID &&
+                        existingMessage.content === message.content,
+                )
+
+                if (pendingMessageIndex === -1) {
+                    return [...currentMessages, message]
+                }
+
+                const updatedMessages = [...currentMessages]
+                updatedMessages[pendingMessageIndex] = message
+
+                return updatedMessages
+            })
 
             await authFetch(
                 `/Communication/MarkChatAsRead/${selectedChat.id}`,
@@ -181,7 +208,27 @@ export default function ChatPage(props) {
     async function sendMessage(event) {
         event.preventDefault()
 
-        if (!messageText.trim() || !selectedChat) return
+        const content = messageText.trim()
+
+        if (!content || !selectedChat) return
+
+        const temporaryId = crypto.randomUUID()
+
+        const optimisticMessage = {
+            id: temporaryId,
+            chatID: selectedChat.id,
+            senderID: currentUserId,
+            content: content,
+            sent: new Date().toISOString(),
+            isPending: true,
+        }
+
+        setMessages((prevMessages) => [
+            ...(prevMessages ?? []),
+            optimisticMessage,
+        ])
+
+        setMessageText("")
 
         const response = await authFetch("/Communication/SendMessage", {
             method: "POST",
@@ -190,16 +237,34 @@ export default function ChatPage(props) {
             },
             body: JSON.stringify({
                 chatID: selectedChat.id,
-                content: messageText.trim(),
+                content: content,
             }),
         })
 
         if (!response.ok) {
             console.log("Greška pri slanju poruke")
+
+            setMessages((prevMessages) =>
+                prevMessages.filter((message) => message.id !== temporaryId),
+            )
+
+            setMessageText(content)
             return
         }
 
-        setMessageText("")
+        const data = await response.json()
+
+        setMessages((prevMessages) =>
+            prevMessages.map((message) =>
+                message.id === temporaryId
+                    ? {
+                          ...message,
+                          id: data.messageId,
+                          isPending: false,
+                      }
+                    : message,
+            ),
+        )
     }
 
     //VARIABLES
@@ -260,7 +325,6 @@ export default function ChatPage(props) {
         </button>
     ))
 
-    //Navodno vadi ID iz tokena
     const token = localStorage.getItem("token")
     const currentUserId = token
         ? Number(
@@ -272,17 +336,47 @@ export default function ChatPage(props) {
 
     const messagesElements = messages?.map((message, index) => {
         const currentDate = formatMessageDate(message.sent)
-        const previousDate =
-            index > 0 ? formatMessageDate(messages[index - 1].sent) : null
+
+        const previousMessage = index > 0 ? messages[index - 1] : null
+
+        const previousDate = previousMessage
+            ? formatMessageDate(previousMessage.sent)
+            : null
+
         const showDateSeparator = currentDate !== previousDate
+
+        const timeDifference = previousMessage
+            ? new Date(message.sent).getTime() -
+              new Date(previousMessage.sent).getTime()
+            : null
+
+        const showTimeSeparator =
+            previousMessage &&
+            !showDateSeparator &&
+            timeDifference >= 60 * 60 * 1000
+
+        const formattedTime = new Date(message.sent).toLocaleTimeString(
+            "sr-RS",
+            {
+                hour: "2-digit",
+                minute: "2-digit",
+            },
+        )
 
         return (
             <div key={message.id}>
                 {showDateSeparator && (
                     <div className={styles["date-separator"]}>
-                        {currentDate}
+                        {currentDate} · {formattedTime}
                     </div>
                 )}
+
+                {showTimeSeparator && (
+                    <div className={styles["time-separator"]}>
+                        {formattedTime}
+                    </div>
+                )}
+
                 <div
                     className={
                         message.senderID === currentUserId
@@ -299,12 +393,6 @@ export default function ChatPage(props) {
                     >
                         <p>{message.content}</p>
                     </div>
-                    <span>
-                        {new Date(message.sent).toLocaleTimeString("sr-RS", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        })}
-                    </span>
                 </div>
             </div>
         )
@@ -362,7 +450,12 @@ export default function ChatPage(props) {
                     </div>
                 ) : (
                     <>
-                        <div className={styles["chat-window-header"]}>
+                        <div
+                            className={styles["chat-window-header"]}
+                            onClick={() =>
+                                props.onUserClick(selectedChat.otherUser.id)
+                            }
+                        >
                             <img
                                 src={selectedChat.otherUser.profilePicture}
                                 alt=""

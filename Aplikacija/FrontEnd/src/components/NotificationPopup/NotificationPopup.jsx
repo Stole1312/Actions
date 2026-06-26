@@ -30,7 +30,12 @@ export default function NotificationPopup(props) {
 
                 <button
                     className={styles["close-button"]}
-                    onClick={props.closeNotification}
+                    onClick={() => {
+                        props.closeNotification()
+                        notification.type === 2
+                            ? props.setCurrentView("login")
+                            : {}
+                    }}
                 >
                     U redu
                 </button>

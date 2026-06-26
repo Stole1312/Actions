@@ -1,5 +1,9 @@
 import { useState } from "react"
 import styles from "./ProcessReportPopup.module.css"
+import {
+    NoSymbolIcon,
+    ShieldExclamationIcon,
+} from "@heroicons/react/24/outline"
 
 export default function ProcessReportPopup(props) {
     const report = props.reportToProcess
@@ -101,7 +105,16 @@ export default function ProcessReportPopup(props) {
                                         : undefined
                                 }
                             >
-                                {isProcessing ? "Obrada..." : "Upozori"}
+                                {isProcessing ? (
+                                    "Obrada..."
+                                ) : (
+                                    <div className={styles["button-container"]}>
+                                        Upozori
+                                        <ShieldExclamationIcon
+                                            className={styles["button-icon"]}
+                                        />
+                                    </div>
+                                )}
                             </button>
 
                             <button
@@ -116,7 +129,16 @@ export default function ProcessReportPopup(props) {
                                         : undefined
                                 }
                             >
-                                {isProcessing ? "Obrada..." : "Banuj"}
+                                {isProcessing ? (
+                                    "Obrada..."
+                                ) : (
+                                    <div className={styles["button-container"]}>
+                                        Banuj
+                                        <NoSymbolIcon
+                                            className={styles["button-icon"]}
+                                        />
+                                    </div>
+                                )}
                             </button>
                         </div>
                     </>

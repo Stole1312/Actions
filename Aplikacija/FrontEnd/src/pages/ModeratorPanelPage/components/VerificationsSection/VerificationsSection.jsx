@@ -154,9 +154,8 @@ export default function VerificationsSection(props) {
                             <p>Trenutno ne postoje zahtevi za verifikaciju</p>
                         </div>
                     ) : (
-                        reportsElements
+                        verificationElements
                     )}
-                    {verificationElements}
                 </div>
             </section>
 
