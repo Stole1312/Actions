@@ -22,7 +22,11 @@ import CardReview from "../CardReview/CardReview.jsx"
 import Header from "../Header/Header.jsx"
 import { authFetch } from "../../../../api.js"
 
-export default function Main({ handleGoBackClick, setCurrentView }) {
+export default function Main({
+    handleGoBackClick,
+    setCurrentView,
+    setUserAsProducer,
+}) {
     //States
     const [selectedImage, setSelectedImage] = useState(null)
     const [title, setTitle] = useState("")
@@ -201,6 +205,7 @@ export default function Main({ handleGoBackClick, setCurrentView }) {
         })
 
         if (response.ok) {
+            setUserAsProducer()
             setActionCreated(true)
 
             setTimeout(() => {

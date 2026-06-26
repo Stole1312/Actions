@@ -197,6 +197,23 @@ export default function App() {
         await fetchUnreadNotification()
     }
 
+    function setUserAsProducer() {
+        setLoggedUser((previousUser) => {
+            if (!previousUser || previousUser.role !== 0) {
+                return previousUser
+            }
+
+            const updatedUser = {
+                ...previousUser,
+                role: 1,
+            }
+
+            localStorage.setItem("user", JSON.stringify(updatedUser))
+
+            return updatedUser
+        })
+    }
+
     //VARIABLES
     const isProducer = loggedUser?.role === 1
     const isModerator = loggedUser?.role === 2
@@ -260,6 +277,7 @@ export default function App() {
                             setPreviousView("addAction")
                         }}
                         setCurrentView={setCurrentView}
+                        setUserAsProducer={setUserAsProducer}
                     />
                 </div>
             )}
