@@ -3,7 +3,7 @@ import MpHeader from "./components/Header/MpHeader"
 import ActionCard from "../../components/Card/ActionCard" 
 import styles from "./MainPage.module.css"
 
-export default function MainPage(props) {
+export default function MainPage({ onMyProfileClick, onActionClick, mojeAkcije }) {
     const [actionType, setActionType] = useState(null);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -49,7 +49,7 @@ export default function MainPage(props) {
             const url = baseUrl + "/Action/FilterAkcija";
 
             var ProducerID=null
-            if(props.mojeAkcije){
+            if(mojeAkcije){
                 const user = JSON.parse(localStorage.getItem("user"));
                 ProducerID = user.id;
             }
@@ -134,14 +134,14 @@ export default function MainPage(props) {
                 title={title} setTitle={setTitle}
                 onApplyFilters={handleApplyFilters}
                 types={types} setTypes={setTypes}
-                onImageClick={props.onMyProfileClick}
+                onImageClick={onMyProfileClick}
             />
             
             {/* MREŽA KARTICA UNUTAR MAIN TAGA */}
             <main className={styles["cards-grid"]}>
                 {actions.length > 0 ? (
                     actions.map((action) => (
-                        <ActionCard action={action} key={action.id} types={types} mojeAkcije={false}/>
+                        <ActionCard action={action} key={action.id} types={types} mojeAkcije={false} onCardClick={onActionClick}/>
                     ))
                 ) : (
                     <p className={styles["no-results"]}>Nema pronađenih akcija za zadate filtere.</p>

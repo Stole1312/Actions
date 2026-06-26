@@ -5,7 +5,7 @@ import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
 import { act, useEffect, useState } from "react";
 import { authFetch } from "../../api";
 
-export default function ActionCard({ action, types, mojeAkcije}) {
+export default function ActionCard({ action, types, mojeAkcije, onCardClick}) {
 
     const foundType = types.find(t => t.id === action.type);
     const typeName = foundType ? foundType.name : "Ostalo";
@@ -83,6 +83,7 @@ export default function ActionCard({ action, types, mojeAkcije}) {
         console.log(action);
         console.log(`Otvaram detalje za akciju sa ID-jem: ${action.id}`);
         // Ovde će ići ruter: navigate(`/akcija/${action.id}`)
+        if (onCardClick) onCardClick(action)
     };
 
     // Funkcija za prijavu (samo dugme)

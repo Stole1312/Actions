@@ -11,6 +11,7 @@ import ChatPage from "./pages/ChatPage/ChatPage.jsx"
 import FriendsPage from "./pages/FriendsPage/FriendsPage.jsx"
 import ModeratorPanelPage from "./pages/ModeratorPanelPage/ModeratorPanelPage.jsx"
 import NotificationPopup from "./components/NotificationPopup/NotificationPopup.jsx"
+import ActionDetailPage from "./pages/ActionDetailPage/ActionDetailPage"
 
 export default function App() {
     const [currentView, setCurrentView] = useState(() => {
@@ -20,6 +21,7 @@ export default function App() {
     const [previousView, setPreviousView] = useState(() => {
         return localStorage.getItem("previousView")
     })
+    const [selectedAction, setSelectedAction] = useState(null)
 
     //Ovaj state je za unreadMessages za NavBar i za chat
     const [totalUnread, setTotalUnread] = useState(0)
@@ -257,7 +259,11 @@ export default function App() {
                         onMyProfileClick={() => {
                             setCurrentView("myProfilePage")
                         }}
-                        mojeAkcije={false}
+                        onActionClick={(actionObj) => {
+                            setSelectedAction(actionObj)
+                            setPreviousView("main")
+                            setCurrentView("actionDetail")
+                        }}
                     />
                 </div>
             )}
@@ -409,6 +415,22 @@ export default function App() {
                             )
 
                             setPreviousView("moderatorPage")
+                            setCurrentView("profilePage")
+                        }}
+                    />
+                </div>
+            )}
+            
+           {currentView === "actionDetail" && (
+                <div className="app-layout">
+                    <NavBar currentView={currentView} setCurrentView={setCurrentView} totalUnread={totalUnread} role={loggedUser?.role} />
+                    <ActionDetailPage
+                        actionData={selectedAction}
+                        loggedUser={loggedUser}
+                        onBack={() => setCurrentView(previousView || "main")}
+                        onOrganizerClick={(userId) => {
+                            setUserID(userId)
+                            setPreviousView("actionDetail")
                             setCurrentView("profilePage")
                         }}
                     />
