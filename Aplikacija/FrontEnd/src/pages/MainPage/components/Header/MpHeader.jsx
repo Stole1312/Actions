@@ -4,7 +4,9 @@ import {
     MagnifyingGlassIcon, 
     CalendarIcon, 
     MapPinIcon, 
-    BellIcon 
+    BellIcon,
+    XMarkIcon,
+    AdjustmentsHorizontalIcon
 } from "@heroicons/react/24/outline"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -104,6 +106,9 @@ export default function MpHeader(props) {
         setSuggestions([]);
         setShowSuggestions(false);
     };
+
+    //Za burger button
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <header className={styles["header-main-page"]}>
@@ -221,12 +226,45 @@ export default function MpHeader(props) {
                 </div>
 
                 <div className={styles["filters-right-group"]}>
-                    <button 
-                        className={`${styles["sort-button"]} ${props.cheapestFirst ? styles["active"] : ""}`}
-                        onClick={() => props.setCheapestFirst(!props.cheapestFirst)}
-                    >
-                        Najjeftinije prvo
-                    </button>
+                    <div className={styles["burger-menu-container"]}>
+                            <button 
+                                className={styles["burger-toggle-btn"]} 
+                                onClick={() => setIsOpen(!isOpen)}
+                            >
+                                {isOpen ?
+                                    <XMarkIcon className={styles["input-icon-filters"]}/> 
+                                    : 
+                                    <AdjustmentsHorizontalIcon className={styles["input-icon-filters"]}/>
+                                }
+                            </button>
+
+                            {isOpen && (
+                                <div className={styles["burger-dropdown"]}>
+                                    
+                                    <button 
+                                        className={`${styles["sort-button"]} ${props.cheapestFirst ? styles["active"] : ""}`}
+                                        onClick={() => props.setCheapestFirst(!props.cheapestFirst)}
+                                    >
+                                        Najjeftinije prvo
+                                    </button>
+
+                                    <button 
+                                        className={`${styles["sort-button"]} ${props.verifiedFirst ? styles["active"] : ""}`}
+                                        onClick={() => props.setVerifiedFirst(!props.verifiedFirst)}
+                                    >
+                                        Verifikovani prvo
+                                    </button>
+
+                                    <button 
+                                        className={`${styles["sort-button"]} ${props.onlyFollowing ? styles["active"] : ""}`}
+                                        onClick={() => props.setOnlyFollowing(!props.onlyFollowing)}
+                                    >
+                                        Samo one koje pratim
+                                    </button>
+
+                                </div>
+                            )}
+                        </div>
 
                     <button 
                         className={styles["apply-button"]}

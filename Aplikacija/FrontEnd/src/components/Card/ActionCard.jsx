@@ -105,6 +105,24 @@ export default function ActionCard({ action, types, mojeAkcije}) {
 
     };
 
+    const handleUnapplyClick = async (e) => {
+        try{
+            const response = await authFetch(`/Action/UnapplyAkcija/${action.id}`,{
+                method:"DELETE"
+            });
+            if(response.ok){
+                setPrijavljen(false);
+                action.currentNumParticipants-=1;
+            }else {
+                const greskaSaServera = await response.text();
+                alert(`Greška pri odjavi: ${greskaSaServera}`);
+            }
+        } catch (error) {
+            console.error("Mrežna greška pri prijavi:", error.message);
+            alert("Došlo je do greške na serveru.");
+        }
+    };
+
     // Podrazumevana slika ako je actionPicture null
     const fallbackImage = "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=600&auto=format&fit=crop";
 
@@ -132,7 +150,12 @@ export default function ActionCard({ action, types, mojeAkcije}) {
     }
 
     return (
-        <div className={styles["card-container"]} onClick={handleCardClick}>
+        <div className={styles["card-container"]} 
+            onClick={handleCardClick}
+            style={{
+                opacity: action.status === 2 ? 0.5 : 1
+            }}
+        >
             <div className={styles["image-container"]}>
                 <img 
                     src={action.actionPicture || fallbackImage} 
@@ -185,11 +208,27 @@ export default function ActionCard({ action, types, mojeAkcije}) {
                         </span>
                     </div>
 
-                    {(!mojeAkcije && producer?.id !== currentUser.id) ?
-                        <button className={styles["join-button"]} onClick={handleJoinClick}> {prijavljen ? "Prijavljeni ste" : "Prijavi se"}</button>
-                        :
-                        <button className={styles["join-button"]} onClick={console.log("ce ode na detalji akcije")}>Uredi</button>
-                    }
+                    {action.status !== 2 ? (
+                        (!mojeAkcije && producer?.id !== currentUser.id) ? (
+                            (prijavljen ? (
+                                <button className={styles["join-button"]} onClick={handleUnapplyClick}>
+                                    Odjavi se 
+                                </button>)
+                                : 
+                                (<button className={styles["join-button"]} onClick={handleJoinClick}>
+                                    Prijavi se
+                                </button>)
+                            )
+                        ) : (
+                            <button className={styles["join-button"]} onClick={() => console.log("ce ode na detalji akcije")}>
+                                Uredi
+                            </button>
+                        )
+                    ) : (
+                        <button className={styles["join-button"]} onClick={() => console.log("ce ode na detalji akcije")}>
+                            Pregledaj
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

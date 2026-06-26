@@ -240,6 +240,7 @@ export default function App() {
                         onMyProfileClick={() => {
                             setCurrentView("myProfilePage")
                         }}
+                        mojeAkcije={false}
                     />
                 </div>
             )}
@@ -392,6 +393,36 @@ export default function App() {
                             setPreviousView("moderatorPage")
                             setCurrentView("profilePage")
                         }}
+                    />
+                </div>
+            )}
+
+            {notification && (
+                <NotificationPopup
+                    notification={notification}
+                    closeNotification={closeNotification}
+                    setCurrentView={setCurrentView}
+                />
+            )}
+
+            {currentView === "mojeAkcijePage" && (
+                <div className="app-layout">
+                    <NavBar
+                        currentView={currentView}
+                        setCurrentView={setCurrentView}
+                        handleAddActionClick={() => {
+                            setCurrentView("addAction")
+                            setPreviousView("mojeAkcijePage")
+                        }}
+                        selected={"mojeAkcijePage"}
+                        totalUnread={totalUnread}
+                        role={loggedUser?.role}
+                    />
+                    <MainPage
+                        onMyProfileClick={() => {
+                            setCurrentView("myProfilePage")
+                        }}
+                        mojeAkcije={true}
                     />
                 </div>
             )}

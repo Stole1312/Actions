@@ -55,8 +55,17 @@ export default function NavBar(props) {
                     Početna
                 </button>
                 {props.role === 1 && (
-                    <button>
-                        <CalendarIcon className={styles["nav-icons"]} /> Moje
+                    <button onClick={()=> props.setCurrentView("mojeAkcijePage")}
+                        style={
+                            props.selected === "mojeAkcijePage"
+                                ? {
+                                      backgroundColor: "#F59E0B",
+                                    color: "white",
+                                    pointerEvents: "none",
+                                }
+                                : {}
+                    }>
+                        <CalendarIcon className={styles["nav-icons"]}/> Moje
                         Akcije
                     </button>
                 )}

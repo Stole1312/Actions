@@ -16,5 +16,7 @@ namespace Backend.Models
         public int Skip {get;set;}=0; // koliko ce akcija da preskoci - ovo se koristi kad hocu da ucitam nove akcije - prvi put je 0 pa ce bude 9, 18...
         public int Take{get;set;}=9;//koliko akcija da uzima - ako odlucim da uzimam veci/manji sample smo cu ga promenim ovde 
         public int? ProducerID{get;set;}
+        public bool? OnlyFollowing{get;set;}
+        public bool? VerifiedFirst{get;set;}
     }
 }

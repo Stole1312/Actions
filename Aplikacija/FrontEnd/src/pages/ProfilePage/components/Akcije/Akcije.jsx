@@ -40,9 +40,12 @@ export default function Akcije({ userID, akcijeCount, mojeAkcije}) {
         setIsLoading(true);
         try {
             const url = baseUrl + "/Action/FilterAkcija";
+            const token = localStorage.getItem("token");
             const response = await fetch(`${url}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                 },
                 body: JSON.stringify({
                     Title: null,
                     Latitude: -1.0,
@@ -55,7 +58,9 @@ export default function Akcije({ userID, akcijeCount, mojeAkcije}) {
                     CheapestFirst: null,
                     Skip: currentSkip,
                     Take: take,
-                    ProducerID: userID
+                    ProducerID: userID,
+                    OnlyFollowing: false,
+                    VerifiedFirst: false
                 }),
             });
 

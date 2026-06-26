@@ -14,8 +14,7 @@
     padding: 12px 30px;
     gap: 12px;
     border-bottom: 1px solid #e7e5e0;
-    background-color:  white;
-    /* sklonjen margin-bottom da ne pravi belu prazninu pre pozadine */
+    background-color: white;
 }
 
 .search-container {
@@ -80,7 +79,7 @@
 
 .search-container:hover .input-icon,
 .datepicker-container:hover .input-icon {
-    color: #d97706;
+    color: #f59e0b;
 }
 
 .input-icon-dropdown {
@@ -160,15 +159,6 @@
     color: #d97706;
 }
 
-.autocomplete-item strong {
-    font-weight: 600;
-    color: #1a1a1a;
-}
-
-.autocomplete-item:hover strong {
-    color: #d97706;
-}
-
 .country-span {
     font-size: 13px;
     color: #7a7874;
@@ -244,7 +234,6 @@
     cursor: pointer;
 }
 
-/* fiks za pozadinu: prostor pomeren u padding-top umesto margine */
 .lower-header {
     display: flex;
     flex-direction: row;
@@ -284,13 +273,10 @@
     background-color: #ffffff;
     border: 1px solid #e7e5e0;
     border-radius: 20px;
-    outline: none;
     cursor: pointer;
     transition: all 0.2s ease;
     min-width: 160px;
     appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357534e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -301,7 +287,6 @@
     background-color: #ffffff;
     border-color: #d97706;
     color: #1a1a1a;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
 .custom-select:focus {
@@ -348,12 +333,6 @@
     text-align: left;
 }
 
-.custom-input-distance::-webkit-outer-spin-button,
-.custom-input-distance::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
 .distance-suffix {
     position: absolute;
     right: 15px;
@@ -363,41 +342,14 @@
     pointer-events: none;
 }
 
-/* izmenjeno: prebaceno na zelene nijanse */
-.sort-button {
-    background: transparent;
-    border: 1px solid #e7e5e0;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #57534e;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.sort-button:hover {
-    background-color: #ffffff;
-    border-color: #047857; /* tamnija zelena za okvir na hover */
-    color: #1a1a1a;
-}
-
-.sort-button.active {
-    background-color: #10b981; /* tvoja zelena boja */
-    color: #ffffff;
-    border-color: #047857; /* tamnija zelena za okvir aktivnog stanja */
-}
-
 .filters-right-group {
     display: flex;
     align-items: center;
-    gap: 12px; /* razmak između "Najjeftinije prvo" i "Primeni" */
+    gap: 12px;
 }
 
-/* Ako već nisi stilizovao .apply-button, evo predloga da se uklopi */
 .apply-button {
-    background-color: #d97706;
+    background-color: #f59e0b;
     color: white;
     border: none;
     padding: 6px 16px;
@@ -409,5 +361,76 @@
 }
 
 .apply-button:hover {
-    background-color: #b45309;
+    background-color: #d97706;
+}
+
+.burger-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.burger-toggle-btn {
+    background-color: #1a1a1a; 
+    color: white;
+    border: 1px solid #333;
+    padding: 6px 16px;          
+    border-radius: 20px;       
+    font-size: 14px;           
+    font-weight: 500;          
+    cursor: pointer;
+    transition: all 0.2s ease; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.burger-toggle-btn:hover {
+    background-color: #2a2a2a;
+}
+
+.burger-dropdown {
+    position: absolute;
+    top: 125%; 
+    right: 0;                  
+    background-color: #1a1a1a; 
+    border-radius: 20px;       
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 100;
+    min-width: 200px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.sort-button {
+    background: transparent;
+    color: white;              
+    border: none;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 14px;       
+    transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+    background-color: #d97706; 
+    color: white;
+}
+
+.sort-button.active {
+    background-color: #f59e0b;
+    color: white;           
+    font-weight: 600;
+}
+
+.input-icon-filters {
+    width: 14px;
+    height: 15px;
+    color: white;
 }
