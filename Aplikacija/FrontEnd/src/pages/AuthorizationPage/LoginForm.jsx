@@ -1,10 +1,17 @@
 import { useState } from "react"
 import styles from "./Auth.module.css"
+import { Cog6ToothIcon, XMarkIcon } from "@heroicons/react/24/outline"
 
 export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }) {
     const [error, setError] = useState({ field: "", message: "" })
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+
+    const [verificationCode, setVerificationCode]=useState("");
+    const [showChangePassword,setShowChangePassword]=useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordError, setPasswordError] = useState(false);
 
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL
 
@@ -51,6 +58,46 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }) {
                 field: "general",
                 message: "Upps, nešto je puklo. Pokušajte ponovo.",
             })
+        }
+    }
+
+    async function handlePasswordChange() {
+        if(newPassword!==confirmPassword)
+        {
+            setPasswordError(true);
+            return;
+        }
+
+        const response = await fetch(`${baseUrl}/User/ChangePassword/${username}`,{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                VerificationCode: verificationCode.trim(), // State za polje verifikacionog koda
+                NewPassword: newPassword                   // State za novu šifru
+            })
+        });
+        if (!response.ok) {
+            const errorText = await response.text();
+            setError({ field: "username", message: errorText });
+            return;
+        }
+        setVerificationCode("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setPasswordError(false);
+        setShowChangePassword(false);
+    }
+
+    async function handleGetMail() {
+        const response = await fetch(`${baseUrl}/User/SendChangePasswordMail/${username}`,{
+            method:"GET"
+        })
+        if (!response.ok) {
+            const errorText = await response.text();
+            setError({ field: "username", message: errorText });
+            return;
         }
     }
 
@@ -108,7 +155,7 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }) {
                         <span
                             style={{
                                 color: "#DC2626",
-                                fontSize: "12px",
+                                fontSize: "14px",
                                 fontWeight: "bold",
                                 marginBottom: "15px",
                                 display: "block",
@@ -148,13 +195,19 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }) {
                         <span
                             style={{
                                 color: "#DC2626",
-                                fontSize: "12px",
+                                fontSize: "14px",
                                 fontWeight: "bold",
                                 marginBottom: "15px",
                                 display: "block",
                             }}
                         >
-                            {error.message}
+                            Forgot your password?  
+                            <a
+                                href="#"
+                                onClick={()=> {handleGetMail(); setShowChangePassword(true)}}
+                            >
+                                👉 👈 🥺
+                            </a>
                         </span>
                     )}
                 </div>
@@ -173,6 +226,84 @@ export default function LoginForm({ onSwitchToSignUp, onLoginSuccess }) {
                     </a>
                 </p>
             </form>
+            
+            {showChangePassword && (
+                <div className={styles["modal-overlay"]}>
+                    <div className={styles["modal-container"]}>
+                        <div className={styles["modal-header"]}>
+                            <Cog6ToothIcon className={styles["modal-icon"]} />
+                            <h3>Change password</h3>
+                        </div>
+                                                <div className={styles["modal-body"]}>
+                            <p className={styles["modal-instructions"]}>
+                                <strong>Verification code has been sent to your email</strong>
+                            </p>
+
+
+                            <div className={styles["form-group"]}>
+                                <label>Verification Code</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter 6-digit code" 
+                                    required 
+                                    value={verificationCode}
+                                    onChange={(e) =>{
+                                        setVerificationCode(e.target.value)
+                                    }}
+                                />
+                            </div>
+
+
+                            <div className={styles["form-group"]}>
+                                <label>New Password</label>
+                                <input 
+                                    type="password" 
+                                    placeholder="Enter new password" 
+                                    required 
+                                    value={newPassword}
+                                    onChange={(e) =>{
+                                        setNewPassword(e.target.value)
+                                        setPasswordError(false);
+                                    }}
+                                />
+                            </div>
+
+
+                            <div className={styles["form-group"]}>
+                                <label>Confirm New Password</label>
+                                <input 
+                                    type="password" 
+                                    placeholder="Repeat new password" 
+                                    required 
+                                    value={confirmPassword}
+                                    onChange={(e) =>{
+                                        setConfirmPassword(e.target.value)
+                                        setPasswordError(false);
+                                    }}
+                                />
+                                {passwordError && (
+                                    <span style={{ color: "#DC2626", fontSize: "12px", marginTop: "4px", textAlign: "left", fontWeight: "bold" }}>
+                                        Passwords do not match!
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles["modal-actions"]}>
+                            <button className={styles["modal-btn-reject"]} onClick={() => setShowChangePassword(false)}>
+                                Cancel
+                            </button>
+                            <button className={styles["modal-btn-accept"]} onClick={() => { handlePasswordChange();}}>
+                                Confirm
+                            </button>
+                        </div>
+                        
+                        <button className={styles["modal-close-x"]} onClick={() => {setPasswordError(false); setShowChangePassword(false);}}>
+                            <XMarkIcon />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
