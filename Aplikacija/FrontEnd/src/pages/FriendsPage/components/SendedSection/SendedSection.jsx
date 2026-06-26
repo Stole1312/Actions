@@ -5,6 +5,7 @@ import {
     CheckIcon,
     XMarkIcon,
 } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 import { formatTimeAgo } from "../formatTimeAgo.js"
 import { BeatLoader } from "react-spinners"
 import FollowingMiniSection from "../FollowingMiniSection/FollowingMiniSection.jsx"
@@ -29,7 +30,14 @@ export default function SendedSection(props) {
                 onClick={() => props.onUserClick(sr.reciverID)}
             />
             <div className={styles["user-info-container"]}>
-                <p>{sr.receiverUsername}</p>
+                <div className={styles["user-info"]}>
+                    <p>{sr.receiverUsername}</p>
+                    {sr.verificationStatus === 2 && (
+                        <CheckBadgeIcon
+                            className={styles["user-info-verification-icon"]}
+                        />
+                    )}
+                </div>
                 <span>Zahtev poslat {formatTimeAgo(sr.created)}</span>
             </div>
             <div className={styles["request-card-buttons-container"]}>

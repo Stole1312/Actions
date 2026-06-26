@@ -93,6 +93,7 @@ public class SocialController : ControllerBase
                     fr.InitiatorID,
                     InitiatorUsername = fr.Initiator.Username,
                     InitiatorProfilePicture = fr.Initiator.ProfilePicture,
+                    VerificationStatus = fr.Initiator.VerificationStatus,
                     fr.Created,
                     fr.Status
                 })
@@ -171,6 +172,7 @@ public class SocialController : ControllerBase
                     FriendID = f.InitiatorID == currentUserId ? f.ReceiverID : f.InitiatorID,
                     Username = f.InitiatorID == currentUserId ? f.Receiver.Username : f.Initiator.Username,
                     ProfilePicture = f.InitiatorID == currentUserId ? f.Receiver.ProfilePicture : f.Initiator.ProfilePicture,
+                    VerificationStatus = f.InitiatorID == currentUserId ? f.Receiver.VerificationStatus : f.Initiator.VerificationStatus,
                     f.FriendsSince
                 })
                 .ToListAsync();
@@ -227,6 +229,7 @@ public class SocialController : ControllerBase
                     fr.ReciverID,
                     ReceiverUsername = fr.Reciver.Username,
                     ReceiverProfilePicture = fr.Reciver.ProfilePicture,
+                    VerificationStatus = fr.Reciver.VerificationStatus,
                     fr.Created,
                     fr.Status
                 })
@@ -423,6 +426,7 @@ public class SocialController : ControllerBase
                     ProducerID = f.ProducerId,
                     Username = f.Producer!.Username,
                     ProfilePicture = f.Producer.ProfilePicture,
+                    VerificationStatus = f.Producer.VerificationStatus,
                     FollowedSince = f.CreatedAt,
 
                     ActionsCount = Context.Akcije.Count(a =>
@@ -483,6 +487,8 @@ public class SocialController : ControllerBase
                     u.ID,
                     u.Username,
                     u.ProfilePicture,
+
+                    VerificationStatus = u.VerificationStatus,
 
                     IsProducer = u.Role == UserRoles.Producer,
 

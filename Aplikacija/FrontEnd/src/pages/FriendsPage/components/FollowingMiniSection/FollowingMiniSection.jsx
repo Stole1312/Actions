@@ -1,5 +1,6 @@
 import styles from "./FollowingMiniSection.module.css"
 import { StarIcon } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 
 export default function FollowingMiniSection(props) {
     const followingElements = props.topFollowingUsers?.map((tfu) => (
@@ -11,7 +12,14 @@ export default function FollowingMiniSection(props) {
                 onClick={() => props.onUserClick(tfu.producerID)}
             />
             <div className={styles["following-info-container"]}>
-                <h2>{tfu.username}</h2>
+                <div className={styles["user-info"]}>
+                    <h2>{tfu.username}</h2>
+                    {tfu.verificationStatus === 2 && (
+                        <CheckBadgeIcon
+                            className={styles["user-info-verification-icon"]}
+                        />
+                    )}
+                </div>
                 <p>{`${tfu.actionsCount} akcije`}</p>
                 <p>{`${tfu.followersCount} pratioca`}</p>
             </div>
@@ -28,7 +36,13 @@ export default function FollowingMiniSection(props) {
                 <h1>Pratim</h1>
                 <p onClick={() => props.setCurrentView("followingPage")}>Svi</p>
             </div>
-            {followingElements}
+            {props.topFollowingUsers?.length === 0 ? (
+                <div className={styles["no-following"]}>
+                    <p>Trenutno ne pratite ni jednu osobu</p>
+                </div>
+            ) : (
+                followingElements
+            )}
         </div>
     )
 }

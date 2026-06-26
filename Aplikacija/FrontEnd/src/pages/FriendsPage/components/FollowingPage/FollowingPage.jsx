@@ -4,6 +4,7 @@ import {
     MagnifyingGlassIcon,
     MinusCircleIcon,
 } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 import { formatTimeAgo } from "../formatTimeAgo"
 import { BeatLoader } from "react-spinners"
 import { authFetch } from "../../../../api"
@@ -42,7 +43,14 @@ export default function FollowingPage(props) {
                 onClick={() => props.onUserClick(fu.producerID)}
             />
             <div className={styles["following-user-info-container"]}>
-                <p>{fu.username}</p>
+                <div className={styles["user-info"]}>
+                    <p>{fu.username}</p>
+                    {fu.verificationStatus === 2 && (
+                        <CheckBadgeIcon
+                            className={styles["user-info-verification-icon"]}
+                        />
+                    )}
+                </div>
                 <span>{formatTimeAgo(fu.followedSince)}</span>
             </div>
             <button

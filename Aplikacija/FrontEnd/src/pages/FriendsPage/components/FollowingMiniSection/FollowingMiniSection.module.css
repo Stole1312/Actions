@@ -60,7 +60,20 @@
     gap: 3px;
 }
 
-.following-info-container > h2 {
+.user-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-info-verification-icon {
+    width: 15px;
+    height: 15px;
+    color: #f59e0b;
+}
+
+.user-info > h2 {
     margin: 0;
     font-size: 0.813rem;
     font-weight: 600;
@@ -97,5 +110,15 @@
 .following-icon {
     width: 12px;
     height: 12px;
+    color: #78716c;
+}
+
+.no-following {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.875rem;
+    font-weight: 400;
     color: #78716c;
 }

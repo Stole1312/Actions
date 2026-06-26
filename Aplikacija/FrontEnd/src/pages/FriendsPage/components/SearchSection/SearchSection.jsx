@@ -8,6 +8,7 @@ import {
     MinusCircleIcon,
     ClockIcon,
 } from "@heroicons/react/24/outline"
+import { CheckBadgeIcon } from "@heroicons/react/24/solid"
 import { BeatLoader } from "react-spinners"
 import { authFetch } from "../../../../api"
 
@@ -156,7 +157,14 @@ export default function SearchSection(props) {
                 onClick={() => props.onUserClick(user.id)}
             />
             <div className={styles["user-info-container"]}>
-                <p>{user.username}</p>
+                <div className={styles["user-info"]}>
+                    <p>{user.username}</p>
+                    {user.verificationStatus === 2 && (
+                        <CheckBadgeIcon
+                            className={styles["user-info-verification-icon"]}
+                        />
+                    )}
+                </div>
                 <div className={styles["followers-count-container"]}>
                     <UsersIcon className={styles["user-info-icon"]} />
                     <p>Pratioci: {user.followersCount}</p>

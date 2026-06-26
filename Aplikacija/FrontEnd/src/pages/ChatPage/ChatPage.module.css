@@ -218,13 +218,16 @@
     color: #78716c;
 }
 
+.chat-window-header-container {
+    border-bottom: 1px solid #e7e5e0;
+}
+
 .chat-window-header {
     cursor: pointer;
     align-self: flex-start;
     display: flex;
     flex-direction: row;
     height: 60px;
-    border-bottom: 1px solid #e7e5e0;
     align-items: center;
     gap: 10px;
 }
@@ -395,4 +398,106 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.message-content-row {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.message-content-row-mine {
+    justify-content: flex-end;
+}
+
+.message-content-row-other {
+    justify-content: flex-start;
+}
+
+.message-actions {
+    position: relative;
+    flex-shrink: 0;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.15s ease;
+}
+
+.message-content-row-mine:hover .message-actions,
+.message-actions-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.message-options-button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #78716c;
+    cursor: pointer;
+}
+
+.message-options-button:hover {
+    background-color: #f5f4f0;
+    color: #111110;
+}
+
+.message-options-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.message-options-menu {
+    position: absolute;
+    right: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+
+    width: max-content;
+    padding: 6px;
+
+    border: 1px solid #e7e5e0;
+    border-radius: 10px;
+    background-color: white;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.message-options-menu > button {
+    padding: 9px 10px;
+
+    border: none;
+    border-radius: 7px;
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #ef4444;
+    font-size: 0.813rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.message-options-menu > button:hover {
+    background-color: #fef2f2;
+}
+
+.delete-message-icon {
+    width: 15px;
+    height: 15px;
 }
