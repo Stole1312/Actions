@@ -215,31 +215,38 @@ namespace Backend.Controllers
         public async Task<ActionResult> GetClientLocation()
         {
             try
-            {
-                var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-
-                // Ako radiš u lokalu (localhost), IP će biti "::1" ili "127.0.0.1"
-                // Pošto eksterni API-jevi ne mogu da lociraju localhost, ovde stavljamo neku pravu IP adresu radi testiranja u lokalu
-                if (ipAddress == "::1" || ipAddress == "127.0.0.1" || string.IsNullOrEmpty(ipAddress))
                 {
-                    ipAddress = "24.135.132.10"; // Primer prave IP adrese iz Srbije (Niš/Beograd)
+                    var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    using var httpClient = new HttpClient();
+
+                    // Ako sam u lokalu mora zovem ovaj dole API da dobijem moju javnu IP
+                    // u sustinij kad se pusti online da radi bice visak al neka ga
+                    if (ipAddress == "::1" || ipAddress == "127.0.0.1" || string.IsNullOrEmpty(ipAddress))
+                    {
+                        try 
+                        {
+                            ipAddress = await httpClient.GetStringAsync("https://api.ipify.org");
+                        }
+                        catch
+                        {
+                            ipAddress = "24.835.142.10"; // ovo sam stavio na nesto random da bi jasno bilo da je ovaj API crko
+                        }
+                    }
+
+                    // e sad zapravo uzimam lokaciju
+                    var response = await httpClient.GetAsync($"https://freeipapi.com/api/json/{ipAddress}");
+                    
+                    if (!response.IsSuccessStatusCode)
+                        return BadRequest("Nije moguće preuzeti lokaciju sa eksternog servisa.");
+
+                    var content = await response.Content.ReadAsStringAsync();
+                    
+                    return Content(content, "application/json");
                 }
-
-                using var httpClient = new HttpClient();
-
-                var response = await httpClient.GetAsync($"https://freeipapi.com/api/json/{ipAddress}");
-                
-                if (!response.IsSuccessStatusCode)
-                    return BadRequest("Nije moguće preuzeti lokaciju sa eksternog servisa.");
-
-                var content = await response.Content.ReadAsStringAsync();
-                
-                return Content(content, "application/json");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
+                }
         }
 
         // koristi se i za inicijalno ucitavanje akcija
