@@ -7,6 +7,7 @@ using Microsoft.VisualBasic;
 using Backend.DTOs;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Org.BouncyCastle.Bcpg;
 
 namespace Backend.Controllers
 {
@@ -248,7 +249,16 @@ namespace Backend.Controllers
             try
             {
                 var query = Context.Akcije.AsQueryable();
+                var userID = GetCurrentUserId();
 
+                // samo one koje pratim?
+                if(filter.OnlyFollowing.HasValue && filter.OnlyFollowing.Value)
+                {
+                    query = query.Where(a => Context.Follows
+                            .Any(f => f.ConsumerId == userID && f.ProducerId == a.ProducerID));
+                }
+
+                // po organizatoru
                 if(filter.ProducerID.HasValue)
                     query = query.Where(a => a.ProducerID == filter.ProducerID);
 
@@ -268,7 +278,7 @@ namespace Backend.Controllers
 
                 // ovo je obim zemlje u km i ovo ce valjda da ufuli da uzme akcije samo koje su unutar odredjene distance od setovane lokacije
                 
-                if(filter.Latitude>=0 && filter.Latitude>=0 && filter.Distance >=0)
+                if(filter.Latitude!=0 && filter.Longitude!=0 && filter.Distance >=0)
                 {
                     double r = 6371;
 
@@ -281,14 +291,28 @@ namespace Backend.Controllers
                     );
                 }
 
-                // cheapest first
-                if (filter.CheapestFirst.HasValue && filter.CheapestFirst.Value)
-                    query = query.OrderBy(a => a.Price ?? 0)
-                                 .ThenBy(a => a.DTStart)
-                                 .ThenByDescending(a => a.currentNumParticipants ?? 0);
+                IOrderedQueryable<Akcija> orderedQuery;
+
+                // ukoliko je selektovano verifiedFirst prvo ce se po tome gledati
+                if (filter.VerifiedFirst.HasValue && filter.VerifiedFirst.Value)
+                {
+                    orderedQuery = query.OrderByDescending(a => Context.Users
+                            .Where(u => u.ID == a.ProducerID)
+                            .Select(u => u.VerificationStatus==VerifiedStatus.Verified)
+                            .FirstOrDefault());
+                }
                 else
-                    query = query.OrderByDescending(a => a.currentNumParticipants ?? 0)
-                                 .ThenBy(a => a.DTStart);
+                    orderedQuery = query.OrderBy(a => 0);
+
+                // ako je i verifiedFirst i cheapestFirst prvo ce po verifier pa tek onda po cheapes
+                if (filter.CheapestFirst.HasValue && filter.CheapestFirst.Value)
+                    query = orderedQuery.ThenBy(a => a.Price ?? 0)
+                                        .ThenBy(a => a.DTStart)
+                                        .ThenByDescending(a => a.currentNumParticipants ?? 0);
+                // po defaultu prvo po datumu pa po popularnosti
+                else
+                    query = orderedQuery.ThenBy(a => a.DTStart)
+                                        .ThenByDescending(a => a.currentNumParticipants ?? 0);
 
                 int ukupnoPronadjeno = await query.CountAsync();
                 // uzimam 9 akcija nakon sto skipijem kolko vec treba
@@ -376,6 +400,8 @@ namespace Backend.Controllers
                 var deoAkcijeCheck = await Context.DeoAkcije.FirstOrDefaultAsync(d => d.AkcijaID == akcijaID && d.UserID == userID);
                 if(deoAkcijeCheck!=null && deoAkcijeCheck.deniedByOrganizator)
                     return BadRequest("This user is denied by organizer");
+                if(deoAkcijeCheck!=null)
+                    return BadRequest("This user has already applied");
 
                 var deoAkcije = new DeoAkcije
                 {
@@ -400,6 +426,37 @@ namespace Backend.Controllers
                 return BadRequest(e);
             }
         }
+
+        [Authorize]
+        [HttpDelete("UnapplyAkcija/{akcijaID}")]
+        public async Task<ActionResult> UnapplyAkcija(int akcijaID)
+        {
+            try
+                {
+                    var userID = GetCurrentUserId();
+
+                    var ucesce = await Context.DeoAkcije
+                        .FirstOrDefaultAsync(da => da.UserID == userID && da.AkcijaID == akcijaID);
+                    if (ucesce == null)
+                        return NotFound("Korisnik nije prijavljen na ovu akciju.");
+                    Context.DeoAkcije.Remove(ucesce);
+
+                    var akcija = await Context.Akcije.FindAsync(akcijaID);
+                    if (akcija != null && akcija.currentNumParticipants > 0)
+                        akcija.currentNumParticipants--;
+
+                    await Context.SaveChangesAsync();
+
+                    return Ok(new { poruka = "Uspešno ste se odjavili sa akcije." });
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
+                }
+
+        }
+   
+
         [HttpPost("AllApplicants/{akcijaID}")]
         public async Task<ActionResult> AllApplicants(int akcijaID, [FromBody] bool showDenied)
         {

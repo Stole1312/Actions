@@ -12,10 +12,12 @@ export default function MainPage(props) {
     const [distance, setDistance] = useState(10);
     const [cheapestFirst, setCheapestFirst] = useState(false);
     const [title, setTitle] = useState("");
+    const [verifiedFirst, setVerifiedFirst]=useState(false);
+    const [onlyFollowing, setOnlyFollowing]=useState(false);
 
     const [actions, setActions] = useState([]);
     const [skip, setSkip] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(null);
     const [backendMessage, setBackendMessage] = useState("");
     const take = 9;
 
@@ -45,9 +47,21 @@ export default function MainPage(props) {
         
         try {
             const url = baseUrl + "/Action/FilterAkcija";
+
+            var ProducerID=null
+            if(props.mojeAkcije){
+                const user = JSON.parse(localStorage.getItem("user"));
+                ProducerID = user.id;
+            }
+
+            console.log(onlyFollowing);
+            console.log(verifiedFirst);
+            const token = localStorage.getItem("token")
             const response = await fetch(`${url}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
                     Title: title,
                     Latitude: latitude,
@@ -60,7 +74,9 @@ export default function MainPage(props) {
                     CheapestFirst: cheapestFirst,
                     Skip: skipLocal,
                     Take: take,
-                    ProducerID: null
+                    ProducerID: ProducerID,
+                    OnlyFollowing: onlyFollowing,
+                    VerifiedFirst: verifiedFirst
                 }),
             });
 
@@ -113,6 +129,8 @@ export default function MainPage(props) {
                 selectedCoordinates={selectedCoordinates} setSelectedCoordinates={setSelectedCoordinates}
                 distance={distance} setDistance={setDistance}
                 cheapestFirst={cheapestFirst} setCheapestFirst={setCheapestFirst}
+                verifiedFirst={verifiedFirst} setVerifiedFirst={setVerifiedFirst}
+                onlyFollowing={onlyFollowing} setOnlyFollowing={setOnlyFollowing}
                 title={title} setTitle={setTitle}
                 onApplyFilters={handleApplyFilters}
                 types={types} setTypes={setTypes}
@@ -129,12 +147,12 @@ export default function MainPage(props) {
                     <p className={styles["no-results"]}>Nema pronađenih akcija za zadate filtere.</p>
                 )} 
             </main>
-                            { hasMore ? (
+                { (hasMore!=null && hasMore)  ? (
                     <button className={styles["load-more-button"]} onClick={handleLoadMore}>
                         Učitaj još akcija <span className={styles["arrow-down"]}></span>
                     </button>
                 ):(
-                    <p className={styles["no-results"]}>{backendMessage}</p>
+                    ( actions.length>0 &&<p className={styles["no-results"]}>{backendMessage}</p>)
                 )}
         </div>
     )
