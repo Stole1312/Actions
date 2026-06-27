@@ -34,16 +34,20 @@ export default function MainPage({ onMyProfileClick, onActionClick, mojeAkcije }
                 
                 const data = await response.json();
                 setTypes([{ id: null, name: "Sve" }, ...data]);
+                handleGetAkcije(0, false); 
             } catch (error) {
                 console.error("Greška pri povlačenju tipova:", error);
             }
         }
         fetchTypes();
-    }, []);
+    }, [mojeAkcije]);
 
     async function handleGetAkcije(skipLocal,isLoadMore) {
-        const latitude = selectedCoordinates ? selectedCoordinates.lat : null;
-        const longitude = selectedCoordinates ? selectedCoordinates.lng : null;
+        console.log("handleGetAkcije pozvan, ProducerID će biti:", mojeAkcije)
+    
+        const latitude = selectedCoordinates ? selectedCoordinates.lat : -1;
+        const longitude = selectedCoordinates ? selectedCoordinates.lng : -1;
+        console.log("latitude:", latitude, "longitude:", longitude)
         
         try {
             const url = baseUrl + "/Action/FilterAkcija";
@@ -57,33 +61,38 @@ export default function MainPage({ onMyProfileClick, onActionClick, mojeAkcije }
             console.log(onlyFollowing);
             console.log(verifiedFirst);
             const token = localStorage.getItem("token")
+           const requestBody = {
+                Title: title,
+                Latitude: latitude,
+                Longitude: longitude,
+                Distance: distance,
+                Type: actionType,
+                OdKada: startDate,
+                DoKada: endDate,
+                Status: null,
+                CheapestFirst: cheapestFirst,
+                Skip: skipLocal,
+                Take: take,
+                ProducerID: ProducerID,
+                OnlyFollowing: onlyFollowing,
+                VerifiedFirst: verifiedFirst
+            }
+            console.log("Šaljem:", JSON.stringify(requestBody))
+
             const response = await fetch(`${url}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json',
+                headers: { 
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    Title: title,
-                    Latitude: latitude,
-                    Longitude: longitude,
-                    Distance: distance,
-                    Type:actionType,
-                    OdKada: startDate,
-                    DoKada: endDate,
-                    Status: null,
-                    CheapestFirst: cheapestFirst,
-                    Skip: skipLocal,
-                    Take: take,
-                    ProducerID: ProducerID,
-                    OnlyFollowing: onlyFollowing,
-                    VerifiedFirst: verifiedFirst
-                }),
-            });
+                body: JSON.stringify(requestBody)
+            })
 
             if (!response.ok)
                 throw new Error(`Server odgovorio sa statusom: ${response.status}`);
 
             const data = await response.json();
+            console.log("Data:", data)
             setBackendMessage(data.poruka);
             setHasMore(data.imaJos);
 
