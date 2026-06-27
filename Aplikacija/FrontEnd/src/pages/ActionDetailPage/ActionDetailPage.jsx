@@ -295,6 +295,8 @@ async function fetchProducer(producerId) {
     const maxParts = a.maxParticipants || 0
     const currParts = participants.length
     const spotsLeft = maxParts - currParts
+    const isOrganizer = loggedUser?.id === action?.producerID
+    console.log("loggedUser.id:", loggedUser?.id, "producerID:", a.producerID, "isOrganizer:", isOrganizer)
 
     return (
         <div className={styles["page"]}>
@@ -446,11 +448,13 @@ async function fetchProducer(producerId) {
                         <button 
                             className={`${styles["join-btn"]} ${action.status === 2 ? styles["disabled"] : ""} ${joined ? styles["leave-btn"] : ""}`}
                             onClick={handleJoin}
-                            disabled={action.status === 2}
+                            disabled={action.status === 2 || loggedUser?.id === a.producerID}
                         >
                             {action.status === 2 
-                                ? "Akcija je završena" 
-                                : (joined ? "Odjavi se sa akcije" : "Prijavi se na akciju")
+                                ? "Akcija je završena"
+                                : loggedUser?.id === a.producerID
+                                    ? "Ti si organizator"
+                                    : joined ? "Odjavi se sa akcije" : "Prijavi se na akciju"
                             }
                         </button>
                     </div>
