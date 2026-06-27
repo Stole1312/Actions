@@ -5,7 +5,7 @@ import {StarIcon as FilledStarIcon} from "@heroicons/react/24/solid"
 import { act, useEffect, useState } from "react";
 import { authFetch } from "../../api";
 
-export default function ActionCard({ action, types, mojeAkcije, onCardClick}) {
+export default function ActionCard({ action, types, mojeAkcije, onCardClick, onEdit}) {
 
     const foundType = types.find(t => t.id === action.type);
     const typeName = foundType ? foundType.name : "Ostalo";
@@ -221,13 +221,13 @@ export default function ActionCard({ action, types, mojeAkcije, onCardClick}) {
                                 </button>)
                             )
                         ) : (
-                            <button className={styles["join-button"]} onClick={() => console.log("ce ode na detalji akcije")}>
+                            <button className={styles["join-button"]} onClick={(e) => { e.stopPropagation(); onEdit(action); }}>
                                 Uredi
                             </button>
                         )
                     ) : (
-                        <button className={styles["join-button"]} onClick={() => console.log("ce ode na detalji akcije")}>
-                            Pregledaj
+                        <button className={styles["join-button"]} onClick={(e) => { e.stopPropagation(); console.log("onEdit:", onEdit, "action:", action); onEdit(action); }}>
+                            Uredi
                         </button>
                     )}
                 </div>

@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import ProfileOverview from "./components/ProfileOverview/ProfileOverview"
 import ProfileStats from "./components/ProfileStats/ProfileStats";
 import Akcije from "./components/Akcije/Akcije.jsx"
-import style from "./ProfilePage.module.css"
+import styles from "./ProfilePage.module.css"
 import ProfileSkeleton from "./components/LoadingSkeleton/ProfileSkeleton.jsx";
+import EditActionPage from "../EditActionPage/EditActionPage.jsx"
+import ActionDetailPage from "../ActionDetailPage/ActionDetailPage.jsx"
 
 export default function ProfilePage(props){
     const baseUrl = import.meta.env.VITE_BACKEND_API_URL;
-
+    
+    const [viewMode, setViewMode] = useState("list");
+    const [selectedAction, setSelectedAction] = useState(null);
     const [userToShow, setUserToShow] = useState(null)
     const [userStats, setUserStats] = useState(null); 
     const [userToShowID,setUserToShowID] =useState(() => {
@@ -91,23 +95,67 @@ export default function ProfilePage(props){
     
     if (!userToShow || !userStats) {
         return (
-            <div className={style["page-container"]}>
+            <div className={styles["page-container"]}>
                 <ProfileSkeleton/>
             </div>    
         );
     }
 
-    return(
-        <div className={style["page-container"]}>
-            <ProfileOverview 
-                userToShow={userToShow}
-                yourProfile={props.yourProfile}
-                onLogout={props.onLogout}
-                reportTypes ={reportTypes}
-                setZelimRefresh={setZelimRefresh}
-            />
-            <ProfileStats stats={userStats}/>
-            <Akcije userID={userToShow.id} akcijeCount={userStats.akcijeCout} mojeAkcije={props.yourProfile}/>
+    // Funkcija za prelazak u edit mod
+    const handleEditAction = (action) => {
+        setSelectedAction(action);
+        setViewMode("edit");
+    };
+
+    // Funkcija za povratak na listu
+    const handleBackToList = () => {
+        setSelectedAction(null);
+        setViewMode("list");
+    };
+
+    return (
+        <div className={styles["page-container"]}>
+            {viewMode === "edit" ? (
+                // 1. EDIT MOD - formu za izmenu
+                <EditActionPage 
+                    actionData={selectedAction} 
+                    onSave={() => {
+                        // Ovde možeš dodati osvežavanje ako treba
+                        setViewMode("list");
+                    }} 
+                    onCancel={() => setViewMode("list")} 
+                />
+            ) : viewMode === "detail" ? (
+                // 2. DETALJNI PRIKAZ
+                <ActionDetailPage 
+                    actionData={selectedAction} 
+                    onBack={() => setViewMode("list")} 
+                    loggedUser={userToShow}
+                />
+            ) : (
+                // 3. LISTA MOD - Tvoj originalni prikaz profila
+                <>
+                    <ProfileOverview 
+                        userToShow={userToShow}
+                        yourProfile={props.yourProfile}
+                        onLogout={props.onLogout}
+                        reportTypes={reportTypes}
+                        setZelimRefresh={setZelimRefresh}
+                    />
+                    <ProfileStats stats={userStats}/>
+                    
+                    <Akcije 
+                        userID={userToShow.id} 
+                        akcijeCount={userStats.akcijeCout} 
+                        mojeAkcije={props.yourProfile}
+                        onEdit={handleEditAction}
+                        onCardClick={(action) => {
+                            setSelectedAction(action);
+                            setViewMode("detail");
+                        }}
+                    />
+                </>
+            )}
         </div>
-    )
+    );
 }
